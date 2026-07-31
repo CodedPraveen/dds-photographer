@@ -1,11 +1,18 @@
 <!-- BEGIN:nextjs-agent-rules -->
-# This is NOT the Next.js you know
-
-description: don't create isolated worktree, all work do in current directory
-
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
 
 # AGENTS.md
+
+## Architecture Reference
+
+Before implementing any feature:
+
+1. Read the relevant Eraser document.
+2. Review the associated architecture canvas.
+3. Follow the Development Roadmap.
+4. Implement only the current phase.
+5. Never modify the approved architecture without explicit instruction.
+
+The Eraser workspace is the project's primary architecture and planning reference.
 
 # DDS Photographer Website
 
@@ -19,6 +26,8 @@ You are **not** the product designer, UX designer, or architect.
 
 Never redesign, simplify, or replace existing decisions.
 
+Before implementing any feature, review the corresponding Eraser document and architecture canvas. The Eraser workspace contains the project's approved architecture, development roadmap, and implementation rulesq
+
 ---
 
 # Project Root
@@ -27,13 +36,13 @@ The currently opened folder is the project root.
 
 Rules:
 
-* Never create another project.
-* Never create another workspace.
-* Never create an isolated worktree.
-* Never clone the repository.
-* Never create duplicate files outside the current workspace.
-* Never generate code inside temporary directories.
-* Never modify files outside the current project root.
+- Never create another project.
+- Never create another workspace.
+- Never create an isolated worktree.
+- Never clone the repository.
+- Never create duplicate files outside the current workspace.
+- Never generate code inside temporary directories.
+- Never modify files outside the current project root.
 
 Every file must remain inside the currently opened workspace.
 
@@ -58,25 +67,25 @@ If documentation conflicts with code, ask before changing anything.
 
 Always:
 
-* Keep code modular.
-* Prefer reusable components.
-* Follow existing naming conventions.
-* Keep functions small.
-* Keep files focused on one responsibility.
-* Write production-ready code.
-* Optimize for readability first.
-* Remove unused code.
-* Remove unused imports.
-* Keep the codebase clean.
+- Keep code modular.
+- Prefer reusable components.
+- Follow existing naming conventions.
+- Keep functions small.
+- Keep files focused on one responsibility.
+- Write production-ready code.
+- Optimize for readability first.
+- Remove unused code.
+- Remove unused imports.
+- Keep the codebase clean.
 
 Never:
 
-* Rewrite large sections without permission.
-* Refactor unrelated files.
-* Change project architecture.
-* Rename files unless requested.
-* Add unnecessary dependencies.
-* Introduce breaking changes.
+- Rewrite large sections without permission.
+- Refactor unrelated files.
+- Change project architecture.
+- Rename files unless requested.
+- Add unnecessary dependencies.
+- Introduce breaking changes.
 
 ---
 
@@ -117,11 +126,11 @@ Never improve layouts unless explicitly requested.
 
 Do not replace:
 
-* spacing
-* typography
-* animations
-* visual hierarchy
-* interactions
+- spacing
+- typography
+- animations
+- visual hierarchy
+- interactions
 
 The approved design is final.
 
@@ -133,19 +142,19 @@ Your responsibility is implementation only.
 
 Prefer:
 
-* Composition over duplication
-* Reusable utilities
-* Reusable UI
-* Clean imports
-* Predictable folder structure
+- Composition over duplication
+- Reusable utilities
+- Reusable UI
+- Clean imports
+- Predictable folder structure
 
 Avoid:
 
-* Magic numbers
-* Hardcoded values
-* Deep component nesting
-* Large files
-* Unused abstractions
+- Magic numbers
+- Hardcoded values
+- Deep component nesting
+- Large files
+- Unused abstractions
 
 ---
 
@@ -167,9 +176,9 @@ Before installing a package:
 
 Verify:
 
-* Is it actually required?
-* Is it actively maintained?
-* Does the project already have an alternative?
+- Is it actually required?
+- Is it actively maintained?
+- Does the project already have an alternative?
 
 Never install dependencies without a reason.
 
@@ -179,12 +188,12 @@ Never install dependencies without a reason.
 
 Always consider:
 
-* Bundle size
-* Lazy loading
-* Tree shaking
-* Image optimization
-* Accessibility
-* SEO
+- Bundle size
+- Lazy loading
+- Tree shaking
+- Image optimization
+- Accessibility
+- SEO
 
 Never sacrifice performance for convenience.
 
@@ -206,13 +215,13 @@ Do not bypass validation just to make the project compile.
 
 Before finishing any task:
 
-* Build succeeds
-* Lint succeeds
-* No broken imports
-* No duplicate code
-* No unused files
-* No unused imports
-* No obvious performance issues
+- Build succeeds
+- Lint succeeds
+- No broken imports
+- No duplicate code
+- No unused files
+- No unused imports
+- No obvious performance issues
 
 If improvements are obvious, make them before stopping.
 
@@ -222,12 +231,12 @@ If improvements are obvious, make them before stopping.
 
 Never:
 
-* Create new repositories.
-* Create worktrees.
-* Create branches.
-* Commit code.
-* Push code.
-* Rewrite Git history.
+- Create new repositories.
+- Create worktrees.
+- Create branches.
+- Commit code.
+- Push code.
+- Rewrite Git history.
 
 Unless the user explicitly asks.
 
@@ -249,15 +258,14 @@ Never guess.
 
 A task is complete only when:
 
-* Requested functionality is implemented.
-* Existing functionality is preserved.
-* Code is clean.
-* Build passes.
-* Lint passes.
-* Documentation remains valid.
-* No unrelated files were modified.
+- Requested functionality is implemented.
+- Existing functionality is preserved.
+- Code is clean.
+- Build passes.
+- Lint passes.
+- Documentation remains valid.
+- No unrelated files were modified.
 
 Do not continue to the next phase unless explicitly instructed.
-
 
 <!-- END:nextjs-agent-rules -->
