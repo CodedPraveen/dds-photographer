@@ -8,8 +8,8 @@ import styles from "./Services.module.css";
 export function Services({ items }) {
   return (
     <Section className={styles.section} id="services">
-      <Container>
-        <div className={styles.header}>
+      <Container className={styles.content}>
+        <div className={styles.header} data-motion-reveal>
           <Text as="p" className={styles.eyebrow} size="caption" tone="muted">
             Services · temporary content
           </Text>
@@ -18,7 +18,7 @@ export function Services({ items }) {
 
         <ol className={styles.list}>
           {items.map((service, index) => (
-            <li className={styles.item} key={service.title}>
+            <li className={styles.item} data-motion-reveal key={service.title}>
               <Text
                 as="span"
                 className={styles.number}

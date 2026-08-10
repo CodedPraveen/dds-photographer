@@ -1,5 +1,11 @@
 .section {
+  position: relative;
   background: var(--dds-color-background);
+}
+
+.content {
+  position: relative;
+  z-index: var(--dds-z-content);
 }
 
 .header {
@@ -25,6 +31,19 @@
   gap: var(--dds-space-4);
   padding-block: var(--dds-space-8);
   border-bottom: 1px solid var(--dds-color-border);
+  transition: padding-inline var(--dds-motion-normal) var(--dds-ease-out);
+}
+
+@media (hover: hover) {
+  .item:hover {
+    padding-inline: var(--dds-space-4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item {
+    transition: none;
+  }
 }
 
 .number {

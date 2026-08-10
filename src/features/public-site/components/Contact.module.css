@@ -1,6 +1,13 @@
 .section {
+  position: relative;
+  min-height: 80svh;
   background: var(--dds-color-inverse-background);
   color: var(--dds-color-inverse-foreground);
+}
+
+.content {
+  position: relative;
+  z-index: var(--dds-z-content);
 }
 
 .eyebrow {

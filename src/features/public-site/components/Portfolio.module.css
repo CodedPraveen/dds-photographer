@@ -1,5 +1,11 @@
 .section {
+  position: relative;
   background: var(--dds-color-surface);
+}
+
+.content {
+  position: relative;
+  z-index: var(--dds-z-content);
 }
 
 .header {
@@ -30,6 +36,9 @@
   min-height: 0;
   overflow: hidden;
   background: var(--dds-color-border);
+  transition:
+    box-shadow var(--dds-motion-normal) var(--dds-ease-out),
+    transform var(--dds-motion-normal) var(--dds-ease-out);
 }
 
 .portrait {
@@ -67,8 +76,25 @@
 }
 
 @media (hover: hover) {
+  .item:hover {
+    box-shadow: 0 1.25rem 3rem rgb(23 23 23 / 0.12);
+    transform: translateY(-0.25rem);
+  }
+
   .item:hover .image {
     transform: scale(1.02);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item,
+  .image {
+    transition: none;
+  }
+
+  .item:hover,
+  .item:hover .image {
+    transform: none;
   }
 }
 

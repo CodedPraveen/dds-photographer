@@ -10,9 +10,9 @@ import styles from "./About.module.css";
 export function About({ content }) {
   return (
     <Section className={styles.section} id="about">
-      <Container>
+      <Container className={styles.content}>
         <div className={styles.layout}>
-          <div className={styles.copy}>
+          <div className={styles.copy} data-motion-reveal>
             <Text as="p" className={styles.eyebrow} size="caption" tone="muted">
               {content.eyebrow} · temporary content
             </Text>
@@ -28,7 +28,7 @@ export function About({ content }) {
             </div>
           </div>
 
-          <figure className={styles.figure}>
+          <figure className={styles.figure} data-motion-reveal>
             <Image
               alt="Temporary abstract image for the About section"
               className={styles.image}

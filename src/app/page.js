@@ -1,3 +1,4 @@
+import { MotionExperience } from "@/features/motion/components/MotionExperience";
 import { About } from "@/features/public-site/components/About";
 import { Contact } from "@/features/public-site/components/Contact";
 import { Footer } from "@/features/public-site/components/Footer";
@@ -22,8 +23,12 @@ export default function Home() {
         Skip to main content
       </a>
       <Navbar items={publicSiteContent.navigation} />
+      <MotionExperience />
       <main id="main-content">
-        <Hero content={publicSiteContent.hero} />
+        <Hero
+          content={publicSiteContent.hero}
+          items={publicSiteContent.portfolio.slice(0, 4)}
+        />
         <About content={publicSiteContent.about} />
         <Portfolio items={publicSiteContent.portfolio} />
         <Services items={publicSiteContent.services} />

@@ -15,8 +15,8 @@ export function Portfolio({ items }) {
 
   return (
     <Section className={styles.section} id="portfolio">
-      <Container>
-        <div className={styles.header}>
+      <Container className={styles.content}>
+        <div className={styles.header} data-motion-reveal>
           <div>
             <Text as="p" className={styles.eyebrow} size="caption" tone="muted">
               Selected work · temporary imagery
@@ -34,6 +34,7 @@ export function Portfolio({ items }) {
           {activeItems.map((item, index) => (
             <figure
               className={cn(styles.item, styles[item.layout])}
+              data-motion-reveal
               key={item.id}
             >
               <Image

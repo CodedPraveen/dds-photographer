@@ -42,12 +42,36 @@
   reduced-motion support
 - Mobile, tablet, desktop, and large-desktop responsive layouts
 
+### Phase 3 Motion and Interactive Experience
+
+- Single lazy-loaded, demand-rendered React Three Fiber canvas for the
+  persistent camera story
+- Lightweight procedural camera development model with front lens, rear LCD,
+  studio lighting, responsive scale, and an HTML/WebGL failure fallback
+- One GSAP/ScrollTrigger camera journey tied to document progress with scoped
+  and cleaned-up section timelines
+- Sticky Hero handoff from the existing camera/LCD image into a layered
+  photo-stack reveal
+- Curved, upward photo paths using transform-only horizontal and vertical
+  keyframes, controlled stacking, and progressive opacity
+- Camera handoff and persistent states across About, Portfolio, Services, and
+  Contact without introducing an unapproved Experience section
+- Accessible section reveals that keep content in the accessibility tree
+- Restrained Portfolio lift/scale and Services spacing feedback using CSS
+- Contact camera emphasis and a reversible, pointer-transparent shutter ending
+- Mobile-scaled camera placement, reduced Hero travel, and verified responsive
+  layouts at 390px, 768px, 1280px, and 1600px
+- `prefers-reduced-motion` path that omits the 3D scene and GSAP choreography
+  while preserving the complete static website
+
 ### Temporary Phase 2 Content
 
 - Centralized replaceable copy and link data in the public-site feature
 - Local neutral SVG assets under `public/placeholders/`
 - Visible temporary labels that prevent placeholder details from being
   presented as verified business information
+- Procedural development camera used until an approved optimized GLB and
+  compressed textures are supplied
 
 ## Not Implemented
 
@@ -62,12 +86,13 @@
 - Notifications or sharing workflows
 - Payments
 - Analytics
-- Three.js scenes
-- GSAP or Framer Motion page animations
+- Approved sub-100k-triangle production camera GLB and validated environment
+  texture (the concurrent candidate model exceeds the approved triangle budget)
+- Framer Motion component animations (not required by the implemented Phase 3
+  interactions)
 
 ## Deferred / Future
 
-- Phase 3: motion and interactive experience
 - Phase 4: private gallery platform, authentication, QR access, and media
   delivery
 - Phase 5: admin dashboard, production hardening, analytics, and deployment

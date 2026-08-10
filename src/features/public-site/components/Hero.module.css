@@ -1,13 +1,15 @@
 .hero {
   position: relative;
-  min-height: 100svh;
-  overflow: hidden;
+  min-height: 260svh;
+  overflow: clip;
   background: var(--dds-color-inverse-background);
   color: var(--dds-color-inverse-foreground);
 }
 
 .container {
-  position: relative;
+  position: sticky;
+  top: 0;
+  z-index: var(--dds-z-content);
   display: grid;
   min-height: 100svh;
   align-items: center;
@@ -49,9 +51,13 @@
 
 .cameraFallback {
   position: relative;
-  z-index: var(--dds-z-base);
+  z-index: var(--dds-z-content);
   width: min(100%, 42rem);
   margin-inline: auto;
+}
+
+.cameraShell {
+  position: relative;
 }
 
 .cameraTop {
@@ -69,6 +75,36 @@
   border-radius: var(--dds-radius-lg);
   background: #232323;
   box-shadow: 0 2rem 7rem rgb(0 0 0 / 0.48);
+}
+
+.photoStack {
+  position: absolute;
+  inset: 3.2rem var(--dds-space-6) auto;
+  aspect-ratio: 16 / 10;
+  pointer-events: none;
+}
+
+.photoCard {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border: 0.35rem solid rgb(247 246 242 / 0.92);
+  background: #111;
+  box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 0.36);
+  transform: translateZ(0);
+  will-change: transform, opacity;
+}
+
+.photoCard:first-child {
+  visibility: hidden;
+}
+
+.photoCard:not(:first-child) {
+  opacity: 0;
+}
+
+.stackImage {
+  object-fit: cover;
 }
 
 .viewfinder {
@@ -128,5 +164,38 @@
   .scrollCue {
     position: absolute;
     inset: auto auto var(--dds-space-8) var(--dds-container-padding);
+  }
+}
+
+@media (max-width: 47.99rem) {
+  .hero {
+    min-height: 220svh;
+  }
+
+  .container {
+    align-content: center;
+    gap: var(--dds-space-8);
+  }
+
+  .copy {
+    max-width: 32rem;
+  }
+
+  .cameraFallback {
+    width: min(86vw, 31rem);
+  }
+
+  .caption {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero {
+    min-height: 100svh;
+  }
+
+  .photoCard:not(:first-child) {
+    display: none;
   }
 }

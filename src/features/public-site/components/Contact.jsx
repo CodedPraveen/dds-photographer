@@ -9,15 +9,21 @@ import styles from "./Contact.module.css";
 export function Contact({ content }) {
   return (
     <Section className={styles.section} id="contact">
-      <Container>
-        <Text as="p" className={styles.eyebrow} size="caption" tone="inverse">
+      <Container className={styles.content}>
+        <Text
+          as="p"
+          className={styles.eyebrow}
+          data-motion-reveal
+          size="caption"
+          tone="inverse"
+        >
           {content.eyebrow} · temporary details
         </Text>
         <div className={styles.layout}>
-          <Heading as="h2" className={styles.title}>
+          <Heading as="h2" className={styles.title} data-motion-reveal>
             {content.title}
           </Heading>
-          <div className={styles.details}>
+          <div className={styles.details} data-motion-reveal>
             <Text as="p" className={styles.description} tone="inverse">
               {content.description}
             </Text>

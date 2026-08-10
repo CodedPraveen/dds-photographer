@@ -6,11 +6,11 @@ import { Text } from "@/components/ui/typography/Text";
 
 import styles from "./Hero.module.css";
 
-export function Hero({ content }) {
+export function Hero({ content, items }) {
   return (
-    <section className={styles.hero} id="home">
+    <section className={styles.hero} data-motion-hero id="home">
       <Container className={styles.container}>
-        <div className={styles.copy}>
+        <div className={styles.copy} data-motion-hero-copy>
           <Text as="p" className={styles.eyebrow} size="caption" tone="inverse">
             {content.eyebrow}
           </Text>
@@ -27,23 +27,44 @@ export function Hero({ content }) {
         </div>
 
         <figure className={styles.cameraFallback}>
-          <div className={styles.cameraTop} aria-hidden="true" />
-          <div className={styles.cameraBody}>
-            <div className={styles.viewfinder}>
-              <Image
-                alt={content.imageAlt}
-                className={styles.image}
-                fill
-                priority
-                sizes="(max-width: 767px) 88vw, (max-width: 1279px) 52vw, 46vw"
-                src={content.image}
-              />
+          <div className={styles.cameraShell} data-motion-camera-fallback>
+            <div className={styles.cameraTop} aria-hidden="true" />
+            <div className={styles.cameraBody}>
+              <div className={styles.viewfinder}>
+                <Image
+                  alt={content.imageAlt}
+                  className={styles.image}
+                  fill
+                  priority
+                  sizes="(max-width: 767px) 88vw, (max-width: 1279px) 52vw, 46vw"
+                  src={content.image}
+                />
+              </div>
+              <span aria-hidden="true" className={styles.dial} />
             </div>
-            <span aria-hidden="true" className={styles.dial} />
           </div>
+
+          <div aria-label="Featured photographs" className={styles.photoStack}>
+            {items.map((item, index) => (
+              <figure
+                className={styles.photoCard}
+                data-motion-photo
+                key={item.id}
+              >
+                <Image
+                  alt={item.altText}
+                  className={styles.stackImage}
+                  fill
+                  loading={index === 0 ? "eager" : "lazy"}
+                  sizes="(max-width: 767px) 74vw, 34vw"
+                  src={item.mediaUrl}
+                />
+              </figure>
+            ))}
+          </div>
+
           <figcaption className={styles.caption}>
-            Static Phase 2 camera fallback · interactive camera deferred to
-            Phase 3
+            Interactive camera preview · temporary local photography
           </figcaption>
         </figure>
 

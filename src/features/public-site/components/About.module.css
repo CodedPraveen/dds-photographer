@@ -1,5 +1,11 @@
 .section {
+  position: relative;
   background: var(--dds-color-background);
+}
+
+.content {
+  position: relative;
+  z-index: var(--dds-z-content);
 }
 
 .layout {
