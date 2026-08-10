@@ -1,12 +1,17 @@
 {
-  "name": "dds",
+  "name": "dds-photographer",
   "version": "0.1.0",
   "private": true,
+  "description": "Premium photographer business website with private client galleries",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "format:check:foundation": "prettier --check \"src/**/*.{js,jsx,css}\" \"*.{js,mjs,json}\" README.md docs/design-system/design/TOKENS.md docs/design-system/development/CURRENT_TASK.md docs/design-system/production/IMPLEMENTATION_STATUS.md docs/design-system/production/IMPLEMENTED_FEATURES.md docs/design-system/production/ENVIRONMENTS.md"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",
@@ -29,6 +34,9 @@
     "@tailwindcss/postcss": "^4",
     "eslint": "^9",
     "eslint-config-next": "^16.2.12",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "prettier": "^3.6.2",
     "tailwindcss": "^4"
   }
 }

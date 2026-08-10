@@ -1,0 +1,17 @@
+.section {
+  position: relative;
+  padding-block: var(--dds-space-16);
+}
+
+/* Custom properties cannot be used in media conditions; these mirror the approved md/lg breakpoint tokens. */
+@media (min-width: 48rem) {
+  .section {
+    padding-block: var(--dds-space-24);
+  }
+}
+
+@media (min-width: 64rem) {
+  .section {
+    padding-block: var(--dds-space-32);
+  }
+}

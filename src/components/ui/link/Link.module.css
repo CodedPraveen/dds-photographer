@@ -1,0 +1,26 @@
+.link {
+  color: inherit;
+  font-weight: var(--dds-font-weight-medium);
+  text-decoration-line: underline;
+  text-decoration-thickness: from-font;
+  text-underline-offset: 0.2em;
+  transition: opacity var(--dds-motion-fast) var(--dds-ease-out);
+}
+
+.default {
+  color: var(--dds-color-foreground);
+}
+
+.muted {
+  color: var(--dds-color-muted);
+}
+
+.inverse {
+  color: var(--dds-color-inverse-foreground);
+}
+
+@media (hover: hover) {
+  .link:hover {
+    opacity: 0.7;
+  }
+}

@@ -2,6 +2,8 @@ import "./globals.css";
 
 import { Manrope } from "next/font/google";
 
+import { siteConfig } from "@/config/site";
+
 const manrope = Manrope({
   variable: "--font-manrope",
   display: "swap",
@@ -11,9 +13,9 @@ const manrope = Manrope({
 });
 
 export const metadata = {
-  title: "DDS Photographer",
-  description:
-    "Premium photography studio and private client gallery platform.",
+  metadataBase: siteConfig.url,
+  title: siteConfig.name,
+  description: siteConfig.description,
 };
 
 export default function RootLayout({ children }) {

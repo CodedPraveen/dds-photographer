@@ -15,6 +15,17 @@
 - Foundation-level focus, media, selection, and reduced-motion defaults
 - Project implementation-status documentation
 
+### Phase 1B Foundation
+
+- Generic Container and Section layout primitives
+- Generic Heading and Text typography primitives
+- Accessible Button, Link, and VisuallyHidden primitives
+- Class-name merging and external-URL detection utilities
+- Centralized site URL and metadata configuration
+- ESLint, Prettier, EditorConfig, and import-ordering foundation
+- Safe `.env.example` containing only the current public site URL
+- Developer setup and environment documentation
+
 ## Not Implemented
 
 - Marketing website sections: Navbar, Hero, About, Portfolio, Services,
@@ -34,8 +45,6 @@
 
 ## Deferred / Future
 
-- Phase 1B: base UI primitives, shared utilities, and the remaining developer
-  foundation
 - Phase 2: public marketing website
 - Phase 3: motion and interactive experience
 - Phase 4: private gallery platform, authentication, QR access, and media

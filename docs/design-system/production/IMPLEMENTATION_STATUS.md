@@ -2,22 +2,23 @@
 
 > **Project:** DDS Photographer
 >
-> **Current stage:** Phase 1 — Foundation
+> **Current stage:** Phase 1 — Complete
 >
-> **Completed work:** Phase 1A — Foundation, Part 1
+> **Completed work:** Phase 1A and Phase 1B
 >
 > **Last verified:** 2026-08-11
 
 ## Current Implementation
 
-The repository started from a fresh Next.js starter and now includes the Phase
-1A foundation. The application uses Next.js 16, React 19, JavaScript, Tailwind
-CSS v4, and the App Router under `src/app/`.
+The repository started from a fresh Next.js starter and now includes the full
+Phase 1 foundation. The application uses Next.js 16, React 19, JavaScript,
+Tailwind CSS v4, and the App Router under `src/app/`.
 
-Phase 1A establishes project configuration, folder boundaries, centralized
-design tokens, global styles, Manrope typography, and truthful project status
-documentation. No DDS Photographer website section or platform feature has
-been implemented.
+Phase 1 establishes project configuration, folder boundaries, centralized
+design tokens, global styles, Manrope typography, generic UI primitives,
+focused shared utilities, developer tooling, environment handling, and
+truthful project documentation. No DDS Photographer website section or
+platform feature has been implemented.
 
 ## Phase Status
 
@@ -25,7 +26,7 @@ been implemented.
 | ------------------------------------------- | ----------- |
 | Phase 0 — Architecture and baseline audit   | Complete    |
 | Phase 1A — Foundation, Part 1               | Complete    |
-| Phase 1B — Foundation, Part 2               | Next        |
+| Phase 1B — Foundation, Part 2               | Complete    |
 | Phase 2 — Marketing website                 | Not started |
 | Phase 3 — Motion and interactive experience | Not started |
 | Phase 4 — Private gallery platform          | Not started |
@@ -38,6 +39,12 @@ been implemented.
 - Manrope is the only approved font family; weights `400`, `500`, `600`, and
   `700` are loaded, with `600` used for semibold typography.
 - Design tokens are centralized in `src/styles/tokens.css`.
+- Generic UI primitives live under `src/components/ui/` and contain no feature
+  logic.
+- Foundation utilities live under `src/lib/`; site configuration lives under
+  `src/config/`.
+- `NEXT_PUBLIC_SITE_URL` is the only Phase 1 environment variable.
+- ESLint, Prettier, EditorConfig, and import ordering are configured.
 - The Eraser workspace defines future architecture and workflows; it does not
   prove those features are implemented.
 - Actual implementation claims must be supported by repository code and Git
@@ -45,5 +52,5 @@ been implemented.
 
 ## Known Issues and Blockers
 
-There are no known blockers for Phase 1A. Uncommitted work that predates Phase
-1A must continue to be treated as user work and reviewed independently.
+There are no known blockers for Phase 1. Uncommitted work that predates Phase 1B
+must continue to be treated as user work and reviewed independently.
