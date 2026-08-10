@@ -1,0 +1,50 @@
+.section {
+  background: var(--dds-color-inverse-background);
+  color: var(--dds-color-inverse-foreground);
+}
+
+.eyebrow {
+  margin-bottom: var(--dds-space-8);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.layout {
+  display: grid;
+  gap: var(--dds-space-12);
+}
+
+.title {
+  max-width: 12ch;
+}
+
+.details {
+  display: grid;
+  align-content: end;
+  gap: var(--dds-space-8);
+}
+
+.description {
+  max-width: 35rem;
+  color: rgb(247 246 242 / 0.68);
+}
+
+.address {
+  display: grid;
+  gap: var(--dds-space-3);
+  font-style: normal;
+}
+
+.address a {
+  width: fit-content;
+  font-size: var(--dds-font-size-h3);
+  font-weight: var(--dds-font-weight-medium);
+  letter-spacing: var(--dds-letter-spacing-heading);
+}
+
+@media (min-width: 48rem) {
+  .layout {
+    grid-template-columns: minmax(0, 1.1fr) minmax(22rem, 0.9fr);
+    gap: var(--dds-space-16);
+  }
+}

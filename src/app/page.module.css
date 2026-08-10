@@ -1,0 +1,15 @@
+.skipLink {
+  position: fixed;
+  inset: var(--dds-space-2) auto auto var(--dds-space-2);
+  z-index: var(--dds-z-toast);
+  padding: var(--dds-space-3) var(--dds-space-4);
+  border-radius: var(--dds-radius-sm);
+  background: var(--dds-color-surface);
+  color: var(--dds-color-foreground);
+  font-weight: var(--dds-font-weight-medium);
+  transform: translateY(-150%);
+}
+
+.skipLink:focus {
+  transform: translateY(0);
+}

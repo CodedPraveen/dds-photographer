@@ -1,0 +1,132 @@
+.hero {
+  position: relative;
+  min-height: 100svh;
+  overflow: hidden;
+  background: var(--dds-color-inverse-background);
+  color: var(--dds-color-inverse-foreground);
+}
+
+.container {
+  position: relative;
+  display: grid;
+  min-height: 100svh;
+  align-items: center;
+  gap: var(--dds-space-12);
+  padding-block: var(--dds-space-32) var(--dds-space-20);
+}
+
+.copy {
+  position: relative;
+  z-index: var(--dds-z-content);
+  max-width: 48rem;
+}
+
+.eyebrow {
+  margin-bottom: var(--dds-space-6);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.title {
+  max-width: 10ch;
+}
+
+.description {
+  margin-top: var(--dds-space-6);
+  color: rgb(247 246 242 / 0.72);
+}
+
+.cta {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: var(--dds-space-3);
+  margin-top: var(--dds-space-8);
+  color: inherit;
+  font-weight: var(--dds-font-weight-medium);
+  text-decoration: none;
+}
+
+.cameraFallback {
+  position: relative;
+  z-index: var(--dds-z-base);
+  width: min(100%, 42rem);
+  margin-inline: auto;
+}
+
+.cameraTop {
+  width: 46%;
+  height: 2.75rem;
+  margin-inline: auto;
+  border-radius: var(--dds-radius-lg) var(--dds-radius-lg) 0 0;
+  background: #2a2a2a;
+}
+
+.cameraBody {
+  position: relative;
+  padding: var(--dds-space-6);
+  border: 1px solid rgb(247 246 242 / 0.2);
+  border-radius: var(--dds-radius-lg);
+  background: #232323;
+  box-shadow: 0 2rem 7rem rgb(0 0 0 / 0.48);
+}
+
+.viewfinder {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border: 0.45rem solid #0b0b0b;
+  border-radius: var(--dds-radius-sm);
+  background: #111;
+}
+
+.image {
+  object-fit: cover;
+}
+
+.dial {
+  position: absolute;
+  inset: var(--dds-space-4) var(--dds-space-4) auto auto;
+  width: 1.25rem;
+  aspect-ratio: 1;
+  border: 1px solid rgb(247 246 242 / 0.25);
+  border-radius: 50%;
+  background: #171717;
+}
+
+.caption {
+  max-width: 35rem;
+  margin: var(--dds-space-4) auto 0;
+  color: rgb(247 246 242 / 0.5);
+  font-size: var(--dds-font-size-caption);
+  line-height: var(--dds-line-height-caption);
+  text-align: center;
+}
+
+.scrollCue {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--dds-space-2);
+  width: fit-content;
+  color: rgb(247 246 242 / 0.72);
+  font-size: var(--dds-font-size-caption);
+  letter-spacing: 0.12em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+@media (min-width: 64rem) {
+  .container {
+    grid-template-columns: minmax(0, 1fr) minmax(28rem, 0.9fr);
+    padding-block: var(--dds-space-32);
+  }
+
+  .cameraFallback {
+    width: 100%;
+  }
+
+  .scrollCue {
+    position: absolute;
+    inset: auto auto var(--dds-space-8) var(--dds-container-padding);
+  }
+}

@@ -26,10 +26,32 @@
 - Safe `.env.example` containing only the current public site URL
 - Developer setup and environment documentation
 
+### Phase 2 Public Website
+
+- Responsive floating Navbar with documented navigation items and mobile menu
+- Static Phase 2 Hero with camera-inspired fallback composition and primary CTA
+- Editorial About section using temporary neutral copy and local media
+- Disciplined responsive portfolio wall with configurable local item data,
+  ordered rendering, mixed aspect ratios, optimized images, lazy loading, and
+  descriptive alt text
+- Four-service presentation using temporary neutral content
+- Accessible Contact section with clearly marked placeholder details
+- Responsive Footer with navigation, services, contact, social-link previews,
+  and a disabled newsletter UI that does not imply backend functionality
+- Page-level metadata, skip navigation, semantic landmarks, visible focus, and
+  reduced-motion support
+- Mobile, tablet, desktop, and large-desktop responsive layouts
+
+### Temporary Phase 2 Content
+
+- Centralized replaceable copy and link data in the public-site feature
+- Local neutral SVG assets under `public/placeholders/`
+- Visible temporary labels that prevent placeholder details from being
+  presented as verified business information
+
 ## Not Implemented
 
-- Marketing website sections: Navbar, Hero, About, Portfolio, Services,
-  Contact, Footer, and Testimonials
+- Testimonials (explicitly excluded from Phase 2)
 - Private client gallery and gallery routing
 - Authentication or access control
 - Admin dashboard
@@ -45,7 +67,6 @@
 
 ## Deferred / Future
 
-- Phase 2: public marketing website
 - Phase 3: motion and interactive experience
 - Phase 4: private gallery platform, authentication, QR access, and media
   delivery

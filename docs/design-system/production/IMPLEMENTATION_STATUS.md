@@ -2,23 +2,27 @@
 
 > **Project:** DDS Photographer
 >
-> **Current stage:** Phase 1 — Complete
+> **Current stage:** Phase 2 — Complete
 >
-> **Completed work:** Phase 1A and Phase 1B
+> **Completed work:** Phase 1A, Phase 1B, and Phase 2
 >
 > **Last verified:** 2026-08-11
 
 ## Current Implementation
 
-The repository started from a fresh Next.js starter and now includes the full
-Phase 1 foundation. The application uses Next.js 16, React 19, JavaScript,
+The repository includes the full Phase 1 foundation and the Phase 2 public
+marketing website. The application uses Next.js 16, React 19, JavaScript,
 Tailwind CSS v4, and the App Router under `src/app/`.
 
-Phase 1 establishes project configuration, folder boundaries, centralized
-design tokens, global styles, Manrope typography, generic UI primitives,
-focused shared utilities, developer tooling, environment handling, and
-truthful project documentation. No DDS Photographer website section or
-platform feature has been implemented.
+Phase 2 implements the public Navbar, Hero, About, Portfolio, Services,
+Contact, and Footer sections. The page is server-rendered by default, with a
+small client boundary limited to the responsive navigation menu and scroll
+state. The portfolio uses local static data and Next.js Image rendering.
+
+Final production copy and photography were unavailable during implementation.
+Phase 2 therefore uses clearly labeled, local temporary content and SVG media
+under `public/placeholders/`. The placeholder data is centralized so approved
+content can replace it without redesigning the sections.
 
 ## Phase Status
 
@@ -27,7 +31,7 @@ platform feature has been implemented.
 | Phase 0 — Architecture and baseline audit   | Complete    |
 | Phase 1A — Foundation, Part 1               | Complete    |
 | Phase 1B — Foundation, Part 2               | Complete    |
-| Phase 2 — Marketing website                 | Not started |
+| Phase 2 — Marketing website                 | Complete    |
 | Phase 3 — Motion and interactive experience | Not started |
 | Phase 4 — Private gallery platform          | Not started |
 | Phase 5 — Admin dashboard and production    | Not started |
@@ -49,8 +53,17 @@ platform feature has been implemented.
   prove those features are implemented.
 - Actual implementation claims must be supported by repository code and Git
   history.
+- Phase 2 includes only lightweight CSS transitions and navigation behavior.
+  The interactive camera, scroll-linked reveals, and cinematic transition
+  system remain Phase 3 work.
+- Testimonials are explicitly excluded from the approved Phase 2 scope.
 
 ## Known Issues and Blockers
 
-There are no known blockers for Phase 1. Uncommitted work that predates Phase 1B
-must continue to be treated as user work and reviewed independently.
+There are no known Phase 2 blockers. Final photography, biography, contact
+details, and social links must replace the clearly marked temporary content
+before production publishing.
+
+The repository-wide Prettier check reports pre-existing formatting differences
+across legacy documentation. Phase 2 implementation files pass targeted
+formatting validation; unrelated legacy files were not rewritten.
