@@ -1,0 +1,172 @@
+@theme inline {
+  --font-sans: var(--font-manrope);
+
+  --color-background: var(--dds-color-background);
+  --color-foreground: var(--dds-color-foreground);
+  --color-muted: var(--dds-color-muted);
+  --color-surface: var(--dds-color-surface);
+  --color-border: var(--dds-color-border);
+  --color-inverse-background: var(--dds-color-inverse-background);
+  --color-inverse-foreground: var(--dds-color-inverse-foreground);
+  --color-focus: var(--dds-color-focus);
+  --color-error: var(--dds-color-error);
+  --color-success: var(--dds-color-success);
+  --color-warning: var(--dds-color-warning);
+
+  --text-display: var(--dds-font-size-display);
+  --text-display--line-height: var(--dds-line-height-display);
+  --text-h1: var(--dds-font-size-h1);
+  --text-h1--line-height: var(--dds-line-height-h1);
+  --text-h2: var(--dds-font-size-h2);
+  --text-h2--line-height: var(--dds-line-height-h2);
+  --text-h3: var(--dds-font-size-h3);
+  --text-h3--line-height: var(--dds-line-height-h3);
+  --text-body: var(--dds-font-size-body);
+  --text-body--line-height: var(--dds-line-height-body);
+  --text-small: var(--dds-font-size-small);
+  --text-small--line-height: var(--dds-line-height-small);
+  --text-caption: var(--dds-font-size-caption);
+  --text-caption--line-height: var(--dds-line-height-caption);
+
+  --spacing-1: var(--dds-space-1);
+  --spacing-2: var(--dds-space-2);
+  --spacing-3: var(--dds-space-3);
+  --spacing-4: var(--dds-space-4);
+  --spacing-6: var(--dds-space-6);
+  --spacing-8: var(--dds-space-8);
+  --spacing-12: var(--dds-space-12);
+  --spacing-16: var(--dds-space-16);
+  --spacing-20: var(--dds-space-20);
+  --spacing-24: var(--dds-space-24);
+  --spacing-32: var(--dds-space-32);
+  --spacing-40: var(--dds-space-40);
+
+  --breakpoint-sm: 40rem;
+  --breakpoint-md: 48rem;
+  --breakpoint-lg: 64rem;
+  --breakpoint-xl: 80rem;
+  --breakpoint-2xl: 96rem;
+
+  --container-page: var(--dds-container-max);
+
+  --radius-none: var(--dds-radius-none);
+  --radius-xs: var(--dds-radius-xs);
+  --radius-sm: var(--dds-radius-sm);
+  --radius-md: var(--dds-radius-md);
+  --radius-lg: var(--dds-radius-lg);
+  --radius-full: var(--dds-radius-full);
+
+  --shadow-none: var(--dds-shadow-none);
+  --shadow-subtle: var(--dds-shadow-subtle);
+  --shadow-elevated: var(--dds-shadow-elevated);
+
+  --z-index-base: var(--dds-z-base);
+  --z-index-content: var(--dds-z-content);
+  --z-index-sticky: var(--dds-z-sticky);
+  --z-index-overlay: var(--dds-z-overlay);
+  --z-index-modal: var(--dds-z-modal);
+  --z-index-toast: var(--dds-z-toast);
+
+  --transition-duration-fast: var(--dds-motion-fast);
+  --transition-duration-normal: var(--dds-motion-normal);
+  --transition-duration-slow: var(--dds-motion-slow);
+  --ease-out: var(--dds-ease-out);
+  --ease-in-out: var(--dds-ease-in-out);
+}
+
+:root {
+  --dds-color-background: #f7f6f2;
+  --dds-color-foreground: #171717;
+  --dds-color-muted: #6b6b6b;
+  --dds-color-surface: #ffffff;
+  --dds-color-border: #e5e2dc;
+  --dds-color-inverse-background: #171717;
+  --dds-color-inverse-foreground: #f7f6f2;
+  --dds-color-focus: #171717;
+  --dds-color-error: #b42318;
+  --dds-color-success: #027a48;
+  --dds-color-warning: #b54708;
+
+  --dds-font-size-display: clamp(3rem, 7vw, 7rem);
+  --dds-font-size-h1: clamp(2.5rem, 6vw, 5rem);
+  --dds-font-size-h2: clamp(2rem, 4.5vw, 4rem);
+  --dds-font-size-h3: clamp(1.5rem, 3vw, 2.5rem);
+  --dds-font-size-body: 1rem;
+  --dds-font-size-small: 0.875rem;
+  --dds-font-size-caption: 0.75rem;
+  --dds-line-height-display: 0.95;
+  --dds-line-height-h1: 1;
+  --dds-line-height-h2: 1.05;
+  --dds-line-height-h3: 1.1;
+  --dds-line-height-body: 1.5;
+  --dds-line-height-small: 1.5;
+  --dds-line-height-caption: 1.4;
+  --dds-font-weight-regular: 400;
+  --dds-font-weight-medium: 500;
+  --dds-font-weight-semibold: 600;
+  --dds-font-weight-bold: 700;
+  --dds-letter-spacing-heading: -0.02em;
+
+  --dds-space-1: 0.25rem;
+  --dds-space-2: 0.5rem;
+  --dds-space-3: 0.75rem;
+  --dds-space-4: 1rem;
+  --dds-space-6: 1.5rem;
+  --dds-space-8: 2rem;
+  --dds-space-12: 3rem;
+  --dds-space-16: 4rem;
+  --dds-space-20: 5rem;
+  --dds-space-24: 6rem;
+  --dds-space-32: 8rem;
+  --dds-space-40: 10rem;
+
+  --dds-breakpoint-sm: 40rem;
+  --dds-breakpoint-md: 48rem;
+  --dds-breakpoint-lg: 64rem;
+  --dds-breakpoint-xl: 80rem;
+  --dds-breakpoint-2xl: 96rem;
+  --dds-container-max: 90rem;
+  --dds-container-padding: 1.25rem;
+
+  --dds-radius-none: 0;
+  --dds-radius-xs: 0.125rem;
+  --dds-radius-sm: 0.25rem;
+  --dds-radius-md: 0.5rem;
+  --dds-radius-lg: 0.75rem;
+  --dds-radius-full: 9999px;
+
+  --dds-shadow-none: none;
+  --dds-shadow-subtle: 0 1px 2px rgb(0 0 0 / 0.06);
+  --dds-shadow-elevated: 0 8px 30px rgb(0 0 0 / 0.08);
+
+  --dds-z-base: 0;
+  --dds-z-content: 10;
+  --dds-z-sticky: 20;
+  --dds-z-overlay: 40;
+  --dds-z-modal: 50;
+  --dds-z-toast: 60;
+
+  --dds-motion-fast: 150ms;
+  --dds-motion-normal: 300ms;
+  --dds-motion-slow: 500ms;
+  --dds-ease-out: ease-out;
+  --dds-ease-in-out: ease-in-out;
+}
+
+@media (min-width: 48rem) {
+  :root {
+    --dds-container-padding: 2rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  :root {
+    --dds-container-padding: 2.5rem;
+  }
+}
+
+@media (min-width: 96rem) {
+  :root {
+    --dds-container-padding: 3rem;
+  }
+}

@@ -1,26 +1,128 @@
 @import "tailwindcss";
+@import "../styles/tokens.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  min-width: 20rem;
+  min-height: 100%;
+  background: var(--dds-color-background);
+  color-scheme: light;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  margin: 0;
+  background: var(--dds-color-background);
+  color: var(--dds-color-foreground);
+  font-family: var(--font-manrope), Arial, Helvetica, sans-serif;
+  font-size: var(--dds-font-size-body);
+  font-weight: var(--dds-font-weight-regular);
+  line-height: var(--dds-line-height-body);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+p,
+figure,
+blockquote,
+dl,
+dd {
+  margin: 0;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: var(--dds-font-weight-semibold);
+  letter-spacing: var(--dds-letter-spacing-heading);
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: var(--dds-font-size-h1);
+  line-height: var(--dds-line-height-h1);
+}
+
+h2 {
+  font-size: var(--dds-font-size-h2);
+  line-height: var(--dds-line-height-h2);
+}
+
+h3 {
+  font-size: var(--dds-font-size-h3);
+  line-height: var(--dds-line-height-h3);
+}
+
+a {
+  color: inherit;
+  text-decoration-thickness: from-font;
+  text-underline-offset: 0.2em;
+}
+
+button,
+input,
+optgroup,
+select,
+textarea {
+  color: inherit;
+  font: inherit;
+}
+
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]) {
+  cursor: pointer;
+}
+
+img,
+picture,
+svg,
+canvas,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+img,
+video {
+  height: auto;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+::selection {
+  background: var(--dds-color-inverse-background);
+  color: var(--dds-color-inverse-foreground);
+}
+
+:focus-visible {
+  outline: 2px solid var(--dds-color-focus);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }
