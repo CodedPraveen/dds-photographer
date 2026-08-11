@@ -15,7 +15,13 @@ const eslintConfig = defineConfig([
       "simple-import-sort/exports": "error",
     },
   },
-  globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts"]),
+  globalIgnores([
+    ".next/**",
+    "out/**",
+    "build/**",
+    "src/generated/prisma/**",
+    "next-env.d.ts",
+  ]),
 ]);
 
 export default eslintConfig;

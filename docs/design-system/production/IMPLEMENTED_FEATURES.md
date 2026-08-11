@@ -64,6 +64,39 @@
 - `prefers-reduced-motion` path that omits the 3D scene and GSAP choreography
   while preserving the complete static website
 
+### Phase 4 Simple Private Gallery
+
+- `/gallery/[token]` gallery-link and QR destination convention
+- Signed gallery link with a cryptographic random nonce, expiry, gallery ID,
+  and token version
+- Server validation of token signature, expiry, gallery existence, active
+  status, availability window, and token version
+- Safe invalid-gallery, form-error, and unexpected-error states without
+  internal details
+- Private entry presentation with the first gallery photo, gallery identity,
+  name, mobile, email, explicit consent, and pending feedback
+- Server-side trimming, length limits, phone/email validation, and required
+  consent validation
+- Accessible form labels, input types, autocomplete metadata, visible focus,
+  keyboard operation, checkbox behavior, and associated errors
+- Prisma/PostgreSQL `Gallery`, `GalleryVisitor`, and `GalleryMedia` models plus
+  a Phase 4 migration
+- One-to-many Gallery-to-GalleryVisitor relationship with a unique
+  `(galleryId, email)` constraint
+- Duplicate visitor upsert that refreshes details and consent timestamp instead
+  of creating a record on every submission
+- Signed 12-hour HTTP-only gallery access cookie; no user authentication or
+  account model
+- Gallery-scoped visitor and media authorization that rejects URL, token,
+  gallery, and media-ID tampering
+- Protected media route with private no-store responses and no private media in
+  `public/`
+- Ignored private development persistence and server-generated media adapter
+  for credential-free local verification
+- Development-only preview-link route that is unavailable in production
+- Responsive entry and gallery layouts at mobile, tablet, desktop, and large
+  desktop widths
+
 ### Temporary Phase 2 Content
 
 - Centralized replaceable copy and link data in the public-site feature
@@ -76,11 +109,10 @@
 ## Not Implemented
 
 - Testimonials (explicitly excluded from Phase 2)
-- Private client gallery and gallery routing
-- Authentication or access control
+- Account authentication, login, signup, password, or OTP
 - Admin dashboard
 - Media uploads or processing pipeline
-- Storage or CDN integration
+- Production private-storage provider or CDN integration
 - QR-code delivery
 - AI search or face recognition
 - Notifications or sharing workflows
@@ -93,6 +125,4 @@
 
 ## Deferred / Future
 
-- Phase 4: private gallery platform, authentication, QR access, and media
-  delivery
 - Phase 5: admin dashboard, production hardening, analytics, and deployment

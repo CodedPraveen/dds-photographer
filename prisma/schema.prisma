@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Gallery {
+  id           String           @id @default(cuid())
+  title        String
+  isActive     Boolean          @default(true)
+  tokenVersion Int              @default(1)
+  opensAt      DateTime?
+  closesAt     DateTime?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  media        GalleryMedia[]
+  visitors     GalleryVisitor[]
+}
+
+model GalleryMedia {
+  id         String   @id @default(cuid())
+  galleryId  String
+  storageKey String
+  altText    String
+  sortOrder  Int      @default(0)
+  isCover    Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  gallery    Gallery  @relation(fields: [galleryId], references: [id], onDelete: Cascade)
+
+  @@index([galleryId, sortOrder])
+}
+
+model GalleryVisitor {
+  id          String   @id @default(cuid())
+  galleryId   String
+  name        String
+  mobile      String
+  email       String
+  consent     Boolean
+  consentedAt DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  gallery     Gallery  @relation(fields: [galleryId], references: [id], onDelete: Cascade)
+
+  @@unique([galleryId, email])
+  @@index([galleryId])
+}

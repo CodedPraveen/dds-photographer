@@ -2,9 +2,9 @@
 
 > **Project:** DDS Photographer
 >
-> **Current stage:** Phase 3 — Complete
+> **Current stage:** Phase 4 — Complete
 >
-> **Completed work:** Phase 1A, Phase 1B, Phase 2, and Phase 3
+> **Completed work:** Phase 1A, Phase 1B, Phase 2, Phase 3, and Phase 4
 >
 > **Last verified:** 2026-08-11
 
@@ -28,6 +28,28 @@ camera preserves a complete fallback when JavaScript, WebGL, or motion is
 unavailable. Replacing these assets does not require changing the motion
 boundary.
 
+Phase 4 adds a simple private-gallery path at `/gallery/[token]`. The gallery
+link or QR destination contains a signed, random-nonce token that is validated
+on the server for signature, expiry, token version, gallery existence, and
+gallery availability. It shows the gallery cover and requests name, mobile,
+email, and explicit consent. Successful server validation upserts one visitor
+per gallery and normalized email, then grants a signed, expiring,
+gallery-scoped, HTTP-only cookie. This access cookie is a lightweight gallery
+grant, not an authenticated user account.
+
+PostgreSQL and Prisma remain the production persistence boundary. `Gallery`
+owns `GalleryVisitor` records containing `galleryId`, `name`, `mobile`, `email`,
+`consent`, `consentedAt`, and timestamps; an internal primary key supports the
+relationship and access grant. `GalleryMedia` records are also gallery-scoped,
+and their delivery route revalidates the gallery token and visitor grant before
+serving non-cover media.
+
+When production credentials are absent during development, Phase 4 uses an
+ignored `.data/private-gallery/` file adapter and server-generated placeholder
+media. The development-only `/gallery/preview` route creates a sample gallery
+link; it returns `404` in production or whenever `DATABASE_URL` is configured.
+The fallback never writes visitor data or private media into `public/`.
+
 ## Phase Status
 
 | Phase                                       | Status      |
@@ -37,7 +59,7 @@ boundary.
 | Phase 1B — Foundation, Part 2               | Complete    |
 | Phase 2 — Marketing website                 | Complete    |
 | Phase 3 — Motion and interactive experience | Complete    |
-| Phase 4 — Private gallery platform          | Not started |
+| Phase 4 — Private gallery platform          | Complete    |
 | Phase 5 — Admin dashboard and production    | Not started |
 
 ## Confirmed Decisions
@@ -67,6 +89,15 @@ boundary.
 - The Phase 2 implementation does not contain an Experience section, so Phase
   3 does not invent one.
 - Testimonials are explicitly excluded from the approved Phase 2 scope.
+- Private gallery links use signed, unpredictable tokens with a 30-day expiry
+  and gallery token-version revocation.
+- Gallery access after consent uses a signed 12-hour HTTP-only, SameSite=Lax,
+  gallery-scoped cookie. It is not account authentication.
+- Visitor input is trimmed and validated on the server. Consent is required and
+  records both `consent = true` and `consentedAt`.
+- The `(galleryId, email)` database uniqueness constraint prevents duplicate
+  visitor records while allowing the same email in different galleries.
+- Private media IDs are resolved only inside the validated gallery context.
 
 ## Known Issues and Blockers
 
@@ -90,3 +121,9 @@ runtime errors.
 The repository-wide Prettier check may report pre-existing formatting
 differences across legacy documentation. Unrelated legacy files were not
 rewritten.
+
+Production Phase 4 deployment requires a PostgreSQL `DATABASE_URL`, a
+server-only `GALLERY_TOKEN_SECRET` of at least 32 characters, `prisma migrate
+deploy`, provisioned gallery/media records, and the approved private storage
+provider behind the protected media route. The development adapter and
+placeholder renderer are intentionally not production integrations.

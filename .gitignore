@@ -20,6 +20,12 @@
 # production
 /build
 
+# private local development data
+/.data/
+
+# generated Prisma client
+/src/generated/prisma/
+
 # misc
 .DS_Store
 *.pem
