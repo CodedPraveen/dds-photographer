@@ -1,0 +1,134 @@
+.section {
+  position: relative;
+  background: var(--dds-color-surface);
+}
+
+.content {
+  position: relative;
+  z-index: var(--dds-z-content);
+}
+
+.header {
+  display: grid;
+  gap: var(--dds-space-8);
+  margin-bottom: var(--dds-space-12);
+}
+
+.eyebrow {
+  margin-bottom: var(--dds-space-6);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.intro {
+  max-width: 34rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--dds-space-4);
+}
+
+.item {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--dds-color-border);
+  transition:
+    box-shadow var(--dds-motion-normal) var(--dds-ease-out),
+    transform var(--dds-motion-normal) var(--dds-ease-out);
+}
+
+.portrait {
+  aspect-ratio: 2 / 3;
+}
+
+.landscape,
+.wide {
+  aspect-ratio: 16 / 9;
+}
+
+.square {
+  aspect-ratio: 1;
+}
+
+.tall {
+  aspect-ratio: 2 / 3;
+}
+
+.image {
+  object-fit: cover;
+  transition: transform var(--dds-motion-slow) var(--dds-ease-out);
+}
+
+.caption {
+  position: absolute;
+  inset: auto 0 0;
+  display: flex;
+  justify-content: space-between;
+  gap: var(--dds-space-3);
+  padding: var(--dds-space-4);
+  background: linear-gradient(transparent, rgb(0 0 0 / 0.72));
+  color: var(--dds-color-inverse-foreground);
+  font-size: var(--dds-font-size-caption);
+}
+
+@media (hover: hover) {
+  .item:hover {
+    box-shadow: 0 1.25rem 3rem rgb(23 23 23 / 0.12);
+    transform: translateY(-0.25rem);
+  }
+
+  .item:hover .image {
+    transform: scale(1.02);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item,
+  .image {
+    transition: none;
+  }
+
+  .item:hover,
+  .item:hover .image {
+    transform: none;
+  }
+}
+
+@media (min-width: 40rem) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .landscape,
+  .wide {
+    grid-column: span 2;
+  }
+}
+
+@media (min-width: 64rem) {
+  .header {
+    grid-template-columns: minmax(0, 1.2fr) minmax(20rem, 0.8fr);
+    align-items: end;
+    gap: var(--dds-space-16);
+    margin-bottom: var(--dds-space-16);
+  }
+
+  .grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    align-items: start;
+    gap: var(--dds-space-6);
+  }
+
+  .item {
+    grid-column: span 3;
+  }
+
+  .landscape,
+  .wide {
+    grid-column: span 6;
+  }
+}

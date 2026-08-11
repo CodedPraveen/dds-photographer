@@ -1,157 +1,559 @@
-# Portfolio Section
+# Portfolio Section — Design & Interaction Specification
 
-The portfolio section begins immediately after the hero animation finishes.
+## 1. Purpose
 
-The transition feels natural, as though the photographs that emerged from the camera have expanded into a complete gallery.
+The Portfolio section is the main visual showcase of the photographer business website.
 
-There is no hard separation between the hero and the portfolio.
+It must feel like a premium, editorial photography wall inspired by the **visual discipline of Pinterest masonry**, but it must **not copy Pinterest's UI or interaction design**.
+
+The section should communicate:
+
+- High-quality photography
+- Variety of professional work
+- Premium visual presentation
+- A strong photography-business identity
+- A smooth cinematic scrolling experience
+
+The portfolio is not a personal photographer profile. It represents the **photography business/studio and its client work**.
 
 ---
 
-## Section Introduction
+## 2. Core Experience
 
-A clean editorial heading introduces the work.
+The portfolio follows this sequence:
 
 ```text
-────────────────────────────────────
-
-           Selected Work
-
-      Capturing Moments That Last
-
-────────────────────────────────────
+PORTFOLIO START
+       │
+       ↓
+MASONRY GALLERY
+       │
+       ↓
+USER SCROLLS
+       │
+       ↓
+IMAGES REVEAL FROM BOTTOM → TOP
+       │
+       ↓
+MORE ROWS / LINES APPEAR
+       │
+       ↓
+PORTFOLIO CONTENT COMPLETES
+       │
+       ↓
+PORTFOLIO SLIDES LEFT
+       │
+       └──────────────→ FOOTER ENTERS FROM RIGHT
 ```
 
-Large typography.
-
-Minimal description.
-
-Generous whitespace.
+The user should feel that they are exploring a continuously revealed photography collection, not scrolling through a conventional card grid.
 
 ---
 
-## Portfolio Layout
+## 3. Masonry Layout
 
-Instead of a traditional masonry layout, use a magazine-inspired editorial grid.
+### 3.1 Pinterest-inspired visual discipline
 
-Large hero images are mixed with medium and small images to create visual rhythm.
+Use a disciplined masonry layout similar to Pinterest's image arrangement:
 
 ```text
-┌──────────────────────────────┐
-│                              │
-│         Large Image          │
-│                              │
-└──────────────────────────────┘
+┌────────┐       ┌───────────┐
+│        │       │           │
+│ Photo  │       │   Photo   │
+│        │       │           │
+└────────┘       │           │
+                 └───────────┘
 
-┌──────────────┐ ┌──────────────┐
-│              │ │              │
-│   Portrait   │ │   Wedding    │
-│              │ │              │
-└──────────────┘ └──────────────┘
 
-┌──────────────────────────────┐
-│                              │
-│      Full Width Image        │
-│                              │
-└──────────────────────────────┘
+┌──────────┐       ┌───────┐
+│          │       │       │
+│  Photo   │       │ Photo │
+│          │       │       │
+└──────────┘       └───────┘
 ```
 
-Every few rows, a full-width image creates a pause before the next group of photographs.
+The important rule is **line/column discipline**.
+
+Images should form visually organized columns and rows while still creating an organic masonry rhythm.
+
+Do not randomly scatter images around the screen.
+
+### 3.2 Image size
+
+Image items do not need to have the same dimensions.
+
+Supported visual ratios include:
+
+- `1:1`
+- `2:3`
+- `16:9`
+- Other source aspect ratios may be preserved when appropriate.
+
+The layout must accommodate portrait, square, and landscape photography naturally.
+
+### 3.3 Spacing
+
+Maintain consistent:
+
+- Column gaps
+- Row gaps
+- Section padding
+- Image corner treatment
+- Alignment rules
+
+The masonry layout should look intentional and premium.
 
 ---
 
-## Image Appearance
+## 4. Media Types
 
-Images should feel like premium printed photographs.
+Portfolio items must support:
 
-Each image has:
+- Images
+- Videos
 
-- Soft rounded corners (optional)
-- Subtle shadows
-- Natural spacing
-- High resolution
-- Clean borders (optional)
+Videos should behave as first-class portfolio media, not as a separate unrelated section.
 
-No heavy effects or decorative frames.
+A video item can occupy the same masonry positions as an image.
 
-The photography should remain the focus.
+Video behavior should remain subtle and premium:
+
+- Autoplay only when appropriate and technically safe
+- Muted by default if autoplay is used
+- Loop where appropriate
+- Avoid intrusive controls inside the main masonry presentation unless required
+- Respect reduced-motion preferences
 
 ---
 
-## Hover Interaction
+## 5. Admin-Controlled Portfolio Content
 
-Hovering over an image should feel elegant and understated.
+Portfolio media must **not be hard-coded inside the frontend**.
 
-- Slight scale increase
-- Shadow becomes slightly stronger
-- Image brightness increases subtly
-- Category and project title fade in smoothly
+Do not hard-code:
+
+- Image URLs
+- Video URLs
+- Image filenames
+- Portfolio item count
+- Portfolio ordering
+- Portfolio content
+
+The portfolio content must come from the application's admin-managed data.
+
+### Admin must be able to:
+
+1. Add a portfolio item.
+2. Select/upload an image or video.
+3. Set the media type.
+4. Change the display/order position.
+5. Enable/disable an item.
+6. Control how many portfolio items are displayed.
+7. Replace/update portfolio media without changing frontend code.
+8. Remove portfolio items.
+
+The frontend should automatically render the currently active portfolio items from the data source.
+
+### Quantity
+
+The number of visible portfolio items must be configurable by the admin.
+
+Example:
 
 ```text
-Wedding
+Admin selects:
+Portfolio items to display = 12
 
-Royal Palace Ceremony
+Frontend:
+Render 12 active items.
 ```
 
-No dramatic animations.
-
----
-
-## Portfolio Categories
-
-A minimal category filter appears above the gallery.
+If the admin changes it to:
 
 ```text
-All   Weddings   Portraits   Events   Fashion
+Portfolio items to display = 20
 ```
 
-Switching categories smoothly rearranges the images without a full page reload.
+the frontend should render 20 active items without code changes.
+
+The implementation must not depend on a fixed number such as 8, 12, or 16.
 
 ---
 
-## Scroll Experience
+## 6. Image Reveal Animation
 
-As visitors continue scrolling, images appear with subtle motion.
+The portfolio should reveal content progressively during scrolling.
 
-Each photograph gently fades upward into view.
+### Direction
 
-Avoid large slide animations or exaggerated effects.
-
-The motion should support the photography rather than distract from it.
-
----
-
-## Visual Rhythm
-
-The gallery should never feel repetitive.
-
-Mix different image sizes throughout the layout.
+Images enter from **bottom → top**.
 
 ```text
-Large
-
-Small   Small
-
-Wide
-
-Small
-
-Large
-
-Wide
+       ┌──────────┐
+       │  Photo   │
+       └──────────┘
+            ↑
+            │
+            │
+       appears here
+            │
+            │
+       ────────────
 ```
 
-This creates a premium editorial flow similar to luxury magazines.
+The reveal should feel like the next line of photographs is coming upward into the viewport.
+
+### Important
+
+Do not make every individual image randomly fly into the screen.
+
+The animation should work in **organized lines/rows**.
+
+Example:
+
+```text
+Line 1
+┌──────┐   ┌────────┐   ┌──────┐
+│      │   │        │   │      │
+└──────┘   └────────┘   └──────┘
+
+
+Line 2 enters from bottom
+┌────────┐   ┌──────┐   ┌────────┐
+│        │   │      │   │        │
+└────────┘   └──────┘   └────────┘
+       ↑
+       ↑
+       ↑
+```
+
+As the user scrolls:
+
+- Existing line moves upward naturally.
+- The next line reveals from below.
+- More lines follow.
+- The movement remains continuous.
 
 ---
 
-## Design Principles
+## 7. Animation Quality
 
-- Photography always comes first.
-- Large whitespace creates breathing room.
-- Minimal text.
-- Elegant typography.
-- Smooth, unobtrusive animations.
-- Editorial composition instead of a standard image grid.
+The animation must feel:
 
-The portfolio should feel less like a collection of photos and more like a curated visual exhibition, encouraging visitors to slow down and appreciate each photograph.
+- Smooth
+- Fast enough to feel responsive
+- Cinematic
+- Controlled
+- Premium
+- Natural
+
+### Do NOT use
+
+- Slow-motion feeling
+- Excessive easing
+- Bounce
+- Elastic effects
+- Random rotations
+- Random directions
+- Large unnecessary scaling
+- Excessive blur
+- Flashy effects
+
+The user should feel that the gallery is moving naturally with their scroll.
+
+### Transition timing
+
+The portfolio reveal should have a **responsive scroll-linked feel**, not a slow standalone animation.
+
+The user must remain in control through scrolling.
+
+---
+
+## 8. Portfolio Completion
+
+Once all configured portfolio items have been revealed, the portfolio section reaches its completed state.
+
+Do not immediately jump to the footer.
+
+Instead, trigger the portfolio exit transition.
+
+```text
+PORTFOLIO COMPLETE
+       │
+       ↓
+PORTFOLIO MOVES LEFT
+       │
+       └──────────────→
+                         FOOTER ENTERS FROM RIGHT
+```
+
+---
+
+## 9. Portfolio → Footer Transition
+
+This is a major transition and must feel intentional.
+
+### Direction
+
+Portfolio:
+
+```text
+← exits to the left
+```
+
+Footer:
+
+```text
+→ enters from the right
+```
+
+Conceptually:
+
+```text
+┌──────────────────┐
+│                  │
+│    PORTFOLIO     │  → → →
+│                  │
+└──────────────────┘
+
+                         ┌──────────────┐
+                         │              │
+                         │    FOOTER    │
+                         │              │
+                         └──────────────┘
+```
+
+During the transition:
+
+```text
+┌──────────────────┐   ┌──────────────────┐
+│    PORTFOLIO     │ → │      FOOTER      │
+│                  │   │                  │
+└──────────────────┘   └──────────────────┘
+```
+
+Final state:
+
+```text
+┌─────────────────────────────────────────┐
+│                                         │
+│                  FOOTER                 │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+### Transition characteristics
+
+The transition must be:
+
+- Smooth
+- Clean
+- Relatively quick
+- Responsive to scroll
+- Directionally obvious
+- Premium
+
+**Do not use a slow-motion cinematic slide.**
+
+It should feel like one section naturally replaces another.
+
+---
+
+## 10. Footer Context
+
+The footer is a simple business footer.
+
+It should not become another large content section.
+
+The footer can contain:
+
+- Business logo
+- Phone number
+- WhatsApp
+- Instagram
+- Address
+- Basic navigation
+- Copyright
+
+No booking system is required.
+
+No booking form is required.
+
+No pricing section is required.
+
+No testimonial section is required.
+
+No FAQ is required.
+
+No customer journey section is required.
+
+---
+
+## 11. Responsive Behavior
+
+The masonry system must adapt to viewport size.
+
+### Desktop
+
+Use multiple disciplined columns.
+
+Example:
+
+```text
+┌──────┐  ┌────────┐  ┌──────┐  ┌────────┐
+│      │  │        │  │      │  │        │
+│      │  │        │  │      │  │        │
+└──────┘  └────────┘  └──────┘  └────────┘
+```
+
+### Tablet
+
+Reduce the number of columns while preserving masonry rhythm.
+
+### Mobile
+
+Use fewer columns, typically 1–2 depending on the final visual design.
+
+Do not simply shrink the desktop layout.
+
+The mobile layout must be deliberately composed.
+
+The bottom-to-top reveal behavior must remain understandable on mobile.
+
+The portfolio-to-footer transition must remain smooth on touch devices.
+
+---
+
+## 12. Data Architecture Requirements
+
+The design must remain compatible with an admin-driven portfolio system.
+
+Recommended conceptual portfolio item data:
+
+```text
+PortfolioItem
+├── id
+├── title
+├── mediaType       // IMAGE | VIDEO
+├── mediaUrl
+├── thumbnailUrl    // optional for video
+├── altText
+├── sortOrder
+├── isActive
+└── createdAt
+```
+
+The exact database/schema implementation should follow the project's existing architecture and conventions.
+
+Do not introduce a duplicate portfolio data system if an existing content/media architecture already exists.
+
+---
+
+## 13. Frontend Rules
+
+The frontend must:
+
+- Fetch portfolio items from the application data source.
+- Render only active items.
+- Respect admin ordering.
+- Respect admin-controlled quantity.
+- Support image and video items.
+- Preserve appropriate aspect ratios.
+- Use optimized media loading.
+- Avoid hard-coded media URLs.
+- Avoid hard-coded portfolio item counts.
+- Keep animation logic independent from media content.
+
+Adding or removing portfolio items from admin must not require frontend code changes.
+
+---
+
+## 14. Accessibility & Performance
+
+Images must have meaningful alt text where appropriate.
+
+Decorative media should not create unnecessary accessibility noise.
+
+Videos should not create unexpected sound.
+
+Respect:
+
+```text
+prefers-reduced-motion
+```
+
+When reduced motion is enabled:
+
+- Keep the masonry layout.
+- Reduce/remove large movement.
+- Use simple opacity or minimal positional transitions.
+- Do not break the portfolio experience.
+
+Lazy-load media where appropriate.
+
+Avoid loading the entire portfolio's full-resolution media immediately.
+
+Use responsive image sizes.
+
+Do not allow animations to cause horizontal page overflow.
+
+---
+
+## 15. Design Principle
+
+The portfolio should feel like:
+
+> A carefully curated photography wall that reveals itself as the visitor scrolls.
+
+It should NOT feel like:
+
+- A normal image grid
+- A social media feed
+- A Pinterest clone
+- A random floating-image animation
+- A slow slideshow
+- A personal photographer resume
+
+The final experience should communicate:
+
+**Premium photography business + disciplined masonry + cinematic scroll interaction.**
+
+---
+
+## 16. Final Interaction Summary
+
+```text
+PORTFOLIO START
+       │
+       ↓
+DISCIPLINED MASONRY WALL
+       │
+       ↓
+USER SCROLLS
+       │
+       ↓
+NEXT LINE ENTERS FROM BOTTOM
+       │
+       ↓
+MORE PHOTOS
+       │
+       ↓
+MORE LINES
+       │
+       ↓
+ALL ADMIN-CONFIGURED ITEMS SHOWN
+       │
+       ↓
+PORTFOLIO COMPLETE
+       │
+       ↓
+PORTFOLIO EXITS LEFT  ← ← ←
+       │
+       │
+       └──────────────→ FOOTER ENTERS RIGHT
+                              │
+                              ↓
+                           FOOTER
+```
+
+This interaction is part of the approved visual direction for the Portfolio section.

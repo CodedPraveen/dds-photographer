@@ -13,6 +13,19 @@ This document defines the environments used throughout the Photographer Business
 
 Each environment has a specific purpose, configuration, and deployment process to ensure development remains predictable, stable, and production-ready.
 
+## Phase 1 Foundation
+
+The current codebase requires one public environment variable:
+
+```text
+NEXT_PUBLIC_SITE_URL
+```
+
+It must be an absolute URL. Local development defaults to
+`http://localhost:3000` through `.env.example`. No database, storage, API,
+analytics, feature-flag, or secret environment variable is implemented in
+Phase 1.
+
 ---
 
 # Philosophy
@@ -33,12 +46,12 @@ Code should behave the same regardless of where it runs.
 
 The project uses four primary environments.
 
-| Environment | Purpose |
-|-------------|---------|
-| Local | Development |
-| Development | Team integration |
-| Staging | Pre-production validation |
-| Production | Live website |
+| Environment | Purpose                   |
+| ----------- | ------------------------- |
+| Local       | Development               |
+| Development | Team integration          |
+| Staging     | Pre-production validation |
+| Production  | Live website              |
 
 ---
 
@@ -197,21 +210,14 @@ Environment-specific values should never be hardcoded.
 
 # Environment Variables
 
-Examples
+Implemented in Phase 1:
 
 ```text
 NEXT_PUBLIC_SITE_URL
-
-NEXT_PUBLIC_API_URL
-
-DATABASE_URL
-
-NEXT_PUBLIC_CDN_URL
-
-NEXT_PUBLIC_GA_ID
-
-NEXT_PUBLIC_ENVIRONMENT
 ```
+
+All other environment variables must be introduced by the phase that actually
+implements their owning feature.
 
 Never commit secrets to the repository.
 
@@ -233,7 +239,10 @@ Secrets should be stored using the deployment platform's secure environment mana
 
 # Feature Flags
 
-Experimental features should use feature flags instead of long-lived branches.
+Feature flags are deferred. Phase 1 defines no feature-flag variables.
+
+Future phases may introduce narrowly scoped flags when an implemented feature
+requires them. Do not add flags to `.env.example` in advance.
 
 Examples
 
