@@ -5,7 +5,7 @@ import styles from "./Button.module.css";
 const variantClasses = {
   primary: styles.primary,
   secondary: styles.secondary,
-  ghost: styles.ghost,
+  ghost: styles.ghost, 
 };
 
 export function Button({
