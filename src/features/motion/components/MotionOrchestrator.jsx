@@ -11,6 +11,7 @@ export function MotionOrchestrator() {
     );
     let cleanupMotion;
     let isCancelled = false;
+
     const stopMotionForPreference = () => {
       if (reducedMotionQuery.matches) {
         isCancelled = true;
@@ -42,18 +43,23 @@ export function MotionOrchestrator() {
         const context = gsap.context(() => {
           const cameraStage = document.querySelector("[data-camera-stage]");
           const hero = document.querySelector("[data-motion-hero]");
-          const heroCopy = document.querySelector("[data-motion-hero-copy]");
-          const cameraFallback = document.querySelector(
-            "[data-motion-camera-fallback]",
-          );
           const photoCards = gsap.utils.toArray("[data-motion-photo]");
           const revealItems = gsap.utils.toArray("[data-motion-reveal]");
+          const portfolio = document.querySelector("[data-motion-portfolio]");
+          const services = document.querySelector("[data-motion-services]");
+          const contact = document.querySelector("#contact");
           const shutter = document.querySelector("[data-motion-shutter]");
           const shutterIris = document.querySelector(
             "[data-motion-shutter-iris]",
           );
 
-          if (cameraStage) gsap.set(cameraStage, { autoAlpha: 0 });
+          if (cameraStage) {
+            gsap.fromTo(
+              cameraStage,
+              { autoAlpha: 0 },
+              { autoAlpha: 1, duration: 0.8, ease: "power2.out" },
+            );
+          }
 
           const cameraJourney = { progress: 0 };
           gsap.to(cameraJourney, {
@@ -74,82 +80,114 @@ export function MotionOrchestrator() {
             },
           });
 
-          if (hero && photoCards.length > 1) {
-            gsap.set(photoCards.slice(1), {
+          if (hero && photoCards.length > 0) {
+            const firstPhoto = photoCards[0];
+            const laterPhotos = photoCards.slice(1);
+            const finalPhotoScale = () => {
+              const width = firstPhoto.getBoundingClientRect().width || 1;
+              return Math.max(2.8, (window.innerWidth * 0.9) / width);
+            };
+
+            gsap.set(firstPhoto, {
+              autoAlpha: 1,
+              scale: 0.66,
+              xPercent: 0,
+              yPercent: 4,
+            });
+            gsap.set(laterPhotos, {
               autoAlpha: 0,
-              scale: 0.9,
-              xPercent: -10,
-              yPercent: 72,
+              scale: 0.58,
+              xPercent: 0,
+              yPercent: 8,
             });
 
             const heroTimeline = gsap.timeline({
               defaults: { ease: "power2.inOut" },
               scrollTrigger: {
                 end: "bottom top",
+                invalidateOnRefresh: true,
                 scrub: 1,
                 start: "top top",
                 trigger: hero,
               },
             });
 
-            if (heroCopy) {
-              heroTimeline.to(
-                heroCopy,
-                { autoAlpha: 0.3, duration: 0.28, yPercent: -8 },
-                0.08,
+            heroTimeline
+              .to(
+                firstPhoto,
+                {
+                  autoAlpha: 1,
+                  duration: 0.24,
+                  scale: 0.92,
+                  xPercent: -6,
+                  yPercent: -34,
+                },
+                0.1,
+              )
+              .to(
+                firstPhoto,
+                {
+                  duration: 0.34,
+                  scale: finalPhotoScale,
+                  xPercent: 0,
+                  yPercent: -12,
+                },
+                0.34,
               );
-            }
 
-            photoCards.slice(1).forEach((card, index) => {
+            laterPhotos.forEach((card, index) => {
               const direction = index % 2 === 0 ? 1 : -1;
               heroTimeline.to(
                 card,
                 {
-                  autoAlpha: 1,
-                  duration: 0.42,
+                  autoAlpha: 0.92,
+                  duration: 0.38,
                   keyframes: {
-                    scale: [0.9, 0.97, 1],
-                    xPercent: [-10, direction * 8, direction * (6 + index * 3)],
-                    yPercent: [72, 18, -18 - index * 20],
+                    scale: [0.58, 0.86, 1.08],
+                    xPercent: [0, direction * 34, direction * (54 + index * 8)],
+                    yPercent: [8, -48, -126 - index * 30],
                   },
                 },
-                0.16 + index * 0.18,
+                0.24 + index * 0.14,
               );
             });
-
-            if (cameraFallback) {
-              heroTimeline
-                .to(
-                  cameraFallback,
-                  { autoAlpha: 0.28, duration: 0.22, scale: 0.94 },
-                  0.34,
-                )
-                .to(
-                  cameraFallback,
-                  { autoAlpha: 0, duration: 0.2, scale: 0.9 },
-                  0.8,
-                );
-            }
 
             if (cameraStage) {
               heroTimeline.to(
                 cameraStage,
-                { autoAlpha: 0.58, duration: 0.24 },
-                0.7,
+                { autoAlpha: 0.34, duration: 0.16 },
+                0.84,
               );
             }
-          } else if (cameraStage) {
-            gsap.to(cameraStage, {
-              autoAlpha: 1,
-              duration: 1.2,
-              ease: "power2.out",
-            });
           }
 
-          if (cameraStage) {
+          if (portfolio && services) {
+            gsap
+              .timeline({
+                scrollTrigger: {
+                  end: "top 18%",
+                  scrub: 1,
+                  start: "top 92%",
+                  trigger: services,
+                },
+              })
+              .to(
+                portfolio,
+                { autoAlpha: 0.42, ease: "none", xPercent: -18 },
+                0,
+              )
+              .fromTo(
+                services,
+                { xPercent: 18 },
+                { ease: "none", xPercent: 0 },
+                0,
+              );
+          }
+
+          if (cameraStage && contact && !hero) {
             gsap.fromTo(
               cameraStage,
-              { opacity: 0.58 },
+              { opacity: 0.35 },
               {
                 immediateRender: false,
                 opacity: 0.92,
@@ -157,7 +195,7 @@ export function MotionOrchestrator() {
                   end: "center center",
                   scrub: 1,
                   start: "top bottom",
-                  trigger: "#contact",
+                  trigger: contact,
                 },
               },
             );

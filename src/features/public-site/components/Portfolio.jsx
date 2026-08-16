@@ -4,7 +4,6 @@ import { Container } from "@/components/ui/container/Container";
 import { Section } from "@/components/ui/section/Section";
 import { Heading } from "@/components/ui/typography/Heading";
 import { Text } from "@/components/ui/typography/Text";
-import { cn } from "@/lib/ui/cn";
 
 import styles from "./Portfolio.module.css";
 
@@ -14,40 +13,40 @@ export function Portfolio({ items }) {
     .sort((first, second) => first.sortOrder - second.sortOrder);
 
   return (
-    <Section className={styles.section} id="portfolio">
+    <Section className={styles.section} data-motion-portfolio id="portfolio">
       <Container className={styles.content}>
         <div className={styles.header} data-motion-reveal>
           <div>
             <Text as="p" className={styles.eyebrow} size="caption" tone="muted">
-              Selected work · temporary imagery
+              Selected work · development imagery
             </Text>
-            <Heading as="h2">A curated photography wall.</Heading>
+            <Heading as="h2">A continuous photography journey.</Heading>
           </div>
           <Text as="p" className={styles.intro} tone="muted">
-            Six local placeholders preserve the approved image ordering, aspect
-            ratios, and responsive editorial rhythm until final work is
-            supplied.
+            Twenty data-driven frames preserve their natural proportions and can
+            be replaced with final photography without changing the grid.
           </Text>
         </div>
 
         <div className={styles.grid}>
           {activeItems.map((item, index) => (
             <figure
-              className={cn(styles.item, styles[item.layout])}
+              className={styles.item}
               data-motion-reveal
               key={item.id}
+              style={{ "--portfolio-ratio": `${item.width} / ${item.height}` }}
             >
               <Image
                 alt={item.altText}
                 className={styles.image}
                 fill
-                loading={index < 2 ? "eager" : "lazy"}
+                loading="lazy"
                 sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 25vw"
                 src={item.mediaUrl}
               />
               <figcaption className={styles.caption}>
                 <span>{String(index + 1).padStart(2, "0")}</span>
-                <span>{item.title} · temporary</span>
+                <span>{item.title}</span>
               </figcaption>
             </figure>
           ))}

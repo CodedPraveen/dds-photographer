@@ -105,7 +105,7 @@ export function Footer({ contact, navigation, services, socialLinks }) {
           <Text as="p" size="caption" tone="inverse">
             © 2026 DDS Photographer. Temporary business details.
           </Text>
-          <Link href="#home" tone="inverse">
+          <Link href="/#home" tone="inverse">
             Back to top ↑
           </Link>
         </div>

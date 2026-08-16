@@ -6,7 +6,7 @@ import { Text } from "@/components/ui/typography/Text";
 
 import styles from "./Contact.module.css";
 
-export function Contact({ content }) {
+export function Contact({ content, headingLevel = "h1" }) {
   return (
     <Section className={styles.section} id="contact">
       <Container className={styles.content}>
@@ -20,7 +20,11 @@ export function Contact({ content }) {
           {content.eyebrow} · temporary details
         </Text>
         <div className={styles.layout}>
-          <Heading as="h2" className={styles.title} data-motion-reveal>
+          <Heading
+            as={headingLevel}
+            className={styles.title}
+            data-motion-reveal
+          >
             {content.title}
           </Heading>
           <div className={styles.details} data-motion-reveal>
