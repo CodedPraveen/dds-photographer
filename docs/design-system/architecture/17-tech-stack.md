@@ -1,597 +1,99 @@
-# Technology Stack
-
-> **Document Version:** 1.0  
-> **Status:** Active  
-> **Category:** Architecture  
-> **Last Updated:** YYYY-MM-DD
-
----
-
-# Purpose
-
-This document defines the official technology stack for the Photographer Business Website.
-
-Every technology included here has a specific purpose.
-
-Before introducing a new dependency, library, or service, it should be evaluated against the project's goals and architecture.
-
-This document serves as the single source of truth for all technical decisions.
-
----
-
-# Project Philosophy
-
-We prioritize:
-
-- Performance
-- Scalability
-- Maintainability
-- Developer Experience
-- Accessibility
-- Modern Web Standards
-- Long-Term Stability
-
-We avoid adding dependencies unless they provide clear value.
-
----
-
-# Core Stack
-
-| Layer | Technology |
-|---------|------------|
-| Framework | Next.js |
-| Language | JavaScript (ES2023+) |
-| UI Library | React |
-| Styling | Tailwind CSS |
-| Animation | GSAP + Framer Motion |
-| 3D Graphics | Three.js + React Three Fiber |
-| 3D Helpers | Drei |
-| Build Tool | Turbopack (Next.js) |
-| Package Manager | npm |
-| Runtime | Node.js |
-
----
-
-# Frontend
-
-## Next.js
-
-Purpose
-
-- App Router
-- Server Components
-- Static Generation
-- Route Optimization
-- Metadata API
-- Image Optimization
-
-Reason
-
-Provides a production-ready React framework with excellent performance and SEO.
-
----
-
-## React
-
-Purpose
-
-- Component Architecture
-- State Management
-- UI Rendering
-
-Reason
-
-Industry-standard UI library with excellent ecosystem support.
-
----
-
-## JavaScript
-
-Language Standard
-
-ES2023+
-
-Reason
-
-Keeps development simple while maintaining compatibility.
-
-TypeScript may be considered in future versions if project complexity increases.
-
----
-
-# Styling
-
-## Tailwind CSS
-
-Purpose
-
-- Utility-first styling
-- Responsive layouts
-- Consistent spacing
-- Fast development
-
-Reason
-
-Allows rapid development while maintaining consistency.
-
----
-
-## CSS Variables
-
-Purpose
-
-Centralized design tokens.
-
-Examples
-
-- Colors
-- Typography
-- Spacing
-- Shadows
-- Border Radius
-
-Reason
-
-Provides scalability and easy theme management.
-
----
-
-# Animation
-
-## GSAP
-
-Purpose
-
-Primary animation engine.
-
-Used For
-
-- Hero animations
-- Camera timeline
-- Scroll animations
-- Image reveal
-- Section transitions
-
-Reason
-
-Industry-leading animation performance.
-
----
-
-## Framer Motion
-
-Purpose
-
-React component animations.
-
-Used For
-
-- Page transitions
-- Hover interactions
-- Small UI animations
-
-Reason
-
-Excellent integration with React.
-
----
-
-# 3D
-
-## Three.js
-
-Purpose
-
-3D rendering.
-
-Used For
-
-- Camera model
-- Lighting
-- Environment
-- Interactive 3D scenes
-
----
-
-## React Three Fiber
-
-Purpose
-
-React renderer for Three.js.
-
-Reason
-
-Simplifies integration between React and Three.js.
-
----
-
-## Drei
-
-Purpose
-
-Reusable Three.js helpers.
-
-Examples
-
-- Camera Controls
-- Environment
-- Lighting
-- Loading Utilities
-
----
-
-# Images
-
-## Next.js Image
-
-Purpose
-
-- Image optimization
-- Responsive loading
-- Lazy loading
-- Automatic sizing
-
-Reason
-
-Essential for photography websites.
-
----
-
-# Backend
-
-## Next.js Server Actions
-
-Purpose
-
-- Form submissions
-- Contact actions
-- Server-side logic
-
-Reason
-
-Reduces API boilerplate.
-
----
-
-## Route Handlers
-
-Purpose
-
-Backend endpoints.
-
-Examples
-
-- Contact
-- Newsletter
-- Future CMS
-- Analytics
-
----
-
-# Database (Future)
-
-Recommended
-
-PostgreSQL
-
-ORM
-
-Prisma
-
-Purpose
-
-- Portfolio
-- Services
-- Contact Messages
-- CMS
-- Analytics
-
-Current Version
-
-Not required.
-
-The first version may use local content files.
-
----
-
-# Storage
-
-Current
-
-Local Assets
-
-Future
-
-Cloudinary
-
-Purpose
-
-- Image hosting
-- Image optimization
-- CDN
-- Transformations
-
----
-
-# Content Management
-
-Current
-
-Markdown
-
-JSON
-
-Future
-
-Headless CMS
-
-Possible Options
-
-- Payload CMS
-- Sanity
-- Strapi
-
-Selection will depend on future business requirements.
-
----
-
-# State Management
-
-Current
-
-React State
-
-Context API
-
-Future
-
-Zustand
-
-Reason
-
-Only introduce a dedicated state management library when application complexity requires it.
-
----
-
-# Forms
-
-Recommended
-
-React Hook Form
-
-Validation
-
-Zod
-
-Purpose
-
-- Contact Form
-- Newsletter
-- Future Admin Forms
-
----
-
-# Icons
-
-Recommended
-
-Lucide React
-
-Reason
-
-Simple
-
-Consistent
-
-Lightweight
-
-Open Source
-
----
-
-# Fonts
-
-Google Fonts
-
-Recommended
-
-- Inter
-- Manrope
-- Geist
-
-Final selection will follow the Design System.
-
----
-
-# Deployment
-
-Platform
-
-Vercel
-
-Reason
-
-Native Next.js support.
-
-Automatic deployments.
-
-Edge infrastructure.
-
----
-
-# Version Control
-
-Platform
-
-Git
-
-Repository
-
-GitHub
-
-Branch Strategy
-
-Defined in:
-
-development/BRANCH_STRATEGY.md
-
----
-
-# Code Quality
-
-Recommended
-
-ESLint
-
-Prettier
-
-Purpose
-
-- Formatting
-- Linting
-- Consistency
-
----
-
-# Performance Tools
-
-Recommended
-
-- Lighthouse
-- Chrome DevTools
-- WebPageTest
-- Vercel Analytics
-
-Purpose
-
-Continuous performance monitoring.
-
----
-
-# Testing (Future)
-
-Recommended
-
-Unit Testing
-
-- Vitest
-
-Component Testing
-
-- React Testing Library
-
-End-to-End
-
-- Playwright
-
-Testing will be introduced after the initial development phase.
-
----
-
-# Browser Support
-
-Target
-
-- Chrome
-- Edge
-- Firefox
-- Safari
-
-Mobile
-
-- Android Chrome
-- Safari iOS
-
-Older browsers are not a priority.
-
----
-
-# Accessibility
-
-Standards
-
-WCAG 2.2 AA
-
-Requirements
-
-- Keyboard navigation
-- Focus management
-- Screen reader compatibility
-- Reduced motion support
-
-Accessibility is considered a core requirement.
-
----
-
-# Dependency Policy
-
-Before adding a dependency, ask:
-
-- Can this be solved with existing tools?
-- Is the dependency actively maintained?
-- Does it improve developer experience?
-- Does it affect performance?
-- Will it still be useful in two years?
-
-If the answer is uncertain, do not add it.
-
----
-
-# Technology Principles
-
-The project follows these principles:
-
-- Modern Web Standards
-- Progressive Enhancement
-- Component-Based Architecture
-- Server-First Rendering
-- Performance First
-- Accessibility First
-- Mobile First
-- SEO Friendly
-- Scalable Architecture
-
----
-
-# Future Considerations
-
-Possible future integrations:
-
-- Headless CMS
-- AI Search
-- Face Recognition
-- Image Tagging
-- Client Gallery
-- Online Booking
-- Payment Integration
-- Multi-language Support
-- Analytics Dashboard
-- Admin Panel
-
-These are not part of Version 1.
-
----
-
-# Decision Log
-
-Technology decisions should only change when:
-
-- Performance improves significantly.
-- Security improves.
-- Maintainability improves.
-- Business requirements change.
-- Current tools become unsupported.
-
-Avoid switching technologies because of trends.
-
----
-
-# Related Documents
-
-- system-architecture.md
-- folder-structure.md
-- data-flow.md
-- state-management.md
-- deployment.md
-- api.md
-- performance/PERFORMANCE_BUDGET.md
+# Technology Stack and Decision Status
+
+> Updated 2026-10-26. The Eraser workspace remains the primary approved architecture reference under `AGENTS.md`.
+
+## Status vocabulary
+- **Implemented:** Present in repository code and used.
+- **Selected — not implemented:** Owner-approved future direction.
+- **Evaluation only:** Research/prototype only; not production-approved.
+- **Deferred / on hold:** Do not implement until reopened.
+
+## Implemented stack
+
+| Layer | Technology | Current evidence |
+| --- | --- | --- |
+| Framework | Next.js 16 | App Router under `src/app/` |
+| UI | React 19 | Server/client components |
+| Language | JavaScript | Application source |
+| Styling | Tailwind CSS v4 + CSS | Global styles and tokens |
+| 3D | Three.js + React Three Fiber | Persistent camera scene |
+| Motion | GSAP + ScrollTrigger | Scroll choreography |
+| Database | PostgreSQL | Prisma datasource and migration |
+| ORM | Prisma 7 + PostgreSQL adapter | Gallery repository |
+| Image library | Sharp | Dependency installed; no production upload pipeline |
+| Tests | Node.js test runner | `node --test` |
+| Quality | ESLint + Prettier | Repository scripts |
+| Package manager | npm | Package manifest and lockfile |
+
+An installed dependency is not proof of active runtime use. Verify imports before describing Framer Motion, Lenis, Drei, or other packages as part of a feature architecture. Framer Motion is not the approved primary animation engine; current motion uses GSAP and CSS.
+
+## Selected future technology
+
+| Area | Direction | Status / constraint |
+| --- | --- | --- |
+| Private photo object storage | Cloudflare R2 | Selected; integration not implemented |
+| Background jobs | Redis + BullMQ | Selected; integration not implemented |
+| Wedding guest password | One shared password per wedding | Selected; not implemented |
+| Gallery expiry | Extendable | Selected; exact policy pending |
+| Face matching | SFace | Evaluation only; no production approval |
+
+## Deferred
+
+### Video
+Cloudflare Stream is on hold. The active product scope is photo-only. Do not add video upload, processing, playback, or billing until explicitly reopened.
+
+### Face search
+SFace may be evaluated but is not approved for production. Evaluation must cover model provenance/license, accuracy, false-positive/negative behavior, bias, security, retention, and deletion.
+
+Face-search data must not be collected or processed without a separate, purpose-specific, affirmative, optional consent flow. General gallery-entry consent is not face-search consent.
+
+## Application architecture
+- Next.js App Router under `src/app/`.
+- Server-first rendering.
+- Server-only modules own secrets, authorization, and persistence.
+- Route Handlers implement actual HTTP endpoints.
+- Server Actions handle form mutations where implemented.
+- Generic UI primitives live under `src/components/ui/`.
+- Design tokens live in `src/styles/tokens.css`.
+
+## Motion and 3D
+- GSAP/ScrollTrigger drives the implemented camera scroll journey.
+- React Three Fiber renders the persistent camera.
+- The scene is lazy-loaded and demand-rendered.
+- Static fallback and reduced-motion behavior must remain usable.
+- Do not introduce a second animation system without an approved requirement.
+
+## Data and storage boundaries
+
+### PostgreSQL / Prisma
+Current Prisma models are `Gallery`, `GalleryMedia`, and `GalleryVisitor`. Proposed future entities must not be described as existing.
+
+### Cloudflare R2
+Selected for future private photo storage. Keep credentials and object keys server-side. Scope upload authorization to a gallery/object, verify uploads, and authorize every private media delivery. Bucket layout, derivatives, and lifecycle rules require a detailed storage design.
+
+### Redis + BullMQ
+Selected for future asynchronous photo processing. Specify job payloads, idempotency, retry/backoff, worker deployment, failed-job handling, and monitoring before implementation.
+
+## Privacy and security requirements
+- Secrets remain server-only and out of source control.
+- Gallery-link tokens and visitor access grants are separate credentials.
+- Media authorization is checked in gallery context.
+- Face-search consent is separate from gallery-entry consent.
+- Face-search consent is optional, explicit, unchecked by default, and withdrawable.
+- Do not capture a selfie or create embeddings before face-search consent.
+- Do not condition basic gallery access on face-search opt-in.
+- Define retention and deletion before production face-search work.
+
+## Dependency policy
+Before adding a package/service, confirm the feature is approved for the current phase, check existing alternatives, evaluate maintenance/security/license/cost, and document the reason. Do not install dependencies for deferred or evaluation-only work.
+
+## Related documents
+- `01-system-architecture.md`
+- `02-database-erd.md`
+- `09-storage.md`
+- `10-security.md`
+- `11-api.md`
+- `12-deployment.md`
+- `13-roadmap.md`
+- `../production/IMPLEMENTATION_STATUS.md`
+- `../production/IMPLEMENTED_FEATURES.md`
