@@ -1,6 +1,9 @@
 .section {
   position: relative;
-  min-height: 80svh;
+  display: grid;
+  min-height: 100svh;
+  align-items: center;
+  overflow: clip;
   background: var(--dds-color-inverse-background);
   color: var(--dds-color-inverse-foreground);
 }

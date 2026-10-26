@@ -38,7 +38,7 @@ export function Navbar({ items }) {
   return (
     <header className={cn(styles.header, isScrolled && styles.scrolled)}>
       <Container className={styles.container}>
-        <Link className={styles.brand} href="#home" tone="inverse">
+        <Link className={styles.brand} href="/#home" tone="inverse">
           DDS
           <VisuallyHidden> Photographer home</VisuallyHidden>
         </Link>

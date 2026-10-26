@@ -10,6 +10,7 @@
 html {
   min-width: 20rem;
   min-height: 100%;
+  overflow-x: clip;
   background: var(--dds-color-background);
   color-scheme: light;
   -webkit-text-size-adjust: 100%;
@@ -19,6 +20,7 @@ html {
 body {
   min-height: 100vh;
   margin: 0;
+  overflow-x: clip;
   background: var(--dds-color-background);
   color: var(--dds-color-foreground);
   font-family: var(--font-manrope), Arial, Helvetica, sans-serif;
