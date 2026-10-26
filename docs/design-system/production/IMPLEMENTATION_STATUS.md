@@ -1,94 +1,110 @@
 # Implementation Status
 
 > **Project:** DDS Photographer
->
-> **Current stage:** Phase 5 — Complete
->
-> **Completed work:** Phases 1–5
->
-> **Last verified:** 2026-08-11
+> **Last verified against repository source:** 2026-10-26
+> **Architecture authority:** Eraser workspace, as specified in `AGENTS.md`
 
-## Current Implementation
+## Current stage
 
-The repository uses Next.js 16, React 19, JavaScript, Tailwind CSS v4, and the
-App Router under `src/app/`. Phases 1–4 remain intact, including the server-side
-private-gallery foundation at `/gallery/[token]`.
+The public website, camera-led motion experience, and first private-gallery foundation
+are implemented. The next planned implementation phase is Phase 5 — Admin Dashboard
+and Production Readiness. Phase 5 has not started.
 
-Phase 5 finalizes the public marketing website. The homepage now tells its Hero
-story through the approved `public/cameras/camera.glb` model, an LCD-aligned
-photo emergence, and the existing GSAP/ScrollTrigger motion boundary. Selected
-Work is a data-driven 20-image gallery with natural ratios and four desktop
-columns. Its ending transitions left as the interactive Services presentation
-enters from the right. Services synchronize keyboard, pointer, and touch state
-with their image and camera composition. The full Contact experience now lives
-at `/contact`, and the public navbar links to that route.
+## Implemented scope
 
-Reduced-motion users receive the complete static content without the R3F scene
-or GSAP scroll choreography. The camera canvas remains demand-rendered, media
-uses responsive `next/image` delivery, and event/timeline cleanup remains
-scoped to the existing motion system.
+### Foundation and public website
+- Next.js 16, React 19, JavaScript, and App Router under `src/app/`.
+- Tailwind CSS v4, global CSS, CSS Modules, and design tokens.
+- Public homepage and `/contact`.
+- Navbar, Hero, About, Portfolio, Services, Contact, and Footer components.
+- Centralized replaceable development content and placeholder photography.
 
-## Phase Status
+### Camera-led motion
+- Lazy React Three Fiber camera scene using `public/cameras/camera.glb`.
+- GSAP / ScrollTrigger choreography.
+- Demand-rendered camera canvas.
+- Reduced-motion/static fallback.
+- Services interaction can update the camera composition.
 
-| Phase                                                    | Status      |
-| -------------------------------------------------------- | ----------- |
-| Phase 1 — Foundation & Architecture                      | Complete    |
-| Phase 2 — Public Website                                 | Complete    |
-| Phase 3 — Motion & Interactive Experience                | Complete    |
-| Phase 4 — Private Gallery Foundation                     | Complete    |
-| Phase 5 — Marketing Website Finalization                 | Complete    |
-| Phase 6 — Admin + Gallery Creation                       | Not started |
-| Phase 7 — AI + Face Recognition                          | Not started |
-| Phase 8 — Client Photo Delivery / Downloads              | Not started |
-| Phase 9 — Notifications / Optional Client Authentication | Not started |
+### Private-gallery foundation
+- Private gallery route at `/gallery/[token]`.
+- Signed 30-day gallery-link token with nonce, gallery ID, and token version.
+- Token-version validation supports revoking earlier links.
+- Visitor entry form with server-side validation.
+- Current gallery-entry consent capture.
+- Signed 12-hour HTTP-only, gallery-scoped visitor access cookie.
+- Gallery-scoped media route and authorization check.
+- Prisma/PostgreSQL and local development repository adapters.
+- Development preview route unavailable in production or when `DATABASE_URL` is set.
 
-## Confirmed Decisions
+This is a foundation, not a complete production photo-delivery platform. The inspected
+media route returns 503 for non-development storage keys because production storage
+delivery is not implemented.
 
-- The approved application root is `src/app/`, and the project remains
-  JavaScript-based.
-- The approved design tokens, typography, content, and section architecture
-  remain the source of truth.
-- Phase 5 reuses one lazy-loaded, demand-rendered R3F canvas and one primary
-  GSAP camera journey; it does not create duplicate animation systems.
-- The supplied GLB is used as requested. It is normalized at runtime and shown
-  with responsive scale and demand rendering.
-- The approved site contains no Experience section, so none was invented.
-- The four existing approved Services entries remain unchanged.
-- `/contact` reuses the existing Contact presentation and design language.
-- The Phase 4 private-gallery data, routes, authorization, and storage boundary
-  remain unchanged by Phase 5.
+## Roadmap status
 
-## Private Gallery and Future Features
+| Workstream | Status |
+| --- | --- |
+| Phase 0 — Architecture and baseline audit | Complete |
+| Phase 1A / 1B — Application foundation | Complete |
+| Phase 2 — Public marketing website | Complete |
+| Phase 3 — Camera-led motion experience | Complete |
+| Phase 4 — Private-gallery foundation | Complete |
+| Phase 5 — Admin dashboard and production readiness | Not started |
+| Production photo upload / processing pipeline | Not implemented |
+| Face-search implementation | Evaluation only |
+| Video | On hold |
 
-| Capability                 | Status      |
-| -------------------------- | ----------- |
-| Private Gallery Foundation | Complete    |
-| Admin UI                   | Not started |
-| Gallery Creation UI        | Not started |
-| AI                         | Not started |
-| Face Recognition           | Not started |
-| Downloads                  | Not started |
-| Client Authentication      | Not started |
-| Notifications              | Not started |
+Use `docs/design-system/architecture/13-roadmap.md` for the current detailed plan.
 
-Favorites and payments are not part of the approved DDS Photographer plan.
+## Owner decisions
 
-## Known Issues and Production Inputs
+| Area | Direction | Status |
+| --- | --- | --- |
+| Wedding guest password | One shared password per wedding | Selected; not implemented |
+| Gallery expiry | Extendable | Selected; policy details pending |
+| Photo storage | Cloudflare R2 | Selected; not integrated |
+| Background processing | Redis + BullMQ | Selected; not integrated |
+| Video | Cloudflare Stream | On hold; photo-only scope |
+| Face matching | SFace | Evaluation only |
+| Face-search consent | Separate, explicit, optional opt-in | Required before processing |
 
-Final photography, biography, contact details, and social links are still
-represented by clearly marked development content and can be replaced through
-the centralized content data without changing the components.
+## Current data model
 
-The supplied camera GLB contains approximately 136,000 triangles. It is usable
-and is now wired into the requested experience, but asset-level optimization is
-recommended before production publishing if a smaller approved export becomes
-available.
+`prisma/schema.prisma` currently defines:
+- `Gallery`
+- `GalleryMedia`
+- `GalleryVisitor`
 
-React Three Fiber emits an upstream `THREE.Clock` deprecation warning with the
-installed Three.js version during development. It does not affect rendering,
-linting, tests, or the production build.
+Do not describe future admin, upload-job, face-consent, embedding, or processing
+models as existing.
 
-Production Phase 4 deployment still requires PostgreSQL credentials, a
-server-only `GALLERY_TOKEN_SECRET`, migrations, provisioned gallery/media data,
-and an approved private storage provider. These are deployment inputs, not
-Phase 5 blockers.
+The existing visitor consent fields are gallery-entry consent only. They must not be
+used as face-search consent.
+
+## Production requirements not yet completed
+
+- Admin authentication and authorization.
+- Gallery creation and management UI.
+- Shared wedding password implementation, hashing, rate limiting, rotation.
+- Extendable expiry controls and retention/deletion policy.
+- Production PostgreSQL configuration, migrations, backups, restore testing.
+- Cloudflare R2 private storage and authorized media delivery.
+- Redis/BullMQ workers and processing pipeline.
+- Upload verification, derivatives, monitoring, and operational recovery.
+- Production face-search decision, consent flow, and data lifecycle (if approved).
+
+## Verification notes
+
+`package.json` defines:
+- `npm run lint`
+- `npm test` (`node --test`)
+- `npm run format:check`
+- `npm run build`
+
+These scripts must be run to claim local validation. A successful Vercel preview
+deployment does not prove lint, test, formatting, or build checks all passed.
+
+For the PR head reviewed on 2026-10-26, GitHub returned a successful Vercel deployment
+status and no GitHub Actions lint/test/format/build check-runs. Do not report full CI
+as passing based on that result.
