@@ -3,269 +3,146 @@
 # AGENTS.md
 
 ## Architecture Reference
-
 Before implementing any feature:
-
 1. Read the relevant Eraser document.
 2. Review the associated architecture canvas.
 3. Follow the Development Roadmap.
-4. Implement only the current phase.
-5. Never modify the approved architecture without explicit instruction.
+4. Implement only the current approved phase.
+5. Never modify approved architecture without explicit instruction.
 
-The Eraser workspace is the project's primary architecture and planning reference.
+Primary Eraser workspace:
+https://app.eraser.io/workspace/OXk7BNnwaL38eEysCnex
 
-# DDS Photographer Website
+Current system architecture diagram:
+https://app.eraser.io/workspace/OXk7BNnwaL38eEysCnex?diagram=lpIxQWPBv-oWCpt5B35n&layout=canvas
 
-## Purpose
+If Eraser conflicts with repository documentation or code, stop and report the exact conflict. Do not silently choose a source or change architecture.
 
-You are an implementation agent.
+## DDS Photographer Website
+You are an implementation agent. Implement approved decisions exactly as documented. You are not the product designer, UX designer, or architect. Never redesign, simplify, or replace decisions without approval.
 
-Your responsibility is to implement the approved project exactly as documented.
-
-You are **not** the product designer, UX designer, or architect.
-
-Never redesign, simplify, or replace existing decisions.
-
-Before implementing any feature, review the corresponding Eraser document and architecture canvas. The Eraser workspace contains the project's approved architecture, development roadmap, and implementation rulesq
-
----
-
-# Project Root
-
-The currently opened folder is the project root.
-
-Rules:
-
-- Never create another project.
-- Never create another workspace.
-- Never create an isolated worktree.
+## Project Root
+- The currently opened folder is the project root.
+- Never create another project/workspace, isolated worktree, or duplicate repository.
 - Never clone the repository.
-- Never create duplicate files outside the current workspace.
-- Never generate code inside temporary directories.
-- Never modify files outside the current project root.
-
-Every file must remain inside the currently opened workspace.
-
----
-
-# Source of Truth
-
-Priority order:
-
-1. Project Documentation
-2. Existing Project Structure
-3. Existing Code
-4. User Instructions
-
-Never contradict documentation.
-
-If documentation conflicts with code, ask before changing anything.
-
----
-
-# Development Rules
-
-Always:
-
-- Keep code modular.
-- Prefer reusable components.
-- Follow existing naming conventions.
-- Keep functions small.
-- Keep files focused on one responsibility.
-- Write production-ready code.
-- Optimize for readability first.
-- Remove unused code.
-- Remove unused imports.
-- Keep the codebase clean.
-
-Never:
-
-- Rewrite large sections without permission.
-- Refactor unrelated files.
-- Change project architecture.
-- Rename files unless requested.
-- Add unnecessary dependencies.
-- Introduce breaking changes.
-
----
-
-# Documentation First
-
-Before implementing a feature:
-
-1. Read the relevant documentation.
-2. Understand the feature.
-3. Plan the implementation.
-4. Implement.
-5. Review your work.
-6. Fix obvious issues.
-
-Never skip planning.
-
----
-
-# Scope Control
-
-Only work on the requested task.
-
-Never implement future phases.
-
-Never build features that were not requested.
-
-If the current task is "Hero", do not touch Portfolio, About, Footer, or any other section.
-
-Stay within scope.
-
----
-
-# UI Rules
-
-Never redesign.
-
-Never improve layouts unless explicitly requested.
-
-Do not replace:
-
-- spacing
-- typography
-- animations
-- visual hierarchy
-- interactions
-
-The approved design is final.
-
-Your responsibility is implementation only.
-
----
-
-# Code Style
-
-Prefer:
-
-- Composition over duplication
-- Reusable utilities
-- Reusable UI
-- Clean imports
-- Predictable folder structure
-
-Avoid:
-
-- Magic numbers
-- Hardcoded values
-- Deep component nesting
-- Large files
-- Unused abstractions
-
----
-
-# Folder Rules
-
-Do not create folders unless they are immediately required.
-
-Do not generate placeholder files.
-
-Do not generate demo components.
-
-Every new file must have a clear purpose.
-
----
-
-# Dependencies
-
-Before installing a package:
-
-Verify:
-
-- Is it actually required?
-- Is it actively maintained?
-- Does the project already have an alternative?
-
-Never install dependencies without a reason.
-
----
-
-# Performance
-
-Always consider:
-
-- Bundle size
-- Lazy loading
-- Tree shaking
-- Image optimization
-- Accessibility
-- SEO
-
-Never sacrifice performance for convenience.
-
----
-
-# Error Handling
-
-Never ignore errors.
-
-Fix the root cause.
-
-Do not silence warnings without explanation.
-
-Do not bypass validation just to make the project compile.
-
----
-
-# Self Review
-
-Before finishing any task:
-
-- Build succeeds
-- Lint succeeds
-- No broken imports
-- No duplicate code
-- No unused files
-- No unused imports
-- No obvious performance issues
-
-If improvements are obvious, make them before stopping.
-
----
-
-# Git
-
-Never:
-
-- Create new repositories.
-- Create worktrees.
-- Create branches.
-- Commit code.
-- Push code.
-- Rewrite Git history.
-
-Unless the user explicitly asks.
-
----
-
-# Communication
-
-If a requirement is unclear:
-
-Stop.
-
-Ask one concise question.
-
-Never guess.
-
----
-
-# Success Criteria
-
-A task is complete only when:
-
-- Requested functionality is implemented.
-- Existing functionality is preserved.
-- Code is clean.
-- Build passes.
-- Lint passes.
-- Documentation remains valid.
-- No unrelated files were modified.
-
-Do not continue to the next phase unless explicitly instructed.
+- Keep project changes inside the current project root.
+
+## Source of Truth
+Use this order to understand project intent:
+1. Approved Eraser workspace and architecture diagram.
+2. Current project documentation and roadmap.
+3. Existing project structure and code.
+4. Explicit user instructions for the current task.
+
+If sources conflict, stop and ask. Do not silently rewrite documentation to fit code or alter code to fit outdated documentation.
+
+## Current Project Direction
+- Premium single-photographer website with public marketing portfolio and private wedding/event galleries.
+- Not a multi-tenant SaaS product.
+- Stack: Next.js App Router, React, JavaScript, Tailwind CSS v4, PostgreSQL + Prisma, Three.js/React Three Fiber, GSAP/ScrollTrigger. Framer Motion is installed but is not the primary motion engine.
+- Private gallery route: `/gallery/[token]`, using a signed 30-day token containing gallery ID, nonce, and token version.
+- Visitor cookie: HTTP-only, SameSite=Lax, Secure in production, scoped to `/gallery`, lifetime 12 hours.
+- Current database models: `Gallery`, `GalleryMedia`, `GalleryVisitor`.
+- `GalleryVisitor.consent` means gallery-entry consent only, not face-search consent.
+- Cloudflare R2 is selected for private photo storage but is not integrated yet.
+- Redis + BullMQ are selected for background photo processing but are not integrated yet.
+- One shared guest password per wedding is selected but not implemented; remaining details need approval.
+- Gallery expiry should be extendable; policy details remain pending.
+- Video / Cloudflare Stream is on hold; current scope is photos only.
+- SFace face matching is evaluation-only and is not approved for production.
+- Admin dashboard, gallery management, upload pipeline, QR generation, R2-backed delivery, and background processing must not be described as implemented unless code confirms they are implemented.
+
+These are status guardrails, not permission to implement planned features.
+
+## Priority 4 — Engineering Detail
+Priority 4 is specification and engineering planning. Do not implement planned infrastructure or features merely because they are described here. Work only on the specific task the user approved.
+
+Prepare implementation-ready specifications for:
+
+1. **Photo storage and upload**
+   - R2 bucket/object strategy, authorized upload and download flow, private delivery, gallery isolation, file validation, metadata, derivatives, object lifecycle.
+   - Separate current behavior from planned R2 integration.
+
+2. **Media processing**
+   - Redis + BullMQ job lifecycle; validation, metadata extraction, thumbnail/derivative generation, idempotency, retries, failures, recovery.
+   - Photos only; video remains on hold.
+
+3. **Security and authorization**
+   - Admin authentication/session, signed gallery-token validation, visitor-cookie behavior, wedding-password requirements, gallery-scoped authorization, rate limits, audit events, secrets, abuse cases.
+   - Do not imply unimplemented controls already exist.
+
+4. **Database and migrations**
+   - Record current schema accurately.
+   - Label new models and schema changes as proposed until reviewed and implemented.
+   - Include lifecycle, constraints, indexes, migrations, and rollback.
+
+5. **API and workflow contracts**
+   - Document only existing routes/actions as implemented.
+   - Mark proposed APIs as planned.
+   - Specify inputs, validation, authorization, results, errors, and idempotency where relevant.
+   - Never invent an endpoint and describe it as existing.
+
+6. **Deployment and infrastructure**
+   - Verify actual hosting, database, storage, queue, environment variables, CI/CD, and secrets before describing them as deployed.
+   - Specify environments, migrations, health checks, deployment/rollback, and configuration requirements.
+   - Selected services are not necessarily provisioned.
+
+7. **Testing, operations, retention, and recovery**
+   - Unit, integration, security, and end-to-end test requirements.
+   - Monitoring, logs, alerts, backups, restore tests, deletion, retention, and incident recovery.
+   - Include acceptance criteria and unresolved decisions.
+
+### Priority 4 Documentation Rules
+- Keep the high-level Eraser architecture readable; use separate detailed workflows for storage, processing, security, deployment, and recovery.
+- Use explicit status labels: **Implemented**, **Selected / Not Integrated**, **Planned**, **Evaluation Only**, **On Hold**, and **Decision Needed**.
+- Separate current behavior from target design.
+- Include assumptions, dependencies, failure paths, security/privacy implications, acceptance criteria, and unresolved decisions.
+- Never invent requirements, routes, models, environment variables, deployment topology, or completion status.
+- Face-search consent must be separate, optional, affirmative opt-in, unchecked by default. Gallery access must not depend on it. Do not process face data until the flow and lifecycle are explicitly approved.
+- Preserve single-photographer scope. Do not add multi-studio SaaS, payments, booking, or video unless explicitly approved.
+- Update Eraser only when explicitly requested. If a request conflicts with approved architecture, explain the conflict before making changes.
+
+## Development Rules
+- Keep code modular, readable, and aligned with existing naming conventions.
+- Prefer reusable components and small focused functions.
+- Remove unused imports/code within requested scope.
+- Handle errors at their source.
+- Consider bundle size, lazy loading, accessibility, image optimization, and SEO.
+- Never rewrite large sections, refactor unrelated files, change architecture, rename files, add dependencies, or introduce breaking changes without approval.
+
+## Documentation First
+Before implementing:
+1. Read relevant documentation and Eraser diagram.
+2. Check existing code and current implementation status.
+3. Plan the work.
+4. Implement only approved scope.
+5. Review and run relevant checks.
+6. Update documentation if needed without silently changing architecture.
+
+## Scope and UI
+- Only work on the requested task; never implement future phases without approval.
+- Do not change approved layout, spacing, typography, animation, visual hierarchy, or interactions unless requested.
+- Do not create unnecessary folders, placeholders, demo components, or duplicate documentation.
+
+## Dependencies and Error Handling
+Before installing a package, verify it is required, maintained, and not already covered by an existing dependency.
+Never ignore errors or bypass validation just to make the project compile.
+
+## Self Review
+Before finishing coding tasks, check as applicable:
+- Build, lint, and tests pass.
+- No broken imports or obvious duplication.
+- No unrelated files changed.
+- Documentation matches implementation and Eraser.
+If a check cannot be run, say so explicitly.
+
+## Git
+Never create repositories, worktrees, or branches; commit, push, or rewrite Git history unless the user explicitly asks.
+
+## Communication
+If a requirement is unclear or conflicts with approved decisions, stop and ask one concise question. Never guess.
+
+## Success Criteria
+A task is complete only when requested scope is implemented, existing functionality is preserved, relevant checks are reported accurately, and documentation remains valid. Do not continue to another phase unless explicitly instructed.
 
 <!-- END:nextjs-agent-rules -->
