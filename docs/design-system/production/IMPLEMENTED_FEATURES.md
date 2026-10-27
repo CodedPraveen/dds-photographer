@@ -1,72 +1,66 @@
 # Implemented Features
 
-> **Last verified:** 2026-08-11
->
-> **Evidence:** Current repository code
+> **Last verified against repository source:** 2026-10-26
+> **Evidence:** Current `system-design` branch source tree, Prisma schema, and routes.
 
 ## Implemented
 
-### Phases 1–4
+### Foundation and public website
+- Next.js 16 and React 19 App Router under `src/app/`.
+- JavaScript application source.
+- Tailwind CSS v4, CSS Modules, global styles, and central design tokens.
+- Public homepage and `/contact`.
+- Navbar, Hero, About, Portfolio, Services, Contact, and Footer components.
+- Centralized public content data in `src/features/public-site/content/site-content.js`.
+- Placeholder images and temporary business details remain in use.
 
-- Next.js 16 and React 19 App Router foundation under `src/app/`
-- Central design tokens, Manrope typography, reusable UI primitives, metadata,
-  responsive layouts, visible focus, and reduced-motion defaults
-- Public Navbar, Hero, About, Selected Work, Services, Contact, and Footer
-  foundations with centralized replaceable development content
-- One scoped GSAP/ScrollTrigger orchestration and one lazy, demand-rendered R3F
-  camera scene
-- Server-validated private gallery at `/gallery/[token]` with signed expiring
-  links, consent capture, gallery-scoped access cookies, Prisma/PostgreSQL
-  models, protected media delivery, and development-only adapters
+### Camera-led motion experience
+- Actual `public/cameras/camera.glb` model loaded by the existing R3F scene.
+- React Three Fiber / Three.js rendering.
+- GSAP / ScrollTrigger scroll choreography.
+- Lazy camera loading and demand rendering.
+- Reduced-motion path and static fallback.
+- Service selection communicates with the camera scene.
 
-### Phase 5 Marketing Website Finalization
+### Private-gallery foundation
+- `/gallery/[token]` route.
+- Signed expiring gallery-link token with nonce, gallery ID, and token version.
+- Gallery token-version check.
+- Visitor entry form with name, mobile, email, and gallery-entry consent.
+- Server-side input validation.
+- Signed 12-hour HTTP-only visitor access cookie, scoped to `/gallery`.
+- Gallery-scoped media lookup and authorization for non-cover media.
+- Prisma/PostgreSQL repository adapter.
+- Local development repository adapter.
+- Development-only `/gallery/preview` route.
 
-- Actual `public/cameras/camera.glb` model normalized and rendered by the
-  existing single R3F scene
-- Camera entrance from distance, settled rear-LCD composition, visible Hero
-  background, and camera persistence through the photo handoff
-- First photo aligned to the LCD before moving upward and expanding into the
-  Hero visual stage; no large marketing headline
-- Existing About content preserved without inventing an Experience section
-- Data-driven Selected Work gallery containing 20 replaceable development
-  entries
-- Natural image aspect ratios, responsive `next/image` delivery, lazy loading,
-  one mobile column, two tablet columns, and four desktop columns
-- GSAP/ScrollTrigger ending in which Selected Work exits left while Services
-  enters from the right, with scoped cleanup
-- Interactive Services state shared between each service control, its matching
-  background image, and subtle camera composition
-- Pointer hover, keyboard focus, click, and touch/tap support for every service
-- Full Contact experience moved off the homepage to `/contact`
-- Existing navbar architecture updated so Contact routes to `/contact`
-- Static reduced-motion path that omits unnecessary 3D and scroll choreography
-- Responsive verification at 390px, 768px, 1280px, and 1600px
+## Current database models
 
-### Temporary Development Content
+- `Gallery`
+- `GalleryMedia`
+- `GalleryVisitor`
 
-- Centralized replaceable copy and link data in the public-site feature
-- Reused local development photography under `public/placeholders/`
-- Clearly marked temporary contact details and photography labels
+See `prisma/schema.prisma` and `docs/design-system/architecture/02-database-erd.md`.
 
-## Not Implemented
+## Not implemented
 
-- Phase 6 admin authentication, dashboard, gallery creation, uploads,
-  publishing, QR generation, or visitor management UI
-- Phase 7 AI or face recognition
-- Phase 8 client photo downloads
-- Phase 9 notifications or optional client authentication
-- Favorites
-- Payments
-- Production private-storage provider or CDN integration
+- Phase 5 admin authentication, dashboard, gallery creation/editing, publishing,
+  shared wedding password, and extendable expiry controls.
+- Production uploads and Cloudflare R2 integration.
+- Production private object delivery and CDN integration.
+- Redis/BullMQ background processing.
+- Upload validation, thumbnails, derivatives, and processing-job operations.
+- QR-code generation.
+- Face-search feature or production face recognition.
+- Face-search consent model and derived face-data lifecycle.
+- Video upload, storage, processing, or playback (on hold).
+- Favorites, payments, multi-studio SaaS, and mobile apps.
 
-## Phase Status
+## Status language
 
-- Phase 1: Complete
-- Phase 2: Complete
-- Phase 3: Complete
-- Phase 4: Complete
-- Phase 5: Complete
-- Phase 6: Not started
-- Phase 7: Not started
-- Phase 8: Not started
-- Phase 9: Not started
+- Cloudflare R2 and Redis/BullMQ are selected future directions, not integrations.
+- Cloudflare Stream is on hold; product scope is photo-only.
+- SFace is evaluation-only, not production-approved.
+- One shared password per wedding and extendable expiry are selected decisions,
+  not implemented features.
+- Gallery-entry consent is not face-search consent.
