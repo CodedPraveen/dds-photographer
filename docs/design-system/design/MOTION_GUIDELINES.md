@@ -275,14 +275,14 @@ Motion should remain consistent.
 
 Recommended timing philosophy:
 
-| Type | Feel |
-|------|------|
-| Hover | Fast |
-| Button | Fast |
-| Reveal | Medium |
-| Camera | Slow |
-| Section Transition | Slow |
-| Hero Sequence | Cinematic |
+| Type               | Feel      |
+| ------------------ | --------- |
+| Hover              | Fast      |
+| Button             | Fast      |
+| Reveal             | Medium    |
+| Camera             | Slow      |
+| Section Transition | Slow      |
+| Hero Sequence      | Cinematic |
 
 Exact durations will be defined during implementation.
 
@@ -522,3 +522,47 @@ If not, it should not exist.
 - HERO.md
 - CAMERA.md
 - PORTFOLIO.md
+
+# Cinematic Camera-to-Photograph Journey (2026-11-13)
+
+This section adds detail to the existing motion principles above. It does not remove or weaken any existing accessibility, performance, or reduced-motion requirements.
+
+## Story sequence
+
+1. The camera enters slowly and settles as the hero's visual anchor.
+2. The LCD displays the first featured photograph.
+3. On scroll, the photograph appears to lift directly from the LCD rather than fade in from an unrelated page position.
+4. It travels upward along a soft curved, check-mark-like trajectory and settles into a layered printed-photo composition.
+5. The LCD previews the next photograph. The reveal repeats as the visitor scrolls, while earlier photographs remain part of the composition.
+6. The camera remains present as a companion after the hero sequence and through the About, Experience / portfolio, Services, Testimonials, Contact, and Footer sections.
+7. The journey closes with a restrained shutter-inspired footer moment.
+
+## Persistent camera behavior
+
+- The camera must never permanently disappear after the hero sequence.
+- It may become less prominent, move behind or beside content, or temporarily reduce opacity when needed for readability, but it must return to a visible companion role.
+- Section-specific movement must remain subtle and intentional. The camera must not compete with photography or text.
+- Contact may emphasize the camera lens as the visual anchor for the call to action.
+- The footer may use a shutter-inspired close; it must not become a disruptive full-screen effect.
+
+## Photo trajectory and physical feel
+
+- The image's origin is the camera LCD, using the actual 3D LCD anchor projected into viewport coordinates.
+- Keep the spawn point synchronized with camera movement so the image does not drift away from the LCD.
+- Use a smooth upward curved path rather than a straight translation.
+- Land each image into a deliberate layered composition with controlled overlap, subtle depth, restrained rotation, and soft shadows.
+- Avoid bounce, elastic easing, random placement, abrupt direction changes, and excessive rotation.
+- Scroll remains under visitor control; motion follows scroll and never blocks access to content.
+
+## Visual direction
+
+Keep the premium editorial direction: black and white as the base, restrained warm gold / gray accents, large typography, generous negative space, and photography as the hero. Avoid gradients, glassmorphism, and unnecessary decoration.
+
+## Engineering constraints
+
+- Continue with the existing React Three Fiber / Three.js and GSAP / ScrollTrigger architecture.
+- Do not introduce a second motion engine for this work without explicit approval.
+- Prefer optimized responsive HTML images for the photo layer where appropriate.
+- Respect reduced motion, semantic image descriptions, keyboard accessibility, responsive layouts, and graceful static fallbacks.
+- Keep image loading progressive and avoid layout shifts.
+- Treat every behavior in this section as a design requirement until verified in implementation; this document alone is not evidence that it exists.
