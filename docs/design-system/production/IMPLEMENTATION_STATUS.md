@@ -108,8 +108,6 @@ deployment does not prove lint, test, formatting, or build checks all passed.
 For the PR head reviewed on 2026-10-26, GitHub returned a successful Vercel deployment
 status and no GitHub Actions lint/test/format/build check-runs. Do not report full CI
 as passing based on that result.
-
-
 ## Public experience refinement — status update (2026-11-13)
 
 The camera-led motion foundation remains implemented as described in the existing status record. A follow-on cinematic refinement has now been documented, but **the refinement itself is not implemented or verified**.
@@ -126,7 +124,27 @@ The camera-led motion foundation remains implemented as described in the existin
 | Camera-lens-inspired Contact call to action | Design requirement; implementation not verified |
 | Shutter-inspired footer ending | Design requirement; implementation not verified |
 
-No code, tests, or deployment were changed as part of this documentation update. Do not infer implementation completion from the design specifications. Verify each item against source and runtime behavior before moving it to Implemented.
+### Public-camera refinement implementation attempt — 2026-11-13
+
+The hero's HTML photo stack now waits for an event emitted from the camera model's
+named `Screen` node, projected through the active R3F camera into viewport
+coordinates. This replaces its fixed CSS placement as the initial photograph
+origin. The existing GSAP timeline remains responsible for the scroll path and
+layered reveal.
+
+| Refinement item                                                 | Status                                                                             |
+| --------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| Projected `Screen`-node coordinate supplied to hero photo stack | Partially Implemented; code checked by lint and unit tests                         |
+| Visual LCD alignment across supported breakpoints               | Not verified at runtime                                                            |
+| Full repeatable camera-to-photo journey                         | Partially Implemented; existing choreography remains, runtime verification pending |
+
+Verification on 2026-11-13: `npm run lint` and `npm test` passed. Repository-wide
+format checking reports pre-existing issues in 82 files. The production build did
+not finish because Next left a stale `.next/lock` without a running build worker.
+Do not elevate the refinement to Implemented until runtime and production-build
+verification succeed.
+
+Code and local checks changed as recorded above; no deployment changed. Do not infer implementation completion from the design specifications. Verify each item against source and runtime behavior before moving it to Implemented.
 
 See:
 - `docs/design-system/architecture/13-roadmap.md`

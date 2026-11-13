@@ -6,6 +6,7 @@
 ## Implemented
 
 ### Foundation and public website
+
 - Next.js 16 and React 19 App Router under `src/app/`.
 - JavaScript application source.
 - Tailwind CSS v4, CSS Modules, global styles, and central design tokens.
@@ -15,14 +16,20 @@
 - Placeholder images and temporary business details remain in use.
 
 ### Camera-led motion experience
+
 - Actual `public/cameras/camera.glb` model loaded by the existing R3F scene.
 - React Three Fiber / Three.js rendering.
 - GSAP / ScrollTrigger scroll choreography.
 - Lazy camera loading and demand rendering.
 - Reduced-motion path and static fallback.
 - Service selection communicates with the camera scene.
+- **Partially implemented refinement:** the hero photo stack can consume the
+  projected viewport coordinate of the model's named `Screen` node, and remains
+  hidden until the coordinate is available. Runtime visual verification is still
+  required before treating the LCD-to-photo journey as fully implemented.
 
 ### Private-gallery foundation
+
 - `/gallery/[token]` route.
 - Signed expiring gallery-link token with nonce, gallery ID, and token version.
 - Gallery token-version check.

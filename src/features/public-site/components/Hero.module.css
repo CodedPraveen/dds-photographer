@@ -62,12 +62,17 @@
 .photoStack {
   position: absolute;
   z-index: 20;
-  top: 53%;
-  left: 50%;
+  top: var(--lcd-anchor-y, 53%);
+  left: var(--lcd-anchor-x, 50%);
   width: clamp(10rem, 23vw, 22rem);
   aspect-ratio: 16 / 10;
   pointer-events: none;
   transform: translate(-50%, -50%);
+  transition: opacity 180ms var(--dds-ease-out);
+}
+
+.photoStack:not([data-lcd-ready="true"]) {
+  opacity: 0;
 }
 
 .photoCard {
@@ -100,7 +105,6 @@
   }
 
   .photoStack {
-    top: 52%;
     width: min(48vw, 12rem);
   }
 

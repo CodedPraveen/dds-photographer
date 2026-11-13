@@ -14,6 +14,7 @@
 ## Implemented
 
 ### Public website
+
 - Next.js 16 App Router and React 19 JavaScript application.
 - Homepage composition: Navbar, Hero, About, Portfolio, Services, Footer.
 - Contact page at `/contact`.
@@ -22,6 +23,7 @@
 - Responsive image delivery through `next/image` in the public site.
 
 ### Camera and motion
+
 - Persistent camera experience in `src/features/motion/components/`.
 - React Three Fiber / Three.js camera scene using `public/cameras/camera.glb`.
 - GSAP / ScrollTrigger orchestration.
@@ -29,6 +31,7 @@
 - Services interaction communicates state to the camera scene.
 
 ### Private-gallery foundation
+
 - Gallery page: `src/app/gallery/[token]/page.js`.
 - Media handler: `src/app/gallery/[token]/media/[mediaId]/route.js`.
 - Development preview: `src/app/gallery/preview/route.js`.
@@ -45,7 +48,9 @@
 - `/gallery/preview` is unavailable in production or when `DATABASE_URL` is set.
 
 ### Database
+
 Current Prisma models:
+
 - `Gallery`
 - `GalleryMedia`
 - `GalleryVisitor`
@@ -99,3 +104,20 @@ not equivalent to a passing full CI pipeline.
 
 Package scripts currently include `lint`, `test` (`node --test`), `format:check`,
 and `build`. Run them locally or add a CI workflow to obtain explicit results.
+
+## Public-camera refinement update — 2026-11-13
+
+- **Partially implemented:** the public hero now receives a viewport coordinate
+  from the named `Screen` node in `public/cameras/camera.glb`. The HTML featured
+  photograph remains hidden until that projected LCD coordinate is available,
+  avoiding the former fixed viewport-origin approximation.
+- **Verified:** `npm run lint` and `npm test` passed after this change.
+- **Not verified:** visual behavior across desktop, tablet, mobile, and reduced
+  motion. `npm run build` did not complete in this environment: Next left a
+  `.next/lock` file while no build worker remained running. Repository-wide
+  `npm run format:check` also fails on existing formatting issues across 82
+  files; the three changed source files were formatted individually.
+- The repeatable LCD preview, full curved photograph sequence, contact lens CTA,
+  and end-to-end persistent-camera behavior remain **Partially Implemented**
+  pending runtime verification. No storage, admin, video, or contact-delivery
+  functionality was added.

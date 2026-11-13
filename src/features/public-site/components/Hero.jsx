@@ -1,10 +1,38 @@
+"use client";
+
 import Image from "next/image";
+import { useEffect, useRef } from "react";
 
 import { VisuallyHidden } from "@/components/ui/visually-hidden/VisuallyHidden";
 
 import styles from "./Hero.module.css";
 
 export function Hero({ content, items }) {
+  const photoStackRef = useRef(null);
+
+  useEffect(() => {
+    const updateLcdAnchor = (event) => {
+      const photoStack = photoStackRef.current;
+      const { x, y, visible } = event.detail ?? {};
+
+      if (
+        !photoStack ||
+        !visible ||
+        !Number.isFinite(x) ||
+        !Number.isFinite(y)
+      ) {
+        return;
+      }
+
+      photoStack.style.setProperty("--lcd-anchor-x", `${x}px`);
+      photoStack.style.setProperty("--lcd-anchor-y", `${y}px`);
+      photoStack.dataset.lcdReady = "true";
+    };
+
+    window.addEventListener("dds:lcd-anchor", updateLcdAnchor);
+    return () => window.removeEventListener("dds:lcd-anchor", updateLcdAnchor);
+  }, []);
+
   return (
     <section className={styles.hero} data-motion-hero id="home">
       <Image
@@ -27,6 +55,7 @@ export function Hero({ content, items }) {
         <div
           aria-label="Featured photographs emerging from the camera"
           className={styles.photoStack}
+          ref={photoStackRef}
         >
           {items.map((item, index) => (
             <figure
