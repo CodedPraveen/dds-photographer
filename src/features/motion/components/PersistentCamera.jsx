@@ -1,7 +1,7 @@
 "use client";
 
 import { useGLTF } from "@react-three/drei";
-import { Canvas, useThree } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Component, useEffect, useMemo, useRef } from "react";
 import { Box3, DoubleSide, Vector3 } from "three";
 
@@ -184,7 +184,46 @@ function CameraModel() {
     return clone;
   }, [scene]);
 
-  return <primitive object={model} />;
+  return (
+    <>
+      <primitive object={model} />
+      <LcdAnchor model={model} />
+    </>
+  );
+}
+
+function LcdAnchor({ model }) {
+  const camera = useThree((state) => state.camera);
+  const size = useThree((state) => state.size);
+  const screen = useMemo(
+    () =>
+      model.getObjectByName("Screen") ??
+      model.getObjectByName("screen") ??
+      null,
+    [model],
+  );
+  const position = useMemo(() => new Vector3(), []);
+  const projected = useMemo(() => new Vector3(), []);
+  const previous = useRef("");
+
+  useFrame(() => {
+    if (!screen) return;
+
+    screen.getWorldPosition(position);
+    projected.copy(position).project(camera);
+    const visible = projected.z >= -1 && projected.z <= 1;
+    const x = ((projected.x + 1) / 2) * size.width;
+    const y = ((-projected.y + 1) / 2) * size.height;
+    const next = `${Math.round(x)}:${Math.round(y)}:${visible}`;
+
+    if (next === previous.current) return;
+    previous.current = next;
+    window.dispatchEvent(
+      new CustomEvent("dds:lcd-anchor", { detail: { x, y, visible } }),
+    );
+  });
+
+  return null;
 }
 
 function mix(start, end, progress) {
