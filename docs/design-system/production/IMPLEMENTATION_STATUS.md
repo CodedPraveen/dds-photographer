@@ -108,3 +108,27 @@ deployment does not prove lint, test, formatting, or build checks all passed.
 For the PR head reviewed on 2026-10-26, GitHub returned a successful Vercel deployment
 status and no GitHub Actions lint/test/format/build check-runs. Do not report full CI
 as passing based on that result.
+
+
+## Public experience refinement — status update (2026-11-13)
+
+The camera-led motion foundation remains implemented as described in the existing status record. A follow-on cinematic refinement has now been documented, but **the refinement itself is not implemented or verified**.
+
+| Refinement item | Status |
+| --- | --- |
+| Existing R3F / Three.js camera scene and GSAP / ScrollTrigger foundation | Implemented (baseline) |
+| Camera LCD anchor projected to a responsive screen coordinate for image spawning | Planned; not verified as implemented |
+| First photograph visibly emerging from the LCD | Planned; not verified as implemented |
+| Repeatable LCD preview and curved upward photo reveal sequence | Planned; not verified as implemented |
+| Layered printed-photo landing composition | Planned; not verified as implemented |
+| Camera remains a companion across all public sections | Design requirement; end-to-end behavior not verified |
+| Section-specific camera behavior for About / Experience | Planned refinement; not verified |
+| Camera-lens-inspired Contact call to action | Design requirement; implementation not verified |
+| Shutter-inspired footer ending | Design requirement; implementation not verified |
+
+No code, tests, or deployment were changed as part of this documentation update. Do not infer implementation completion from the design specifications. Verify each item against source and runtime behavior before moving it to Implemented.
+
+See:
+- `docs/design-system/architecture/13-roadmap.md`
+- `docs/design-system/design/MOTION_GUIDELINES.md`
+- `docs/design-system/design/components/HERO_SECTION.md`
