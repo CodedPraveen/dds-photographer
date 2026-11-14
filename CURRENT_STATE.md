@@ -14,6 +14,7 @@
 ## Implemented
 
 ### Public website
+
 - Next.js 16 App Router and React 19 JavaScript application.
 - Homepage composition: Navbar, Hero, About, Portfolio, Services, Footer.
 - Contact page at `/contact`.
@@ -22,6 +23,7 @@
 - Responsive image delivery through `next/image` in the public site.
 
 ### Camera and motion
+
 - Persistent camera experience in `src/features/motion/components/`.
 - React Three Fiber / Three.js camera scene using `public/cameras/camera.glb`.
 - GSAP / ScrollTrigger orchestration.
@@ -29,6 +31,7 @@
 - Services interaction communicates state to the camera scene.
 
 ### Private-gallery foundation
+
 - Gallery page: `src/app/gallery/[token]/page.js`.
 - Media handler: `src/app/gallery/[token]/media/[mediaId]/route.js`.
 - Development preview: `src/app/gallery/preview/route.js`.
@@ -45,10 +48,15 @@
 - `/gallery/preview` is unavailable in production or when `DATABASE_URL` is set.
 
 ### Database
+
 Current Prisma models:
+
 - `Gallery`
 - `GalleryMedia`
 - `GalleryVisitor`
+- `AdminUser`
+- `AdminSession`
+- `AdminAuditEvent`
 
 No production admin/user/face-search/job/upload model should be assumed to exist.
 
@@ -58,14 +66,31 @@ No production admin/user/face-search/job/upload model should be assumed to exist
 - Extendable gallery expiry.
 - Cloudflare R2 private photo storage.
 - Redis + BullMQ photo-processing jobs.
-- Admin dashboard, admin authentication, gallery creation/management UI.
+- Admin authentication architecture approved by ADR-001 on 2026-11-14. The admin
+  foundation is now partially implemented; remaining Phase 5 work is tracked below.
+
+### Phase 5 admin foundation — partially implemented
+
+- Admin schema and migration for one provisioned account, hashed sessions, and
+  audit events are implemented.
+- Argon2id password verification, required TOTP MFA, one-time provisioning CLI,
+  admin-scoped HTTP-only session cookies, 12-hour idle/7-day absolute expiry,
+  logout/all-session revocation, progressive login cooldown, and protected routes
+  are implemented.
+- Dashboard overview and gallery listing/creation/editing/activation controls are
+  implemented. Shared wedding passwords, gallery expiry policy, uploads, and
+  production media delivery remain unimplemented.
 - Production uploads and private media delivery pipeline.
 - QR-code generation.
 
-## Evaluation only
+## Selected — not implemented: face-recognition architecture
 
-- SFace face-matching evaluation.
-- No production face-search implementation or approval.
+- YuNet detects faces and returns bounding boxes/landmarks.
+- OpenCV handles image processing and runs YuNet and SFace ONNX inference.
+- SFace ONNX generates embeddings from aligned face regions.
+- A separate Python FastAPI/Uvicorn service will expose processing/search APIs.
+- PostgreSQL + pgvector will store and similarity-search embeddings.
+- MTCNN, PyTorch, and Torchvision are excluded from the initial implementation.
 
 ## Deferred / on hold
 
@@ -99,3 +124,49 @@ not equivalent to a passing full CI pipeline.
 
 Package scripts currently include `lint`, `test` (`node --test`), `format:check`,
 and `build`. Run them locally or add a CI workflow to obtain explicit results.
+
+## Public-camera refinement update — 2026-11-13
+
+- **Partially implemented:** the public hero now receives a viewport coordinate
+  from the named `Screen` node in `public/cameras/camera.glb`. The HTML featured
+  photograph remains hidden until that projected LCD coordinate is available,
+  avoiding the former fixed viewport-origin approximation.
+- **Verified:** `npm run lint` and `npm test` passed after this change.
+- **Not verified:** visual behavior across desktop, tablet, mobile, and reduced
+  motion. `npm run build` did not complete in this environment: Next left a
+  `.next/lock` file while no build worker remained running. Repository-wide
+  `npm run format:check` also fails on existing formatting issues across 82
+  files; the three changed source files were formatted individually.
+- The repeatable LCD preview, full curved photograph sequence, contact lens CTA,
+  and end-to-end persistent-camera behavior remain **Partially Implemented**
+  pending runtime verification. No storage, admin, video, or contact-delivery
+  functionality was added.
+
+## Docker environment update — 2026-11-14
+
+- **Partially implemented:** `Dockerfile`, `docker-compose.yml`, `.dockerignore`,
+  and `.env.docker.example` define a Node 22 standalone Next.js application,
+  private PostgreSQL 16 service, named database volume, non-root runtime user,
+  and opt-in Prisma migration service.
+- **Implemented configuration:** runtime requires `DATABASE_URL`, Prisma CLI uses
+  `DIRECT_URL`, and production gallery tokens require `GALLERY_TOKEN_SECRET`.
+  The Compose file supplies neither secrets nor a host database port.
+- **Verified:** Docker Engine 29.6.1 was available and `docker compose config
+  --quiet` passed using only a temporary copy of the placeholder example file.
+- **Not verified:** the image build, startup, database connectivity, and HTTP
+  smoke test. Repeated `docker build` attempts stopped during `npm ci` after an
+  invalid/damaged-lockfile warning and produced no image. No migrations were run.
+
+## Phase 3 motion refinement update — 2026-11-14
+
+- **Partially implemented:** hero photo choreography now uses a multi-point,
+  reversible curved keyframe trajectory with restrained rotation and layered
+  scaling; the persistent camera fades back into the composition across later
+  public sections.
+- **Improved:** reduced-motion mode keeps the camera visible as a static scene,
+  disables cinematic scroll choreography, and keeps the shutter hidden.
+- **Verified:** lint and the existing five unit tests passed.
+- **Not verified:** browser visual behavior at desktop/tablet/mobile sizes,
+  reduced-motion runtime behavior, console errors, and the production build;
+  browser automation could not safely bind to the existing Windows Chrome tab,
+  and the build stalled during optimized production-build creation.

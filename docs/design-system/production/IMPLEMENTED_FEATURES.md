@@ -6,6 +6,7 @@
 ## Implemented
 
 ### Foundation and public website
+
 - Next.js 16 and React 19 App Router under `src/app/`.
 - JavaScript application source.
 - Tailwind CSS v4, CSS Modules, global styles, and central design tokens.
@@ -15,14 +16,23 @@
 - Placeholder images and temporary business details remain in use.
 
 ### Camera-led motion experience
+
 - Actual `public/cameras/camera.glb` model loaded by the existing R3F scene.
 - React Three Fiber / Three.js rendering.
 - GSAP / ScrollTrigger scroll choreography.
 - Lazy camera loading and demand rendering.
 - Reduced-motion path and static fallback.
 - Service selection communicates with the camera scene.
+- **Partially implemented refinement:** the hero photo stack can consume the
+  projected viewport coordinate of the model's named `Screen` node, and remains
+  hidden until the coordinate is available. Runtime visual verification is still
+  required before treating the LCD-to-photo journey as fully implemented.
+- **Partially implemented Docker configuration:** a multi-stage production image,
+  local Compose PostgreSQL service, and opt-in Prisma migration command are
+  defined. Container build/startup verification remains pending.
 
 ### Private-gallery foundation
+
 - `/gallery/[token]` route.
 - Signed expiring gallery-link token with nonce, gallery ID, and token version.
 - Gallery token-version check.
@@ -39,13 +49,15 @@
 - `Gallery`
 - `GalleryMedia`
 - `GalleryVisitor`
+- `AdminUser`
+- `AdminSession`
+- `AdminAuditEvent`
 
 See `prisma/schema.prisma` and `docs/design-system/architecture/02-database-erd.md`.
 
 ## Not implemented
 
-- Phase 5 admin authentication, dashboard, gallery creation/editing, publishing,
-  shared wedding password, and extendable expiry controls.
+- Shared wedding password and extendable expiry controls.
 - Production uploads and Cloudflare R2 integration.
 - Production private object delivery and CDN integration.
 - Redis/BullMQ background processing.
@@ -56,11 +68,26 @@ See `prisma/schema.prisma` and `docs/design-system/architecture/02-database-erd.
 - Video upload, storage, processing, or playback (on hold).
 - Favorites, payments, multi-studio SaaS, and mobile apps.
 
+### Phase 5 — partially implemented admin foundation
+
+- Approved single-account admin authentication with Argon2id passwords and
+  required TOTP authenticator-app codes.
+- One-time server-side provisioning CLI; no public registration.
+- Database-backed sessions storing only token hashes, admin-scoped HTTP-only
+  cookies, 12-hour idle and 7-day absolute expiry, logout revocation, and
+  progressive cooldown after five failed attempts per 15-minute window.
+- Server-side protected dashboard routes, one-year audit-event storage, and
+  gallery listing, creation, editing, activation, and deactivation.
+
+Password-change/security-reset flows, shared wedding passwords, expiry policy,
+uploads, and production media delivery remain unimplemented.
+
 ## Status language
 
 - Cloudflare R2 and Redis/BullMQ are selected future directions, not integrations.
 - Cloudflare Stream is on hold; product scope is photo-only.
-- SFace is evaluation-only, not production-approved.
+- The YuNet + SFace ONNX + OpenCV + FastAPI + PostgreSQL/pgvector face pipeline
+  is selected but not implemented or production-approved.
 - One shared password per wedding and extendable expiry are selected decisions,
   not implemented features.
 - Gallery-entry consent is not face-search consent.

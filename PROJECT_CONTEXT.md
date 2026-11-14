@@ -1,8 +1,8 @@
 # DDS Photographer — Project Context
 
 > Prepared 2026-10-26 from the `system-design` branch source tree and repository
-> documentation. This is an AI working context, not a replacement for the Eraser
-> architecture workspace.
+> documentation. This is an AI working context; repository architecture records
+> are the source of truth.
 
 ## 1. Product identity
 
@@ -14,15 +14,15 @@ This is not currently an approved multi-studio, multi-tenant SaaS platform.
 
 ## 2. Architecture authority
 
-`AGENTS.md` explicitly identifies the Eraser workspace as the primary approved
-architecture and planning reference. Before implementing a feature:
+`AGENTS.md` identifies repository architecture documents, Mermaid diagrams, and ADRs
+as the primary approved architecture and planning reference. Before implementing a feature:
 
-1. Read the relevant Eraser document.
-2. Review its associated architecture canvas.
+1. Read the relevant repository architecture document.
+2. Review its associated Mermaid diagram.
 3. Review the development roadmap.
 4. Implement only the approved current phase.
 
-Repository docs and code should be used to verify current implementation. If Eraser,
+Repository docs and code should be used to verify current implementation. If documentation,
 repository documentation, and source disagree, stop and report the conflict; do not
 silently select one or rewrite the approved architecture.
 
@@ -38,7 +38,8 @@ silently select one or rewrite the approved architecture.
 - Private gallery: `/gallery/[token]`, signed gallery-link token, visitor entry form,
   gallery-scoped visitor access cookie, gallery-scoped media route.
 - Data: PostgreSQL with Prisma 7; current Prisma models are `Gallery`,
-  `GalleryMedia`, and `GalleryVisitor`.
+  `GalleryMedia`, `GalleryVisitor`, `AdminUser`, `AdminSession`, and
+  `AdminAuditEvent`.
 - Local gallery development: file-backed adapter and `/gallery/preview` when running
   in development without `DATABASE_URL`.
 
@@ -51,7 +52,10 @@ silently select one or rewrite the approved architecture.
 | Photo storage | Cloudflare R2 | Selected; integration pending |
 | Background processing | Redis + BullMQ | Selected; integration pending |
 | Video | Cloudflare Stream | On hold; photo-only scope |
-| Face matching | SFace | Evaluation only; not production-approved |
+| Face detection | YuNet | Selected; not integrated |
+| Face embeddings | SFace ONNX + OpenCV | Selected; not integrated |
+| Face-search backend | FastAPI/Uvicorn | Selected; not integrated |
+| Embedding search | PostgreSQL + pgvector | Selected; not integrated |
 | Face-search consent | Separate, explicit, optional opt-in | Required before face-search processing |
 
 A shared wedding password is a gallery-level gate, not unique guest authentication.
@@ -75,20 +79,38 @@ Record notice/version, purpose, affirmative action, timestamp, and withdrawal.
 Do not collect or process face-search data before this flow and its lifecycle are
 approved and implemented.
 
-SFace remains evaluation-only. Do not represent it as an integrated feature.
+The face-recognition architecture is selected but not integrated. Do not represent
+it as an implemented feature. MTCNN, PyTorch, and Torchvision are excluded from
+the initial implementation.
 
 ## 6. Phase boundary
 
 The roadmap in `docs/design-system/architecture/13-roadmap.md` is the current
-repository roadmap, while Eraser remains the approved architecture authority.
+repository roadmap, while repository architecture records remain the approved authority.
 
 Repository implementation status:
 - Foundation and public website: implemented.
 - Camera-led motion experience: implemented.
 - Private-gallery foundation: implemented, not a complete production delivery platform.
 - Admin dashboard and production readiness: not started.
+- Admin authentication architecture: approved in ADR-001 on 2026-11-14; admin
+  authentication, sessions, MFA, rate limiting, audit logging, and dashboard
+  routes are not implemented.
+
+Phase 3 motion refinement remains partially implemented: the public motion code
+has a curved reversible photo path, persistent camera return states, and a static
+reduced-motion camera path. Runtime visual verification remains outstanding.
 - R2, Redis/BullMQ, shared password, QR generation, SFace face search: future work.
 - Video: on hold.
+
+Approved admin-authentication policy is limited to one provisioned account, required
+TOTP MFA, Argon2id passwords, one-time server-side CLI provisioning, hashed
+database sessions, HTTP-only Secure-in-production SameSite=Lax admin cookies,
+12-hour idle and 7-day absolute sessions, revocation on logout/password change/
+security reset, progressive cooldown after five failed attempts per 15 minutes,
+no permanent automatic lockout, server-side authorization, and one-year audit
+retention. These policies do not change the separate gallery visitor cookie or
+gallery-link token lifetimes.
 
 ## 7. Non-goals unless explicitly approved
 

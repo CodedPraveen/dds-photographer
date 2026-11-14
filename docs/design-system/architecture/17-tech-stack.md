@@ -1,6 +1,6 @@
 # Technology Stack and Decision Status
 
-> Updated 2026-10-26. The Eraser workspace remains the primary approved architecture reference under `AGENTS.md`.
+> Updated 2026-10-26. Repository architecture documents and ADRs are the approved architecture reference.
 
 ## Status vocabulary
 - **Implemented:** Present in repository code and used.
@@ -35,7 +35,11 @@ An installed dependency is not proof of active runtime use. Verify imports befor
 | Background jobs | Redis + BullMQ | Selected; integration not implemented |
 | Wedding guest password | One shared password per wedding | Selected; not implemented |
 | Gallery expiry | Extendable | Selected; exact policy pending |
-| Face matching | SFace | Evaluation only; no production approval |
+| Face detection | YuNet | Selected; integration not implemented |
+| Face recognition embeddings | SFace ONNX | Selected; integration not implemented |
+| Image processing and inference | OpenCV | Selected; integration not implemented |
+| Face-search backend | Python + FastAPI/Uvicorn | Selected; service not implemented |
+| Embedding storage/search | PostgreSQL + pgvector | Selected; schema/search not implemented |
 
 ## Deferred
 
@@ -43,7 +47,16 @@ An installed dependency is not proof of active runtime use. Verify imports befor
 Cloudflare Stream is on hold. The active product scope is photo-only. Do not add video upload, processing, playback, or billing until explicitly reopened.
 
 ### Face search
-SFace may be evaluated but is not approved for production. Evaluation must cover model provenance/license, accuracy, false-positive/negative behavior, bias, security, retention, and deletion.
+The approved initial architecture is YuNet for face detection, OpenCV for image
+processing and running both models, SFace ONNX for face embeddings, FastAPI with
+Uvicorn for the separate Python service, and PostgreSQL + pgvector for embedding
+storage and similarity search. This is selected target architecture, not an
+implemented feature or production approval.
+
+MTCNN, PyTorch, and Torchvision are alternatives considered and excluded from the
+initial implementation. Validate provenance/license, accuracy, false-positive and
+false-negative behavior, bias, security, retention, deletion, and similarity
+thresholds experimentally before production use.
 
 Face-search data must not be collected or processed without a separate, purpose-specific, affirmative, optional consent flow. General gallery-entry consent is not face-search consent.
 

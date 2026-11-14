@@ -2,13 +2,24 @@
 
 > **Project:** DDS Photographer
 > **Last verified against repository source:** 2026-10-26
-> **Architecture authority:** Eraser workspace, as specified in `AGENTS.md`
+> **Architecture authority:** Repository architecture documents, Mermaid diagrams, and ADRs.
 
 ## Current stage
 
 The public website, camera-led motion experience, and first private-gallery foundation
-are implemented. The next planned implementation phase is Phase 5 — Admin Dashboard
-and Production Readiness. Phase 5 has not started.
+are implemented. Phase 5 — Admin Dashboard and Production Readiness is partially
+implemented; production readiness and remaining policy work are not complete.
+
+### Phase 5 admin foundation — Partially Implemented
+
+Implemented: approved one-account Argon2id/TOTP authentication, one-time provisioning
+CLI, hashed database sessions, admin-scoped secure cookies, session expiry and
+revocation, progressive login cooldown, audit-event writes, protected dashboard
+routes, and gallery create/list/edit/activate/deactivate operations.
+
+Not implemented: password-change/security-reset UI, audit-event review UI, shared
+wedding passwords, gallery expiry policy, uploads, R2 delivery, and production
+operational verification.
 
 ## Implemented scope
 
@@ -50,7 +61,7 @@ delivery is not implemented.
 | Phase 2 — Public marketing website | Complete |
 | Phase 3 — Camera-led motion experience | Complete |
 | Phase 4 — Private-gallery foundation | Complete |
-| Phase 5 — Admin dashboard and production readiness | Not started |
+| Phase 5 — Admin dashboard and production readiness | Partially implemented |
 | Production photo upload / processing pipeline | Not implemented |
 | Face-search implementation | Evaluation only |
 | Video | On hold |
@@ -66,7 +77,7 @@ Use `docs/design-system/architecture/13-roadmap.md` for the current detailed pla
 | Photo storage | Cloudflare R2 | Selected; not integrated |
 | Background processing | Redis + BullMQ | Selected; not integrated |
 | Video | Cloudflare Stream | On hold; photo-only scope |
-| Face matching | SFace | Evaluation only |
+| Face pipeline | YuNet + SFace ONNX + OpenCV + FastAPI + PostgreSQL/pgvector | Selected; not implemented |
 | Face-search consent | Separate, explicit, optional opt-in | Required before processing |
 
 ## Current data model
@@ -75,6 +86,9 @@ Use `docs/design-system/architecture/13-roadmap.md` for the current detailed pla
 - `Gallery`
 - `GalleryMedia`
 - `GalleryVisitor`
+- `AdminUser`
+- `AdminSession`
+- `AdminAuditEvent`
 
 Do not describe future admin, upload-job, face-consent, embedding, or processing
 models as existing.
@@ -108,8 +122,6 @@ deployment does not prove lint, test, formatting, or build checks all passed.
 For the PR head reviewed on 2026-10-26, GitHub returned a successful Vercel deployment
 status and no GitHub Actions lint/test/format/build check-runs. Do not report full CI
 as passing based on that result.
-
-
 ## Public experience refinement — status update (2026-11-13)
 
 The camera-led motion foundation remains implemented as described in the existing status record. A follow-on cinematic refinement has now been documented, but **the refinement itself is not implemented or verified**.
@@ -126,9 +138,51 @@ The camera-led motion foundation remains implemented as described in the existin
 | Camera-lens-inspired Contact call to action | Design requirement; implementation not verified |
 | Shutter-inspired footer ending | Design requirement; implementation not verified |
 
-No code, tests, or deployment were changed as part of this documentation update. Do not infer implementation completion from the design specifications. Verify each item against source and runtime behavior before moving it to Implemented.
+### Public-camera refinement implementation attempt — 2026-11-13
+
+The hero's HTML photo stack now waits for an event emitted from the camera model's
+named `Screen` node, projected through the active R3F camera into viewport
+coordinates. This replaces its fixed CSS placement as the initial photograph
+origin. The existing GSAP timeline remains responsible for the scroll path and
+layered reveal.
+
+| Refinement item                                                 | Status                                                                             |
+| --------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| Projected `Screen`-node coordinate supplied to hero photo stack | Partially Implemented; code checked by lint and unit tests                         |
+| Visual LCD alignment across supported breakpoints               | Not verified at runtime                                                            |
+| Full repeatable camera-to-photo journey                         | Partially Implemented; existing choreography remains, runtime verification pending |
+
+Verification on 2026-11-13: `npm run lint` and `npm test` passed. Repository-wide
+format checking reports pre-existing issues in 82 files. The production build did
+not finish because Next left a stale `.next/lock` without a running build worker.
+Do not elevate the refinement to Implemented until runtime and production-build
+verification succeed.
+
+Code and local checks changed as recorded above; no deployment changed. Do not infer implementation completion from the design specifications. Verify each item against source and runtime behavior before moving it to Implemented.
 
 See:
 - `docs/design-system/architecture/13-roadmap.md`
 - `docs/design-system/design/MOTION_GUIDELINES.md`
 - `docs/design-system/design/components/HERO_SECTION.md`
+
+## Docker environment — 2026-11-14
+
+| Item | Status |
+| --- | --- |
+| Multi-stage Node 22 Dockerfile with standalone Next.js output and non-root runtime user | Implemented configuration; image build unverified |
+| Docker Compose app and PostgreSQL 16 services with private network and named volume | Implemented configuration; Compose syntax verified |
+| Prisma migration service | Implemented configuration; opt-in only, not run automatically |
+| Runtime database connection | Planned verification; no migrations or container startup run |
+
+`DATABASE_URL` is used by the production application; `DIRECT_URL` is read by
+Prisma CLI configuration. `GALLERY_TOKEN_SECRET` remains required in production.
+The image must be built and tested successfully before this environment is marked
+Implemented end to end.
+
+### Phase 3 cinematic refinement — Partially Implemented
+
+The public motion orchestration now includes a multi-point curved photo path,
+camera return states across later sections, and a visible static camera fallback
+when reduced motion is preferred. Code-level lint and unit tests pass. Desktop,
+tablet, mobile, reduced-motion runtime behavior, and production-build verification
+remain outstanding; this refinement is not marked complete.

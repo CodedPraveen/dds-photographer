@@ -1,13 +1,14 @@
 "use client";
 
 import { useGLTF } from "@react-three/drei";
-import { Canvas, useThree } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Component, useEffect, useMemo, useRef } from "react";
 import { Box3, DoubleSide, Vector3 } from "three";
 
 const CAMERA_MODEL_URL = "/cameras/camera.glb";
 const CAMERA_PROGRESS_EVENT = "dds:camera-progress";
 const SERVICE_STATE_EVENT = "dds:service-state";
+const LCD_ANCHOR_EVENT = "dds:lcd-anchor";
 const CAMERA_STOPS = [
   { position: [0, -0.08, 0], rotation: [0.02, 0, 0], scale: 0.98 },
   { position: [0, 0.04, 0], rotation: [0, 0.08, 0], scale: 1 },
@@ -53,6 +54,9 @@ function CameraRig() {
     let animationFrame;
     const introStartedAt = performance.now();
     const introDuration = 1400;
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
 
     const getResponsiveScale = () =>
       viewportWidth < 4 ? 0.46 : viewportWidth < 6 ? 0.72 : 1;
@@ -140,7 +144,12 @@ function CameraRig() {
 
     window.addEventListener(CAMERA_PROGRESS_EVENT, updateCamera);
     window.addEventListener(SERVICE_STATE_EVENT, updateServiceState);
-    animationFrame = requestAnimationFrame(animateEntrance);
+    if (reducedMotion) {
+      introCompleteRef.current = true;
+      applyCameraState(0);
+    } else {
+      animationFrame = requestAnimationFrame(animateEntrance);
+    }
 
     return () => {
       cancelAnimationFrame(animationFrame);
@@ -184,7 +193,64 @@ function CameraModel() {
     return clone;
   }, [scene]);
 
-  return <primitive object={model} />;
+  return (
+    <>
+      <primitive object={model} />
+      <LcdAnchor model={model} />
+    </>
+  );
+}
+
+function LcdAnchor({ model }) {
+  const camera = useThree((state) => state.camera);
+  const size = useThree((state) => state.size);
+  const screen = useMemo(
+    () =>
+      model.getObjectByName("Screen") ??
+      model.getObjectByName("screen") ??
+      null,
+    [model],
+  );
+  const position = useMemo(() => new Vector3(), []);
+  const projected = useMemo(() => new Vector3(), []);
+  const previous = useRef("");
+
+  useFrame(() => {
+    let x = null;
+    let y = null;
+    let z = null;
+    let visible = false;
+
+    if (screen) {
+      screen.getWorldPosition(position);
+      projected.copy(position).project(camera);
+      x = ((projected.x + 1) / 2) * size.width;
+      y = ((-projected.y + 1) / 2) * size.height;
+      z = projected.z;
+      visible =
+        Number.isFinite(x) &&
+        Number.isFinite(y) &&
+        Number.isFinite(z) &&
+        x >= 0 &&
+        x <= size.width &&
+        y >= 0 &&
+        y <= size.height &&
+        z >= -1 &&
+        z <= 1;
+    }
+
+    const next = visible
+      ? `${Math.round(x)}:${Math.round(y)}:${Math.round(z * 1000)}:true`
+      : "hidden";
+
+    if (next === previous.current) return;
+    previous.current = next;
+    const detail = { x, y, z, visible };
+    window.__DDS_LCD_ANCHOR__ = detail;
+    window.dispatchEvent(new CustomEvent(LCD_ANCHOR_EVENT, { detail }));
+  });
+
+  return null;
 }
 
 function mix(start, end, progress) {

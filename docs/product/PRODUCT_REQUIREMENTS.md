@@ -3,7 +3,7 @@
 **Status:** Product specification  
 **Scope:** Priority 3 — product clarity  
 **Last reconciled:** 2026-10-27  
-**Architecture authority:** Eraser workspace, as required by `AGENTS.md`
+**Architecture authority:** Repository architecture documents, Mermaid diagrams, and ADRs.
 
 ## 1. Product overview
 
@@ -47,7 +47,8 @@ There is one photographer/business owner in the current product model. A guest i
 - Multi-studio or multi-tenant SaaS.
 - Video upload/playback; Cloudflare Stream is on hold and current scope is photos only.
 - Payments, favorites, mobile applications.
-- Production face recognition/search. SFace is evaluation-only.
+- Production face recognition/search. The selected pipeline is not implemented
+  or production-approved.
 - Any feature not approved in the Eraser architecture or current roadmap.
 
 ## 5. Product status model
@@ -62,7 +63,7 @@ There is one photographer/business owner in the current product model. A guest i
 | Redis + BullMQ | Selected, not integrated | Future background processing direction |
 | Shared wedding password | Selected, not implemented | One shared password per wedding |
 | Extendable gallery expiry | Selected, policy pending | Exact policy is an open decision |
-| Face matching | Evaluation only | SFace is not production-approved |
+| Face pipeline | Selected; not implemented | YuNet + SFace ONNX + OpenCV + FastAPI + PostgreSQL/pgvector |
 | Video | On hold | Do not implement |
 
 Installed packages, conceptual diagrams, or selected vendors do not establish implementation.
@@ -121,7 +122,7 @@ No numeric targets have been approved. Product review should assess:
 
 ## 9. Dependencies and constraints
 
-- Eraser workspace is the primary approved architecture reference.
+- Repository architecture documents are the primary approved architecture reference.
 - Current implementation status is described in `docs/design-system/production/IMPLEMENTATION_STATUS.md`.
 - Current Prisma models are `Gallery`, `GalleryMedia`, and `GalleryVisitor`.
 - Cloudflare R2 and Redis + BullMQ are selected but not integrated.

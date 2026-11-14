@@ -35,7 +35,8 @@ If the requested change conflicts with Eraser or an owner decision, stop and ask
 - Do not mass-format unrelated legacy documentation.
 - Keep implemented, selected, evaluation-only, and deferred work clearly separated.
 - Do not implement Cloudflare Stream while video remains on hold.
-- Do not integrate R2, Redis/BullMQ, shared passwords, or SFace ahead of approval
+- Do not integrate R2, Redis/BullMQ, shared passwords, or the selected face-search
+  pipeline ahead of an approved implementation phase.
   for the relevant implementation phase.
 
 ## 4. Privacy-specific rules
@@ -47,7 +48,8 @@ If the requested change conflicts with Eraser or an owner decision, stop and ask
 - A guest declining face search must still be able to access the ordinary gallery.
 - Do not collect selfies, face crops, embeddings, or match results before the
   consent flow, retention, withdrawal, and deletion behavior are approved.
-- SFace is evaluation-only, not production-approved.
+- The selected face-search stack is YuNet + SFace ONNX + OpenCV + FastAPI +
+  PostgreSQL/pgvector; it remains unimplemented and is not production-approved.
 
 ## 5. Suggested task prompt
 
@@ -84,7 +86,7 @@ After editing:
 Update the requested documentation using repository source as evidence.
 Keep implemented, selected, evaluation-only, deferred, and unknown items separate.
 Do not invent routes, models, APIs, environment variables, tests, or integrations.
-Preserve the Eraser workspace as the primary architecture authority.
+Preserve repository architecture documents and ADRs as the primary architecture authority.
 Do not reformat unrelated documents.
 List each file changed and any remaining source-of-truth conflicts.
 ```

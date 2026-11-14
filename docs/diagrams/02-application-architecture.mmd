@@ -1,0 +1,16 @@
+flowchart TD
+  Routes[src/app routes and server actions]
+  Features[Feature modules]
+  Shared[src/lib and UI]
+  Motion[Motion: R3F/Three.js + GSAP]
+  Gallery[Private-gallery server boundary]
+  Repo[Gallery repository boundary]
+  Prisma[Prisma adapter]
+  Local[Local adapter]
+  DB[(PostgreSQL)]
+  Routes --> Features
+  Features --> Shared
+  Features --> Motion
+  Routes --> Gallery --> Repo
+  Repo --> Prisma --> DB
+  Repo --> Local

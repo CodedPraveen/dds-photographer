@@ -55,3 +55,41 @@ model GalleryVisitor {
   @@unique([galleryId, email])
   @@index([galleryId])
 }
+
+model AdminUser {
+  id           String         @id @default(cuid())
+  email        String         @unique
+  passwordHash String
+  totpSecret   String
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  sessions     AdminSession[]
+  auditEvents  AdminAuditEvent[]
+}
+
+model AdminSession {
+  id         String    @id @default(cuid())
+  adminId    String
+  tokenHash  String    @unique
+  lastSeenAt DateTime  @default(now())
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  createdAt  DateTime  @default(now())
+  admin      AdminUser @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@index([adminId, revokedAt])
+  @@index([expiresAt])
+}
+
+model AdminAuditEvent {
+  id        String    @id @default(cuid())
+  adminId   String?
+  action    String
+  targetId  String?
+  metadata  Json?
+  createdAt DateTime  @default(now())
+  admin     AdminUser? @relation(fields: [adminId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([adminId, createdAt])
+}

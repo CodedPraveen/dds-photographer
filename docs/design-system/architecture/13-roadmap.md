@@ -1,7 +1,7 @@
 # Development Roadmap
 
 > Reconciled with repository implementation and owner decisions on 2026-10-26.
-> The Eraser workspace remains the primary approved architecture reference under `AGENTS.md`; this file does not replace it.
+> Repository architecture documents and ADRs are the approved architecture reference; this roadmap does not replace them.
 
 ## Phase status
 
@@ -13,11 +13,19 @@
 | 2     | Public marketing website                 | Complete    |
 | 3     | Camera-led motion experience             | Complete    |
 | 4     | First private-gallery foundation         | Complete    |
-| 5     | Admin dashboard and production readiness | Not started |
+| 5     | Admin dashboard and production readiness | Partially implemented |
 
 See `../production/IMPLEMENTATION_STATUS.md` and `../production/IMPLEMENTED_FEATURES.md` for verified details.
 
 ## Phase 5 — Admin dashboard and production readiness
+
+The admin authentication architecture is approved by ADR-001 (2026-11-14).
+Authentication and basic dashboard/gallery management are partially implemented;
+production readiness and the remaining Phase 5 work are not complete.
+
+Phase 3 remains complete for its original camera-led foundation, but the later
+cinematic LCD-to-photo refinement remains **Partially Implemented** pending visual
+verification across supported viewports and reduced-motion runtime checks.
 
 Planned, not implemented:
 
@@ -54,9 +62,10 @@ R2 and Redis + BullMQ are selected directions; neither is integrated yet.
 
 Default expiry, maximum lifetime, retention/deletion schedule, and password rotation policy remain to be specified. Distinguish gallery availability, gallery-link token expiry (currently 30 days), visitor cookie expiry (currently 12 hours), and permanent retention/deletion.
 
-### Face-search evaluation and privacy
+### Face-recognition architecture and privacy
 
-- Evaluate SFace; evaluation is not production approval
+- Implement the selected YuNet + OpenCV + SFace ONNX pipeline in a separate FastAPI service
+- Store/search embeddings with PostgreSQL + pgvector after schema and migration approval
 - Assess provenance/licensing, accuracy, false matches, bias, security, and operational suitability
 - Design separate gallery-scoped face-search consent before collecting or processing any selfie, face crop, embedding, or match data
 - Record notice/version, purpose, affirmative action, timestamp, and withdrawal
@@ -64,7 +73,9 @@ Default expiry, maximum lifetime, retention/deletion schedule, and password rota
 - Never make ordinary gallery access conditional on face-search opt-in
 - Define deletion of source and derived face-search data
 
-The existing gallery-entry consent is not face-search consent. No face-search functionality is currently implemented.
+The existing gallery-entry consent is not face-search consent. The selected
+architecture is not implemented; no face-search functionality is currently
+implemented.
 
 ### Video
 
@@ -83,7 +94,7 @@ Mobile apps, multi-studio support, payments, and SaaS/multi-tenant features are 
 | Photo storage       | Cloudflare R2                       | Selected; integration pending    |
 | Video               | Cloudflare Stream                   | On hold; photo-only              |
 | Background jobs     | Redis + BullMQ                      | Selected; integration pending    |
-| Face matching       | SFace                               | Evaluation only                  |
+| Face pipeline       | YuNet + SFace ONNX + OpenCV + FastAPI + PostgreSQL/pgvector | Selected; integration pending |
 | Face-search consent | Separate, explicit, optional opt-in | Required before processing       |
 
 ## Change control

@@ -1,9 +1,9 @@
 # System Architecture
 
-> Updated 2026-10-26. Eraser remains the primary approved architecture reference under `AGENTS.md`. This file separates verified current code from owner-selected future direction.
+> Updated 2026-10-26. Repository architecture records are the authority. This file separates verified current code from owner-selected future direction.
 
 ## 1. Product boundary
-DDS Photographer is a single-photographer business website with a public portfolio, private wedding/event galleries, and a future photographer/admin platform. A photo upload pipeline is planned. Face search is limited to SFace evaluation and requires separate privacy approval. This is not currently a multi-studio SaaS product.
+DDS Photographer is a single-photographer business website with a public portfolio, private wedding/event galleries, and a future photographer/admin platform. A photo upload pipeline is planned. Face search has a selected YuNet + SFace ONNX + OpenCV architecture with a separate FastAPI service and PostgreSQL + pgvector storage, but remains unimplemented and requires separate privacy approval. This is not currently a multi-studio SaaS product.
 
 ## 2. Current implemented architecture
 
@@ -79,7 +79,11 @@ flowchart TD
     Guest["Guest browser"]
     Gallery["Authorized private photo gallery"]
     Consent["Separate optional face-search consent"]
-    SFace["SFace evaluation only"]
+    FastAPI["FastAPI face service\nSELECTED_NOT_INTEGRATED"]
+    OpenCV["OpenCV processing/inference\nSELECTED_NOT_INTEGRATED"]
+    YuNet["YuNet detection\nSELECTED_NOT_INTEGRATED"]
+    SFace["SFace ONNX embeddings\nSELECTED_NOT_INTEGRATED"]
+    Vector[("PostgreSQL + pgvector\nSELECTED_NOT_INTEGRATED")]
 
     Admin --> AdminUI --> App
     App --> DB
@@ -87,7 +91,7 @@ flowchart TD
     App --> Queue --> Worker --> R2
     Guest --> Gallery --> App
     App --> R2
-    Consent --> SFace
+    Consent --> FastAPI --> OpenCV --> YuNet --> SFace --> Vector
 ```
 
 Selected but not integrated:
@@ -95,7 +99,7 @@ Selected but not integrated:
 - Redis + BullMQ for asynchronous photo processing.
 - One shared password per wedding.
 - Extendable gallery expiry; exact defaults and retention rules pending.
-- SFace evaluation only; production approval pending.
+- YuNet + SFace ONNX + OpenCV + FastAPI + PostgreSQL/pgvector; selected, not integrated.
 - Cloudflare Stream on hold; current scope is photos only.
 
 ## 5. Guest access and face-search consent
@@ -114,7 +118,7 @@ Face search is a separate optional feature. Before any selfie, face crop, embedd
 A preselected checkbox is not an affirmative opt-in. A hidden or bundled terms link is not a substitute for a clear notice. This is the project's privacy-by-design requirement; consult the DPDP commencement notes in `10-security.md` before asserting a provision is currently in force.
 
 ## 6. Out of current scope
-Video (Cloudflare Stream is on hold), production face recognition, admin dashboard/authentication, R2 upload/delivery integration, Redis/BullMQ workers, multi-studio SaaS, mobile app, and payments.
+Video (Cloudflare Stream is on hold), admin dashboard/authentication, R2 upload/delivery integration, Redis/BullMQ workers, multi-studio SaaS, mobile app, and payments. Face recognition remains unimplemented pending privacy and production-readiness gates.
 
 ## 7. Change control
-Before implementing future components, read the relevant Eraser document and canvas, roadmap, and product specification. If approved Eraser architecture conflicts with this file, stop and ask. Never silently promote a planned component to implemented status.
+Before implementing future components, read the relevant repository architecture document, Mermaid diagram, roadmap, and product specification. If records conflict, stop and report the exact conflict. Never silently promote a planned component to implemented status.

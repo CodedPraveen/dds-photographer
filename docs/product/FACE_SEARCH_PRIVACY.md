@@ -1,13 +1,18 @@
 # Face Search — Product and Privacy Specification
 
-**Status:** Evaluation only; not production-approved  
+**Status:** Architecture selected; implementation not approved or shipped
 **Last reconciled:** 2026-10-27
 
 ## 1. Purpose and boundary
 
 Face search is a possible future way for an event guest to locate photographs in a specific wedding/event gallery that may contain them.
 
-SFace is being evaluated only. There is no production face-search feature, no approved production model, and no permission to begin collecting or processing face-search data.
+The selected initial architecture is YuNet for detection, OpenCV for image
+processing and model inference, SFace ONNX for embeddings, FastAPI/Uvicorn for a
+separate backend, and PostgreSQL + pgvector for similarity search. There is no
+production face-search feature and no permission to begin collecting or
+processing face-search data. MTCNN, PyTorch, and Torchvision are excluded from
+the initial implementation.
 
 Ordinary gallery access must work without face search.
 
@@ -20,7 +25,7 @@ Ordinary gallery access must work without face search.
 5. Declining face search does not reduce gallery access or photo visibility.
 6. Consent can be withdrawn.
 7. Withdrawal and deletion behavior must be designed and tested before launch.
-8. SFace evaluation is not production approval.
+8. Architecture selection is not production approval.
 
 ## 3. Distinguish current consent from future consent
 

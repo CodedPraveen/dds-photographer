@@ -1,0 +1,9 @@
+flowchart LR
+  Visitor[Public visitor or gallery guest] --> Browser[Web browser]
+  Browser --> App[Next.js application]
+  App --> Public[Public portfolio]
+  App --> Gallery[Private gallery foundation]
+  Gallery --> DB[(PostgreSQL / Prisma)]
+  Gallery --> Local[Local development adapter]
+  FutureR2[Cloudflare R2\nSELECTED_NOT_INTEGRATED] -.-> Gallery
+  FutureQueue[Redis + BullMQ\nSELECTED_NOT_INTEGRATED] -.-> Gallery

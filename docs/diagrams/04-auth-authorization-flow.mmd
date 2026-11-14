@@ -1,0 +1,11 @@
+sequenceDiagram
+  participant A as Admin/owner
+  participant D as Repository docs
+  participant S as Application
+  participant DB as Database
+  A->>D: Approve authentication ADR
+  D-->>S: Authorization requirements
+  S->>DB: Validate future session (PROPOSED)
+  DB-->>S: Session result
+  S-->>A: Authorized admin response
+  Note over A,DB: No admin auth or session model is implemented today

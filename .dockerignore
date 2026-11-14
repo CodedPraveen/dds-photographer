@@ -1,0 +1,14 @@
+.git
+.github
+.next
+node_modules
+src/generated
+.data
+.env
+.env.*
+!.env.docker.example
+coverage
+*.log
+*.md
+Dockerfile
+docker-compose.yml

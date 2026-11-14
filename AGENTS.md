@@ -4,19 +4,16 @@
 
 ## Architecture Reference
 Before implementing any feature:
-1. Read the relevant Eraser document.
-2. Review the associated architecture canvas.
+1. Read the relevant owner-approved repository documentation.
+2. Review the associated Mermaid diagrams and decision records.
 3. Follow the Development Roadmap.
 4. Implement only the current approved phase.
 5. Never modify approved architecture without explicit instruction.
 
-Primary Eraser workspace:
-https://app.eraser.io/workspace/OXk7BNnwaL38eEysCnex
-
-Current system architecture diagram:
-https://app.eraser.io/workspace/OXk7BNnwaL38eEysCnex?diagram=lpIxQWPBv-oWCpt5B35n&layout=canvas
-
-If Eraser conflicts with repository documentation or code, stop and report the exact conflict. Do not silently choose a source or change architecture.
+The repository documentation is the mandatory architecture authority. Start with
+`docs/README.md`, then use the relevant architecture, security, operations, and
+ADR documents. Historical external references may be retained for provenance,
+but no external system is required to understand or implement the project.
 
 ## DDS Photographer Website
 You are an implementation agent. Implement approved decisions exactly as documented. You are not the product designer, UX designer, or architect. Never redesign, simplify, or replace decisions without approval.
@@ -29,12 +26,14 @@ You are an implementation agent. Implement approved decisions exactly as documen
 
 ## Source of Truth
 Use this order to understand project intent:
-1. Approved Eraser workspace and architecture diagram.
-2. Current project documentation and roadmap.
-3. Existing project structure and code.
-4. Explicit user instructions for the current task.
+1. Explicit owner-approved decisions in repository documentation.
+2. Approved architecture documents and Mermaid diagrams.
+3. Development roadmap.
+4. Current implementation status and actual source code.
+5. Explicit instructions for the current task.
 
-If sources conflict, stop and ask. Do not silently rewrite documentation to fit code or alter code to fit outdated documentation.
+If sources conflict, identify the exact documents and code involved, report the
+conflict, and stop. Do not silently choose a design or modify approved architecture.
 
 ## Current Project Direction
 - Premium single-photographer website with public marketing portfolio and private wedding/event galleries.
@@ -93,14 +92,14 @@ Prepare implementation-ready specifications for:
    - Include acceptance criteria and unresolved decisions.
 
 ### Priority 4 Documentation Rules
-- Keep the high-level Eraser architecture readable; use separate detailed workflows for storage, processing, security, deployment, and recovery.
+- Keep the high-level architecture readable; use separate detailed workflows for storage, processing, security, deployment, and recovery.
 - Use explicit status labels: **Implemented**, **Selected / Not Integrated**, **Planned**, **Evaluation Only**, **On Hold**, and **Decision Needed**.
 - Separate current behavior from target design.
 - Include assumptions, dependencies, failure paths, security/privacy implications, acceptance criteria, and unresolved decisions.
 - Never invent requirements, routes, models, environment variables, deployment topology, or completion status.
 - Face-search consent must be separate, optional, affirmative opt-in, unchecked by default. Gallery access must not depend on it. Do not process face data until the flow and lifecycle are explicitly approved.
 - Preserve single-photographer scope. Do not add multi-studio SaaS, payments, booking, or video unless explicitly approved.
-- Update Eraser only when explicitly requested. If a request conflicts with approved architecture, explain the conflict before making changes.
+- Update architecture documentation only when explicitly requested. If a request conflicts with approved architecture, explain the conflict before making changes.
 
 ## Development Rules
 - Keep code modular, readable, and aligned with existing naming conventions.
@@ -112,7 +111,7 @@ Prepare implementation-ready specifications for:
 
 ## Documentation First
 Before implementing:
-1. Read relevant documentation and Eraser diagram.
+1. Read relevant repository documentation and Mermaid diagrams.
 2. Check existing code and current implementation status.
 3. Plan the work.
 4. Implement only approved scope.
@@ -133,7 +132,7 @@ Before finishing coding tasks, check as applicable:
 - Build, lint, and tests pass.
 - No broken imports or obvious duplication.
 - No unrelated files changed.
-- Documentation matches implementation and Eraser.
+- Documentation matches implementation and repository architecture records.
 If a check cannot be run, say so explicitly.
 
 ## Git

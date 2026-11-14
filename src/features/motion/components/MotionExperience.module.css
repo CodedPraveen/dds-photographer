@@ -36,6 +36,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .cameraStage {
+    opacity: 1;
+  }
+
   .shutter {
     display: none;
   }

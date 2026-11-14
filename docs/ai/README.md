@@ -37,7 +37,7 @@ not the primary motion engine.
 
 ## Architecture authority
 
-`AGENTS.md` says the Eraser workspace is the primary approved architecture reference.
+`AGENTS.md` identifies repository architecture documents, Mermaid diagrams, and ADRs as the approved architecture reference.
 Review the relevant Eraser document/canvas before implementation. Repository docs and
 source code are evidence for implementation status, not permission to silently change
 approved architecture. If Eraser, docs, and code conflict, stop and report the conflict.
