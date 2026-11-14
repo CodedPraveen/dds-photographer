@@ -26,18 +26,18 @@ generation, video, and face search are not implemented.
 
 ## Product and technology decisions
 
-| Area                | Direction                           | Status                                  |
-| ------------------- | ----------------------------------- | --------------------------------------- |
-| Guest password      | One shared password per wedding     | Selected; not implemented               |
-| Gallery expiry      | Extendable                          | Selected; exact policy pending          |
-| Photo storage       | Cloudflare R2                       | Selected; integration pending           |
-| Background jobs     | Redis + BullMQ                      | Selected; integration pending           |
-| Video               | Cloudflare Stream                   | On hold; photo-only scope               |
-| Face detection      | YuNet                               | Selected; not integrated              |
-| Face embeddings     | SFace ONNX + OpenCV                | Selected; not integrated              |
-| Face-search service | FastAPI/Uvicorn                    | Selected; not integrated              |
-| Embedding search    | PostgreSQL + pgvector              | Selected; not integrated              |
-| Face-search consent | Separate, explicit, optional opt-in | Required before face-search processing  |
+| Area                | Direction                           | Status                                 |
+| ------------------- | ----------------------------------- | -------------------------------------- |
+| Guest password      | One shared password per wedding     | Selected; not implemented              |
+| Gallery expiry      | Extendable                          | Selected; exact policy pending         |
+| Photo storage       | Cloudflare R2                       | Selected; integration pending          |
+| Background jobs     | Redis + BullMQ                      | Selected; integration pending          |
+| Video               | Cloudflare Stream                   | On hold; photo-only scope              |
+| Face detection      | YuNet                               | Selected; not integrated               |
+| Face embeddings     | SFace ONNX + OpenCV                 | Selected; not integrated               |
+| Face-search service | FastAPI/Uvicorn                     | Selected; not integrated               |
+| Embedding search    | PostgreSQL + pgvector               | Selected; not integrated               |
+| Face-search consent | Separate, explicit, optional opt-in | Required before face-search processing |
 
 Installed dependencies do not prove that a feature is implemented. See `docs/design-system/architecture/17-tech-stack.md`.
 
@@ -51,6 +51,9 @@ Installed dependencies do not prove that a feature is implemented. See `docs/des
 Without `DATABASE_URL` in local development, private galleries use an ignored file-backed adapter. Visit `/gallery/preview` for a sample gallery. The preview route is unavailable in production and when `DATABASE_URL` is set.
 
 Production setup requires database and signing-secret configuration. Never commit production secrets.
+Admin provisioning also requires `ADMIN_TOTP_ENCRYPTION_KEY`, a server-only 32-byte
+AES-GCM key represented as 64 hexadecimal characters. Run
+`npm run admin:cleanup-sessions` daily from a protected deployment job.
 
 ## Docker (local production-like setup)
 

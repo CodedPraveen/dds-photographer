@@ -28,8 +28,9 @@ five failed attempts per 15 minutes with progressive cooldown, no permanent
 automatic lockout, server-side authorization, and one-year audit retention.
 
 These admin policies are distinct from the implemented 30-day gallery-link token
-and 12-hour gallery visitor cookie policies. The remaining admin gaps are
-password-change/security-reset flows, audit review UI, durable/distributed rate
-limiting, encrypted TOTP-secret storage, and expired-session cleanup.
+and 12-hour gallery visitor cookie policies. The remaining admin gaps are secure
+recovery/reset authority and production scheduling/verification of expired-session
+cleanup. TOTP encryption, password change, audit review, and the cleanup script
+are implemented locally but still require deployment verification.
 
 See [auth flow](../diagrams/04-auth-authorization-flow.mmd) and [gallery flow](../diagrams/05-private-gallery-access-flow.mmd).

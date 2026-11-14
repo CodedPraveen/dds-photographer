@@ -3,6 +3,7 @@ import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import argon2 from "argon2";
 
+import { encryptTotpSecret } from "../src/features/admin/server/totp-secrets.mjs";
 import { PrismaClient } from "../src/generated/prisma/client/index.js";
 
 const [email, password, totpSecret] = process.argv.slice(2);
@@ -18,10 +19,11 @@ const prisma = new PrismaClient({
   }),
 });
 const passwordHash = await argon2.hash(password, { type: argon2.argon2id });
+const totpSecretEncrypted = encryptTotpSecret(totpSecret);
 const admin = await prisma.adminUser.upsert({
   where: { email: email.toLowerCase() },
-  update: { passwordHash, totpSecret },
-  create: { email: email.toLowerCase(), passwordHash, totpSecret },
+  update: { passwordHash, totpSecretEncrypted, totpSecret: null },
+  create: { email: email.toLowerCase(), passwordHash, totpSecretEncrypted },
 });
 await prisma.adminSession.updateMany({
   where: { adminId: admin.id, revokedAt: null },

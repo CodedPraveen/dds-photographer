@@ -2,31 +2,24 @@ import assert from "node:assert/strict";
 import { createHmac } from "node:crypto";
 import test from "node:test";
 
-import {
-  checkLoginRateLimit,
-  clearLoginFailures,
-  recordFailedLogin,
-} from "../src/features/admin/server/rate-limit.mjs";
+import { cooldownForFailures } from "../src/features/admin/server/rate-limit.mjs";
 import {
   createTotpSecret,
   verifyTotp,
 } from "../src/features/admin/server/totp.mjs";
+import {
+  decryptTotpSecret,
+  encryptTotpSecret,
+} from "../src/features/admin/server/totp-secrets.mjs";
 
-test("login rate limiting enters progressive cooldown after five failures", () => {
-  const key = `test-${Date.now()}-${Math.random()}`;
-  const now = 1_000_000;
-
-  for (let index = 0; index < 5; index += 1) {
-    recordFailedLogin(key, now);
-    assert.equal(checkLoginRateLimit(key, now).allowed, true);
-  }
-
-  recordFailedLogin(key, now);
-  const limited = checkLoginRateLimit(key, now);
-  assert.equal(limited.allowed, false);
-  assert.ok(limited.retryAfter > 0);
-  clearLoginFailures(key);
-  assert.equal(checkLoginRateLimit(key, now).allowed, true);
+test("rate limiting starts after five failures and caps cooldown", () => {
+  const now = new Date(1_000_000);
+  assert.equal(cooldownForFailures(5, now), null);
+  assert.equal(cooldownForFailures(6, now).getTime(), 1_002_000);
+  assert.equal(
+    cooldownForFailures(100, now).getTime(),
+    1_000_000 + 60 * 60 * 1000,
+  );
 });
 
 test("TOTP accepts the current code and rejects malformed input", () => {
@@ -52,4 +45,13 @@ test("TOTP accepts the current code and rejects malformed input", () => {
 
   assert.equal(verifyTotp(secret, code, now), true);
   assert.equal(verifyTotp(secret, "12345", now), false);
+});
+
+test("TOTP secrets use authenticated encryption with unique IVs", () => {
+  process.env.ADMIN_TOTP_ENCRYPTION_KEY = "11".repeat(32);
+  const first = encryptTotpSecret("JBSWY3DPEHPK3PXP");
+  const second = encryptTotpSecret("JBSWY3DPEHPK3PXP");
+  assert.notEqual(first, second);
+  assert.equal(decryptTotpSecret(first), "JBSWY3DPEHPK3PXP");
+  assert.throws(() => decryptTotpSecret(`${first}x`));
 });

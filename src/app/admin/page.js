@@ -26,6 +26,12 @@ export default async function AdminPage() {
       <p>
         <Link href="/admin/galleries">Manage galleries</Link>
       </p>
+      <p>
+        <Link href="/admin/audit">Review audit events</Link>
+      </p>
+      <p>
+        <Link href="/admin/security">Change password</Link>
+      </p>
       <h2>Recent galleries</h2>
       <ul>
         {recent.map((gallery) => (

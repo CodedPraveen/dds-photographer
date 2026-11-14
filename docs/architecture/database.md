@@ -17,6 +17,12 @@ See [ERD](../diagrams/03-database-erd.mmd).
 
 ## Target and proposed changes
 
+`IMPLEMENTED` Phase 5 adds `AdminLoginRateLimit` for persistent login cooldown
+state and an encrypted TOTP-secret column. The legacy nullable plaintext column is
+retained only for the controlled migration path and must be removed in a later
+verified migration after all records are encrypted. `ADMIN_TOTP_ENCRYPTION_KEY`
+is server-only and must never be stored in PostgreSQL.
+
 `PROPOSED` Future guest-password, upload, processing, and face-search-consent
 records require separate approval and migrations. No job, upload, embedding, or
 face-consent model exists today. Admin authentication records are implemented by

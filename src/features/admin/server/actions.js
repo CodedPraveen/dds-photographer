@@ -5,7 +5,9 @@ import { redirect } from "next/navigation";
 import {
   audit,
   createAdminSession,
+  getAdminTotpSecret,
   getCurrentAdmin,
+  hashPassword,
   revokeCurrentSession,
   verifyPassword,
 } from "./auth";
@@ -24,18 +26,18 @@ export async function login(_previous, formData) {
   const password = String(formData.get("password") || "");
   const code = String(formData.get("code") || "");
   const rateKey = email || "unknown";
-  if (!checkLoginRateLimit(rateKey).allowed)
+  if (!(await checkLoginRateLimit(prisma, rateKey)).allowed)
     return { error: "Too many attempts. Please try again later." };
   const admin = await prisma.adminUser.findUnique({ where: { email } });
   if (
     !admin ||
     !(await verifyPassword(admin.passwordHash, password)) ||
-    !verifyTotp(admin.totpSecret, code)
+    !verifyTotp(getAdminTotpSecret(admin), code)
   ) {
-    recordFailedLogin(rateKey);
+    await recordFailedLogin(prisma, rateKey);
     return { error: "Invalid sign-in details." };
   }
-  clearLoginFailures(rateKey);
+  await clearLoginFailures(prisma, rateKey);
   await createAdminSession(admin.id);
   await audit(admin.id, "admin.login", null, null);
   redirect("/admin");
@@ -46,6 +48,37 @@ export async function logout() {
   if (admin) await audit(admin.id, "admin.logout", null, null);
   await revokeCurrentSession();
   redirect("/admin/login");
+}
+
+export async function changePassword(_previous, formData) {
+  const admin = await getCurrentAdmin();
+  if (!admin) return { error: "Unauthorized." };
+  const current = String(formData.get("currentPassword") || "");
+  const next = String(formData.get("newPassword") || "");
+  const confirmation = String(formData.get("confirmPassword") || "");
+  if (!(await verifyPassword(admin.passwordHash, current)))
+    return { error: "Current password is incorrect." };
+  if (next.length < 12)
+    return { error: "New password must be at least 12 characters." };
+  if (next !== confirmation) return { error: "New passwords do not match." };
+  await prisma.$transaction(async (tx) => {
+    await tx.adminUser.update({
+      where: { id: admin.id },
+      data: { passwordHash: await hashPassword(next) },
+    });
+    await tx.adminSession.updateMany({
+      where: { adminId: admin.id, revokedAt: null },
+      data: { revokedAt: new Date() },
+    });
+    await tx.adminAuditEvent.create({
+      data: {
+        adminId: admin.id,
+        action: "admin.password_change",
+        targetId: admin.id,
+      },
+    });
+  });
+  return { success: "Password changed. Sign in again." };
 }
 
 export async function createGallery(_previous, formData) {

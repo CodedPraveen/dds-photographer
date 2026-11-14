@@ -1,32 +1,56 @@
-const attempts = new Map();
+import { createHash } from "node:crypto";
+
 const WINDOW_MS = 15 * 60 * 1000;
+const MAX_COOLDOWN_MS = 60 * 60 * 1000;
+const hashKey = (key) => createHash("sha256").update(String(key)).digest("hex");
+export function cooldownForFailures(failures, now = new Date()) {
+  return failures > 5
+    ? new Date(
+        now.getTime() + Math.min(MAX_COOLDOWN_MS, 1000 * 2 ** (failures - 5)),
+      )
+    : null;
+}
 
-export function checkLoginRateLimit(key, now = Date.now()) {
-  const record = attempts.get(key);
+export async function checkLoginRateLimit(prisma, key, now = new Date()) {
+  const rows = await prisma.$queryRaw`
+    SELECT "windowStartedAt", "failures", "cooldownUntil"
+    FROM "AdminLoginRateLimit" WHERE "keyHash" = ${hashKey(key)}
+  `;
+  const record = rows[0];
   if (!record) return { allowed: true };
-  if (record.windowStartedAt + WINDOW_MS <= now) {
-    attempts.delete(key);
+  if (new Date(record.windowStartedAt).getTime() + WINDOW_MS <= now.getTime())
     return { allowed: true };
-  }
-  if (record.cooldownUntil > now)
-    return { allowed: false, retryAfter: record.cooldownUntil - now };
-  return { allowed: true };
+  const cooldown =
+    record.cooldownUntil && new Date(record.cooldownUntil).getTime();
+  return cooldown && cooldown > now.getTime()
+    ? { allowed: false, retryAfter: cooldown - now.getTime() }
+    : { allowed: true };
 }
 
-export function recordFailedLogin(key, now = Date.now()) {
-  const previous = attempts.get(key);
-  const record =
-    previous && previous.windowStartedAt + WINDOW_MS > now
-      ? previous
-      : { windowStartedAt: now, failures: 0, cooldownUntil: 0 };
-  record.failures += 1;
-  if (record.failures > 5)
-    record.cooldownUntil =
-      now +
-      Math.min(60 * 60 * 1000, 1000 * 2 ** Math.min(record.failures - 5, 10));
-  attempts.set(key, record);
+export async function recordFailedLogin(prisma, key, now = new Date()) {
+  const keyHash = hashKey(key);
+  await prisma.$transaction(async (tx) => {
+    await tx.$executeRaw`
+      INSERT INTO "AdminLoginRateLimit" ("keyHash", "windowStartedAt", "failures", "updatedAt")
+      VALUES (${keyHash}, ${now}, 0, ${now}) ON CONFLICT ("keyHash") DO NOTHING
+    `;
+    const [record] = await tx.$queryRaw`
+      SELECT "windowStartedAt", "failures" FROM "AdminLoginRateLimit"
+      WHERE "keyHash" = ${keyHash} FOR UPDATE
+    `;
+    const reset =
+      new Date(record.windowStartedAt).getTime() + WINDOW_MS <= now.getTime();
+    const windowStartedAt = reset ? now : record.windowStartedAt;
+    const failures = reset ? 1 : record.failures + 1;
+    const cooldownUntil = cooldownForFailures(failures, now);
+    await tx.$executeRaw`
+      UPDATE "AdminLoginRateLimit" SET "windowStartedAt" = ${windowStartedAt},
+      "failures" = ${failures}, "cooldownUntil" = ${cooldownUntil}, "updatedAt" = ${now}
+      WHERE "keyHash" = ${keyHash}
+    `;
+  });
 }
 
-export function clearLoginFailures(key) {
-  attempts.delete(key);
+export async function clearLoginFailures(prisma, key) {
+  await prisma.$executeRaw`DELETE FROM "AdminLoginRateLimit" WHERE "keyHash" = ${hashKey(key)}`;
 }
