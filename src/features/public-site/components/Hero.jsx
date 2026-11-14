@@ -15,12 +15,10 @@ export function Hero({ content, items }) {
       const photoStack = photoStackRef.current;
       const { x, y, visible } = event.detail ?? {};
 
-      if (
-        !photoStack ||
-        !visible ||
-        !Number.isFinite(x) ||
-        !Number.isFinite(y)
-      ) {
+      if (!photoStack) return;
+
+      if (!visible || !Number.isFinite(x) || !Number.isFinite(y)) {
+        photoStack.dataset.lcdReady = "false";
         return;
       }
 
@@ -30,6 +28,9 @@ export function Hero({ content, items }) {
     };
 
     window.addEventListener("dds:lcd-anchor", updateLcdAnchor);
+    if (window.__DDS_LCD_ANCHOR__) {
+      updateLcdAnchor({ detail: window.__DDS_LCD_ANCHOR__ });
+    }
     return () => window.removeEventListener("dds:lcd-anchor", updateLcdAnchor);
   }, []);
 

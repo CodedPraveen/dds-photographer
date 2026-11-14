@@ -8,6 +8,7 @@ import { Box3, DoubleSide, Vector3 } from "three";
 const CAMERA_MODEL_URL = "/cameras/camera.glb";
 const CAMERA_PROGRESS_EVENT = "dds:camera-progress";
 const SERVICE_STATE_EVENT = "dds:service-state";
+const LCD_ANCHOR_EVENT = "dds:lcd-anchor";
 const CAMERA_STOPS = [
   { position: [0, -0.08, 0], rotation: [0.02, 0, 0], scale: 0.98 },
   { position: [0, 0.04, 0], rotation: [0, 0.08, 0], scale: 1 },
@@ -207,20 +208,38 @@ function LcdAnchor({ model }) {
   const previous = useRef("");
 
   useFrame(() => {
-    if (!screen) return;
+    let x = null;
+    let y = null;
+    let z = null;
+    let visible = false;
 
-    screen.getWorldPosition(position);
-    projected.copy(position).project(camera);
-    const visible = projected.z >= -1 && projected.z <= 1;
-    const x = ((projected.x + 1) / 2) * size.width;
-    const y = ((-projected.y + 1) / 2) * size.height;
-    const next = `${Math.round(x)}:${Math.round(y)}:${visible}`;
+    if (screen) {
+      screen.getWorldPosition(position);
+      projected.copy(position).project(camera);
+      x = ((projected.x + 1) / 2) * size.width;
+      y = ((-projected.y + 1) / 2) * size.height;
+      z = projected.z;
+      visible =
+        Number.isFinite(x) &&
+        Number.isFinite(y) &&
+        Number.isFinite(z) &&
+        x >= 0 &&
+        x <= size.width &&
+        y >= 0 &&
+        y <= size.height &&
+        z >= -1 &&
+        z <= 1;
+    }
+
+    const next = visible
+      ? `${Math.round(x)}:${Math.round(y)}:${Math.round(z * 1000)}:true`
+      : "hidden";
 
     if (next === previous.current) return;
     previous.current = next;
-    window.dispatchEvent(
-      new CustomEvent("dds:lcd-anchor", { detail: { x, y, visible } }),
-    );
+    const detail = { x, y, z, visible };
+    window.__DDS_LCD_ANCHOR__ = detail;
+    window.dispatchEvent(new CustomEvent(LCD_ANCHOR_EVENT, { detail }));
   });
 
   return null;
