@@ -18,10 +18,11 @@ DDS Photographer is a premium, single-photographer business website with a cinem
 - Credential-free local adapter and development preview route
 
 The current gallery foundation is not a finished admin or production media platform.
-Admin authentication architecture is approved by ADR-001 (2026-11-14), but admin
-authentication/dashboard, users, sessions, MFA, rate limiting, audit logging,
-uploads, R2 integration, background processing, QR generation, video, and face
-search are not implemented.
+Admin authentication architecture is approved by ADR-001 (2026-11-14) and its
+foundation is partially implemented: authentication, sessions, MFA, rate limiting,
+audit writes, and protected dashboard routes exist. Password-change/security-reset
+flows, audit review UI, uploads, R2 integration, background processing, QR
+generation, video, and face search are not implemented.
 
 ## Product and technology decisions
 

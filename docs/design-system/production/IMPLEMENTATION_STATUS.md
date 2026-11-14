@@ -59,11 +59,11 @@ delivery is not implemented.
 | Phase 0 — Architecture and baseline audit | Complete |
 | Phase 1A / 1B — Application foundation | Complete |
 | Phase 2 — Public marketing website | Complete |
-| Phase 3 — Camera-led motion experience | Complete |
+| Phase 3 — Camera-led motion experience | Partially implemented; visual verification pending |
 | Phase 4 — Private-gallery foundation | Complete |
 | Phase 5 — Admin dashboard and production readiness | Partially implemented |
 | Production photo upload / processing pipeline | Not implemented |
-| Face-search implementation | Evaluation only |
+| Face-search implementation | Selected architecture; not implemented |
 | Video | On hold |
 
 Use `docs/design-system/architecture/13-roadmap.md` for the current detailed plan.
@@ -165,7 +165,7 @@ See:
 - `docs/design-system/design/MOTION_GUIDELINES.md`
 - `docs/design-system/design/components/HERO_SECTION.md`
 
-## Docker environment — 2026-11-14
+## Docker environment — 2026-11-14 (historical) / 2026-11-15 verification
 
 | Item | Status |
 | --- | --- |
@@ -173,6 +173,11 @@ See:
 | Docker Compose app and PostgreSQL 16 services with private network and named volume | Implemented configuration; Compose syntax verified |
 | Prisma migration service | Implemented configuration; opt-in only, not run automatically |
 | Runtime database connection | Planned verification; no migrations or container startup run |
+
+On 2026-11-15, Docker CLI was present but the Docker Desktop Linux engine was
+inaccessible and `.env.docker` was not present, so image build, PostgreSQL health,
+migration, application startup, HTTP smoke, and non-root runtime checks were not
+run. The prior Compose syntax check remains historical evidence only.
 
 `DATABASE_URL` is used by the production application; `DIRECT_URL` is read by
 Prisma CLI configuration. `GALLERY_TOKEN_SECRET` remains required in production.
