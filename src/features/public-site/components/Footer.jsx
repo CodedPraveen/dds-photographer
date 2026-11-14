@@ -8,42 +8,6 @@ export function Footer({ contact, navigation, services, socialLinks }) {
   return (
     <footer className={styles.footer}>
       <Container>
-        <div className={styles.newsletter}>
-          <div>
-            <Text
-              as="p"
-              className={styles.eyebrow}
-              size="caption"
-              tone="inverse"
-            >
-              Newsletter preview
-            </Text>
-            <p className={styles.newsletterTitle}>Stay connected.</p>
-          </div>
-          <div className={styles.newsletterControl}>
-            <label className={styles.label} htmlFor="newsletter-email">
-              Email address
-            </label>
-            <input
-              aria-describedby="newsletter-note"
-              className={styles.input}
-              disabled
-              id="newsletter-email"
-              placeholder="Newsletter unavailable in Phase 2"
-              type="email"
-            />
-            <Text
-              as="p"
-              className={styles.note}
-              id="newsletter-note"
-              size="caption"
-              tone="inverse"
-            >
-              Visual placeholder only. No subscription service is connected.
-            </Text>
-          </div>
-        </div>
-
         <div className={styles.main}>
           <div className={styles.brandBlock}>
             <p className={styles.brand}>DDS Photographer</p>
