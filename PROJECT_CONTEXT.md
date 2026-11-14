@@ -91,6 +91,10 @@ Repository implementation status:
 - Admin authentication architecture: approved in ADR-001 on 2026-11-14; admin
   authentication, sessions, MFA, rate limiting, audit logging, and dashboard
   routes are not implemented.
+
+Phase 3 motion refinement remains partially implemented: the public motion code
+has a curved reversible photo path, persistent camera return states, and a static
+reduced-motion camera path. Runtime visual verification remains outstanding.
 - R2, Redis/BullMQ, shared password, QR generation, SFace face search: future work.
 - Video: on hold.
 

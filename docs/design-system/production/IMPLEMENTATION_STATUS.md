@@ -178,3 +178,11 @@ See:
 Prisma CLI configuration. `GALLERY_TOKEN_SECRET` remains required in production.
 The image must be built and tested successfully before this environment is marked
 Implemented end to end.
+
+### Phase 3 cinematic refinement — Partially Implemented
+
+The public motion orchestration now includes a multi-point curved photo path,
+camera return states across later sections, and a visible static camera fallback
+when reduced motion is preferred. Code-level lint and unit tests pass. Desktop,
+tablet, mobile, reduced-motion runtime behavior, and production-build verification
+remain outstanding; this refinement is not marked complete.

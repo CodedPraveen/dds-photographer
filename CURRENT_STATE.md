@@ -152,3 +152,17 @@ and `build`. Run them locally or add a CI workflow to obtain explicit results.
 - **Not verified:** the image build, startup, database connectivity, and HTTP
   smoke test. Repeated `docker build` attempts stopped during `npm ci` after an
   invalid/damaged-lockfile warning and produced no image. No migrations were run.
+
+## Phase 3 motion refinement update — 2026-11-14
+
+- **Partially implemented:** hero photo choreography now uses a multi-point,
+  reversible curved keyframe trajectory with restrained rotation and layered
+  scaling; the persistent camera fades back into the composition across later
+  public sections.
+- **Improved:** reduced-motion mode keeps the camera visible as a static scene,
+  disables cinematic scroll choreography, and keeps the shutter hidden.
+- **Verified:** lint and the existing five unit tests passed.
+- **Not verified:** browser visual behavior at desktop/tablet/mobile sizes,
+  reduced-motion runtime behavior, console errors, and the production build;
+  browser automation could not safely bind to the existing Windows Chrome tab,
+  and the build stalled during optimized production-build creation.

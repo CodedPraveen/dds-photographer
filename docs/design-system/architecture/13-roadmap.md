@@ -23,6 +23,10 @@ The admin authentication architecture is approved by ADR-001 (2026-11-14).
 Authentication and basic dashboard/gallery management are partially implemented;
 production readiness and the remaining Phase 5 work are not complete.
 
+Phase 3 remains complete for its original camera-led foundation, but the later
+cinematic LCD-to-photo refinement remains **Partially Implemented** pending visual
+verification across supported viewports and reduced-motion runtime checks.
+
 Planned, not implemented:
 
 - Secure photographer/admin access and session lifecycle
