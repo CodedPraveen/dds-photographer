@@ -54,6 +54,9 @@ function CameraRig() {
     let animationFrame;
     const introStartedAt = performance.now();
     const introDuration = 1400;
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
 
     const getResponsiveScale = () =>
       viewportWidth < 4 ? 0.46 : viewportWidth < 6 ? 0.72 : 1;
@@ -141,7 +144,12 @@ function CameraRig() {
 
     window.addEventListener(CAMERA_PROGRESS_EVENT, updateCamera);
     window.addEventListener(SERVICE_STATE_EVENT, updateServiceState);
-    animationFrame = requestAnimationFrame(animateEntrance);
+    if (reducedMotion) {
+      introCompleteRef.current = true;
+      applyCameraState(0);
+    } else {
+      animationFrame = requestAnimationFrame(animateEntrance);
+    }
 
     return () => {
       cancelAnimationFrame(animationFrame);

@@ -12,14 +12,13 @@ const PersistentCamera = dynamic(
 );
 
 export function MotionExperience() {
-  const [shouldRenderCamera, setShouldRenderCamera] = useState(false);
+  const [shouldRenderCamera, setShouldRenderCamera] = useState(true);
 
   useEffect(() => {
     const reducedMotionQuery = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     );
-    const updatePreference = () =>
-      setShouldRenderCamera(!reducedMotionQuery.matches);
+    const updatePreference = () => setShouldRenderCamera(true);
 
     updatePreference();
     reducedMotionQuery.addEventListener("change", updatePreference);

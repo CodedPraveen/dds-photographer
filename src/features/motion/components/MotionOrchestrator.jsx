@@ -128,6 +128,7 @@ export function MotionOrchestrator() {
                 firstPhoto,
                 {
                   duration: 0.34,
+                  ease: "power2.inOut",
                   scale: finalPhotoScale,
                   xPercent: 0,
                   yPercent: -12,
@@ -141,11 +142,23 @@ export function MotionOrchestrator() {
                 card,
                 {
                   autoAlpha: 0.92,
-                  duration: 0.38,
+                  duration: 0.5,
+                  ease: "sine.inOut",
                   keyframes: {
-                    scale: [0.58, 0.86, 1.08],
-                    xPercent: [0, direction * 34, direction * (54 + index * 8)],
-                    yPercent: [8, -48, -126 - index * 30],
+                    scale: [0.58, 0.76, 0.96, 1.08],
+                    xPercent: [
+                      0,
+                      direction * 22,
+                      direction * 52,
+                      direction * (42 + index * 8),
+                    ],
+                    yPercent: [8, -24, -82 - index * 12, -126 - index * 30],
+                    rotation: [
+                      0,
+                      direction * -1.2,
+                      direction * 1.4,
+                      direction * 0.4,
+                    ],
                   },
                 },
                 0.24 + index * 0.14,
@@ -184,7 +197,7 @@ export function MotionOrchestrator() {
               );
           }
 
-          if (cameraStage && contact && !hero) {
+          if (cameraStage && contact) {
             gsap.fromTo(
               cameraStage,
               { opacity: 0.35 },
@@ -200,6 +213,25 @@ export function MotionOrchestrator() {
               },
             );
           }
+
+          [
+            ["#about", 0.68],
+            ["#portfolio", 0.56],
+            ["[data-motion-services]", 0.76],
+            ["#contact", 0.92],
+          ].forEach(([trigger, opacity]) => {
+            if (!cameraStage || !document.querySelector(trigger)) return;
+            gsap.to(cameraStage, {
+              autoAlpha: opacity,
+              ease: "none",
+              scrollTrigger: {
+                end: "center center",
+                scrub: 1,
+                start: "top bottom",
+                trigger,
+              },
+            });
+          });
 
           revealItems.forEach((item) => {
             gsap.fromTo(
