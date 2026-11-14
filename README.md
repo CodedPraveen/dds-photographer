@@ -13,10 +13,15 @@ DDS Photographer is a premium, single-photographer business website with a cinem
 - Server-validated visitor details and explicit gallery-entry consent
 - Signed 12-hour HTTP-only, gallery-scoped visitor access cookie
 - Gallery-scoped protected media route
-- Prisma/PostgreSQL models: `Gallery`, `GalleryMedia`, `GalleryVisitor`
+- Prisma/PostgreSQL models: `Gallery`, `GalleryMedia`, `GalleryVisitor`,
+  `AdminUser`, `AdminSession`, `AdminAuditEvent`
 - Credential-free local adapter and development preview route
 
-The current gallery foundation is not a finished admin or production media platform. Admin authentication/dashboard, uploads, R2 integration, background processing, QR generation, video, and face search are not implemented.
+The current gallery foundation is not a finished admin or production media platform.
+Admin authentication architecture is approved by ADR-001 (2026-11-14), but admin
+authentication/dashboard, users, sessions, MFA, rate limiting, audit logging,
+uploads, R2 integration, background processing, QR generation, video, and face
+search are not implemented.
 
 ## Product and technology decisions
 

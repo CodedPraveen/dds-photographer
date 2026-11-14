@@ -7,8 +7,19 @@
 ## Current stage
 
 The public website, camera-led motion experience, and first private-gallery foundation
-are implemented. The next planned implementation phase is Phase 5 — Admin Dashboard
-and Production Readiness. Phase 5 has not started.
+are implemented. Phase 5 — Admin Dashboard and Production Readiness is partially
+implemented; production readiness and remaining policy work are not complete.
+
+### Phase 5 admin foundation — Partially Implemented
+
+Implemented: approved one-account Argon2id/TOTP authentication, one-time provisioning
+CLI, hashed database sessions, admin-scoped secure cookies, session expiry and
+revocation, progressive login cooldown, audit-event writes, protected dashboard
+routes, and gallery create/list/edit/activate/deactivate operations.
+
+Not implemented: password-change/security-reset UI, audit-event review UI, shared
+wedding passwords, gallery expiry policy, uploads, R2 delivery, and production
+operational verification.
 
 ## Implemented scope
 
@@ -50,7 +61,7 @@ delivery is not implemented.
 | Phase 2 — Public marketing website | Complete |
 | Phase 3 — Camera-led motion experience | Complete |
 | Phase 4 — Private-gallery foundation | Complete |
-| Phase 5 — Admin dashboard and production readiness | Not started |
+| Phase 5 — Admin dashboard and production readiness | Partially implemented |
 | Production photo upload / processing pipeline | Not implemented |
 | Face-search implementation | Evaluation only |
 | Video | On hold |
@@ -75,6 +86,9 @@ Use `docs/design-system/architecture/13-roadmap.md` for the current detailed pla
 - `Gallery`
 - `GalleryMedia`
 - `GalleryVisitor`
+- `AdminUser`
+- `AdminSession`
+- `AdminAuditEvent`
 
 Do not describe future admin, upload-job, face-consent, embedding, or processing
 models as existing.

@@ -13,11 +13,15 @@
 | 2     | Public marketing website                 | Complete    |
 | 3     | Camera-led motion experience             | Complete    |
 | 4     | First private-gallery foundation         | Complete    |
-| 5     | Admin dashboard and production readiness | Not started |
+| 5     | Admin dashboard and production readiness | Partially implemented |
 
 See `../production/IMPLEMENTATION_STATUS.md` and `../production/IMPLEMENTED_FEATURES.md` for verified details.
 
 ## Phase 5 — Admin dashboard and production readiness
+
+The admin authentication architecture is approved by ADR-001 (2026-11-14).
+Authentication and basic dashboard/gallery management are partially implemented;
+production readiness and the remaining Phase 5 work are not complete.
 
 Planned, not implemented:
 

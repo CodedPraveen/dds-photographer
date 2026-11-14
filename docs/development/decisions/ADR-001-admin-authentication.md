@@ -1,7 +1,8 @@
-# ADR-001: Admin authentication proposal
+# ADR-001: Admin authentication
 
-Status: `PROPOSED` — owner approval required. This ADR does not authorize
-implementation or Prisma schema changes.
+Status: `APPROVED` — owner approval recorded 2026-11-14. This ADR approves the
+target architecture and security policy; it does not mean authentication is
+implemented or authorize changes outside the approved implementation scope.
 
 ## Context
 
@@ -9,15 +10,26 @@ The project needs future photographer/admin access for gallery management. No ad
 authentication, user model, session model, dashboard, or admin route is currently
 implemented.
 
-## Proposal
+## Approved decision
 
-Evaluate a single provisioned admin account with database-backed authentication,
-Argon2id password hashing, database-backed sessions, HTTP-only cookies, Secure
-cookies in production, SameSite protection, server-side authorization, login rate
-limiting, audit logging, secure initial provisioning, password recovery, and session
-revocation.
+Use one provisioned photographer-admin account with no public registration,
+database-backed authentication, Argon2id password hashing, required TOTP
+authenticator-app MFA, database-backed sessions, and server-side authorization for
+every protected operation.
 
-## Alternative
+Initial provisioning must use a one-time server-side CLI command. Session records
+must store only cryptographic hashes of session tokens. Admin cookies must be
+HTTP-only, Secure in production, SameSite=Lax, and scoped to admin routes.
+
+Admin sessions have a 12-hour idle timeout and a 7-day absolute lifetime. Logout
+revokes the current session. Password changes and administrator security resets
+revoke all active sessions.
+
+Login permits five failed attempts per 15-minute window, followed by progressive
+cooldown. There is no permanent automatic account lockout. Admin security and
+management audit events are retained for one year.
+
+## Rejected alternative
 
 Use an external authentication provider for identity, credential recovery, session
 management, MFA, and abuse controls, integrating only the application roles and
@@ -32,10 +44,13 @@ reduces those operational burdens and may improve MFA/recovery, but adds vendor
 cost, integration complexity, availability dependence, and privacy/data-transfer
 review.
 
-## Unresolved decisions
+## Implementation boundary
 
-- Approve local authentication, an external provider, or another design.
-- Required MFA and account recovery policy.
-- Provisioning channel and secret rotation.
-- Session lifetime, revocation behavior, and audit retention.
-- Provider, region, cost, and data-processing requirements if external.
+The approved architecture does not create an admin user, session model, MFA flow,
+rate limiter, audit log, dashboard route, dependency, environment variable, or
+Prisma migration. Those remain implementation work for Phase 5 and must be
+verified against source before being described as implemented.
+
+Shared wedding-password policy, gallery expiry policy, R2, Redis/BullMQ, uploads,
+processing, and other production-readiness decisions remain separate from this
+ADR and retain their existing statuses.

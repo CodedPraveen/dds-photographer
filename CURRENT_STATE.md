@@ -54,6 +54,9 @@ Current Prisma models:
 - `Gallery`
 - `GalleryMedia`
 - `GalleryVisitor`
+- `AdminUser`
+- `AdminSession`
+- `AdminAuditEvent`
 
 No production admin/user/face-search/job/upload model should be assumed to exist.
 
@@ -63,7 +66,20 @@ No production admin/user/face-search/job/upload model should be assumed to exist
 - Extendable gallery expiry.
 - Cloudflare R2 private photo storage.
 - Redis + BullMQ photo-processing jobs.
-- Admin dashboard, admin authentication, gallery creation/management UI.
+- Admin authentication architecture approved by ADR-001 on 2026-11-14. The admin
+  foundation is now partially implemented; remaining Phase 5 work is tracked below.
+
+### Phase 5 admin foundation — partially implemented
+
+- Admin schema and migration for one provisioned account, hashed sessions, and
+  audit events are implemented.
+- Argon2id password verification, required TOTP MFA, one-time provisioning CLI,
+  admin-scoped HTTP-only session cookies, 12-hour idle/7-day absolute expiry,
+  logout/all-session revocation, progressive login cooldown, and protected routes
+  are implemented.
+- Dashboard overview and gallery listing/creation/editing/activation controls are
+  implemented. Shared wedding passwords, gallery expiry policy, uploads, and
+  production media delivery remain unimplemented.
 - Production uploads and private media delivery pipeline.
 - QR-code generation.
 

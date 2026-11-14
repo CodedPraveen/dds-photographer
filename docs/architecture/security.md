@@ -16,6 +16,16 @@ rotatable, revocable, and never logged or placed in URLs. Face-search consent mu
 be separate, optional, affirmative, unchecked by default, purpose-specific, and
 withdrawable; declining it must not block ordinary gallery access.
 
-Admin authentication remains a proposal in [ADR-001](../development/decisions/ADR-001-admin-authentication.md).
+Admin authentication architecture is approved in [ADR-001](../development/decisions/ADR-001-admin-authentication.md),
+but is not implemented. The approved target requires one provisioned admin with
+TOTP MFA, Argon2id passwords, one-time CLI provisioning, hashed database sessions,
+HTTP-only Secure-in-production SameSite=Lax admin cookies, 12-hour idle and 7-day
+absolute session limits, revocation on logout/password change/security reset,
+five failed attempts per 15 minutes with progressive cooldown, no permanent
+automatic lockout, server-side authorization, and one-year audit retention.
+
+These admin policies are distinct from the implemented 30-day gallery-link token
+and 12-hour gallery visitor cookie policies. No admin authentication, session,
+MFA, rate limiter, audit system, or dashboard route currently exists.
 
 See [auth flow](../diagrams/04-auth-authorization-flow.mmd) and [gallery flow](../diagrams/05-private-gallery-access-flow.mmd).

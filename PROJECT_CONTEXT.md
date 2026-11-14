@@ -38,7 +38,8 @@ silently select one or rewrite the approved architecture.
 - Private gallery: `/gallery/[token]`, signed gallery-link token, visitor entry form,
   gallery-scoped visitor access cookie, gallery-scoped media route.
 - Data: PostgreSQL with Prisma 7; current Prisma models are `Gallery`,
-  `GalleryMedia`, and `GalleryVisitor`.
+  `GalleryMedia`, `GalleryVisitor`, `AdminUser`, `AdminSession`, and
+  `AdminAuditEvent`.
 - Local gallery development: file-backed adapter and `/gallery/preview` when running
   in development without `DATABASE_URL`.
 
@@ -87,8 +88,20 @@ Repository implementation status:
 - Camera-led motion experience: implemented.
 - Private-gallery foundation: implemented, not a complete production delivery platform.
 - Admin dashboard and production readiness: not started.
+- Admin authentication architecture: approved in ADR-001 on 2026-11-14; admin
+  authentication, sessions, MFA, rate limiting, audit logging, and dashboard
+  routes are not implemented.
 - R2, Redis/BullMQ, shared password, QR generation, SFace face search: future work.
 - Video: on hold.
+
+Approved admin-authentication policy is limited to one provisioned account, required
+TOTP MFA, Argon2id passwords, one-time server-side CLI provisioning, hashed
+database sessions, HTTP-only Secure-in-production SameSite=Lax admin cookies,
+12-hour idle and 7-day absolute sessions, revocation on logout/password change/
+security reset, progressive cooldown after five failed attempts per 15 minutes,
+no permanent automatic lockout, server-side authorization, and one-year audit
+retention. These policies do not change the separate gallery visitor cookie or
+gallery-link token lifetimes.
 
 ## 7. Non-goals unless explicitly approved
 

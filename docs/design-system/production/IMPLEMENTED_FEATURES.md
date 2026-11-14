@@ -49,13 +49,15 @@
 - `Gallery`
 - `GalleryMedia`
 - `GalleryVisitor`
+- `AdminUser`
+- `AdminSession`
+- `AdminAuditEvent`
 
 See `prisma/schema.prisma` and `docs/design-system/architecture/02-database-erd.md`.
 
 ## Not implemented
 
-- Phase 5 admin authentication, dashboard, gallery creation/editing, publishing,
-  shared wedding password, and extendable expiry controls.
+- Shared wedding password and extendable expiry controls.
 - Production uploads and Cloudflare R2 integration.
 - Production private object delivery and CDN integration.
 - Redis/BullMQ background processing.
@@ -65,6 +67,20 @@ See `prisma/schema.prisma` and `docs/design-system/architecture/02-database-erd.
 - Face-search consent model and derived face-data lifecycle.
 - Video upload, storage, processing, or playback (on hold).
 - Favorites, payments, multi-studio SaaS, and mobile apps.
+
+### Phase 5 — partially implemented admin foundation
+
+- Approved single-account admin authentication with Argon2id passwords and
+  required TOTP authenticator-app codes.
+- One-time server-side provisioning CLI; no public registration.
+- Database-backed sessions storing only token hashes, admin-scoped HTTP-only
+  cookies, 12-hour idle and 7-day absolute expiry, logout revocation, and
+  progressive cooldown after five failed attempts per 15-minute window.
+- Server-side protected dashboard routes, one-year audit-event storage, and
+  gallery listing, creation, editing, activation, and deactivation.
+
+Password-change/security-reset flows, shared wedding passwords, expiry policy,
+uploads, and production media delivery remain unimplemented.
 
 ## Status language
 
