@@ -1,0 +1,56 @@
+services:
+  app:
+    build:
+      context: .
+      target: runner
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env.docker
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    networks:
+      - dds_internal
+
+  db:
+    image: postgres:16-bookworm
+    env_file:
+      - .env.docker
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    restart: unless-stopped
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - dds_internal
+
+  migrate:
+    build:
+      context: .
+      target: builder
+    command: npx prisma migrate deploy
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env.docker
+    profiles:
+      - tools
+    networks:
+      - dds_internal
+
+volumes:
+  postgres_data:
+
+networks:
+  dds_internal:
+    driver: bridge
