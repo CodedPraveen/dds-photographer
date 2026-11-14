@@ -32,7 +32,10 @@ search are not implemented.
 | Photo storage       | Cloudflare R2                       | Selected; integration pending           |
 | Background jobs     | Redis + BullMQ                      | Selected; integration pending           |
 | Video               | Cloudflare Stream                   | On hold; photo-only scope               |
-| Face matching       | SFace                               | Evaluation only; no production approval |
+| Face detection      | YuNet                               | Selected; not integrated              |
+| Face embeddings     | SFace ONNX + OpenCV                | Selected; not integrated              |
+| Face-search service | FastAPI/Uvicorn                    | Selected; not integrated              |
+| Embedding search    | PostgreSQL + pgvector              | Selected; not integrated              |
 | Face-search consent | Separate, explicit, optional opt-in | Required before face-search processing  |
 
 Installed dependencies do not prove that a feature is implemented. See `docs/design-system/architecture/17-tech-stack.md`.

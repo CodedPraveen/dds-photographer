@@ -83,10 +83,14 @@ No production admin/user/face-search/job/upload model should be assumed to exist
 - Production uploads and private media delivery pipeline.
 - QR-code generation.
 
-## Evaluation only
+## Selected — not implemented: face-recognition architecture
 
-- SFace face-matching evaluation.
-- No production face-search implementation or approval.
+- YuNet detects faces and returns bounding boxes/landmarks.
+- OpenCV handles image processing and runs YuNet and SFace ONNX inference.
+- SFace ONNX generates embeddings from aligned face regions.
+- A separate Python FastAPI/Uvicorn service will expose processing/search APIs.
+- PostgreSQL + pgvector will store and similarity-search embeddings.
+- MTCNN, PyTorch, and Torchvision are excluded from the initial implementation.
 
 ## Deferred / on hold
 

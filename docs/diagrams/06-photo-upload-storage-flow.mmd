@@ -8,3 +8,12 @@ flowchart LR
   Derivatives --> R2
   R2 --> Delivery[Future gallery-scoped private delivery]
   Delivery --> Guest[Guest browser]
+
+  Upload --> FaceAPI[FastAPI face service\nSELECTED_NOT_INTEGRATED]
+  FaceAPI --> CV[OpenCV processing/inference\nSELECTED_NOT_INTEGRATED]
+  CV --> Detect[YuNet detection\nSELECTED_NOT_INTEGRATED]
+  Detect --> Align[Face alignment/cropping]
+  Align --> Embed[SFace ONNX embeddings\nSELECTED_NOT_INTEGRATED]
+  Embed --> Vector[(PostgreSQL + pgvector\nSELECTED_NOT_INTEGRATED)]
+  Vector --> Search[Embedding similarity search]
+  Search --> Guest

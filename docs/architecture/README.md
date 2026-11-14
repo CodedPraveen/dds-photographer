@@ -22,7 +22,9 @@ multi-tenant SaaS product. The current product scope is photos only.
   dashboard and implementation remain Phase 5 work. Upload/processing pipeline,
   shared wedding password, and extendable expiry policy remain planned or
   decision-dependent.
-- `EVALUATION_ONLY` SFace face matching; no production face search.
+- `SELECTED_NOT_INTEGRATED` YuNet + SFace ONNX + OpenCV face-search pipeline,
+  served by FastAPI and backed by PostgreSQL + pgvector. No face-search feature
+  is implemented.
 - `ON_HOLD` Video/Cloudflare Stream.
 
 See [system context](../diagrams/01-system-context.mmd), [application architecture](../diagrams/02-application-architecture.mmd), and the [database record](database.md).

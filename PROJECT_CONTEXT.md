@@ -52,7 +52,10 @@ silently select one or rewrite the approved architecture.
 | Photo storage | Cloudflare R2 | Selected; integration pending |
 | Background processing | Redis + BullMQ | Selected; integration pending |
 | Video | Cloudflare Stream | On hold; photo-only scope |
-| Face matching | SFace | Evaluation only; not production-approved |
+| Face detection | YuNet | Selected; not integrated |
+| Face embeddings | SFace ONNX + OpenCV | Selected; not integrated |
+| Face-search backend | FastAPI/Uvicorn | Selected; not integrated |
+| Embedding search | PostgreSQL + pgvector | Selected; not integrated |
 | Face-search consent | Separate, explicit, optional opt-in | Required before face-search processing |
 
 A shared wedding password is a gallery-level gate, not unique guest authentication.
@@ -76,7 +79,9 @@ Record notice/version, purpose, affirmative action, timestamp, and withdrawal.
 Do not collect or process face-search data before this flow and its lifecycle are
 approved and implemented.
 
-SFace remains evaluation-only. Do not represent it as an integrated feature.
+The face-recognition architecture is selected but not integrated. Do not represent
+it as an implemented feature. MTCNN, PyTorch, and Torchvision are excluded from
+the initial implementation.
 
 ## 6. Phase boundary
 

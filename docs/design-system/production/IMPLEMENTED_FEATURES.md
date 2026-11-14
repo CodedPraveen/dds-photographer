@@ -86,7 +86,8 @@ uploads, and production media delivery remain unimplemented.
 
 - Cloudflare R2 and Redis/BullMQ are selected future directions, not integrations.
 - Cloudflare Stream is on hold; product scope is photo-only.
-- SFace is evaluation-only, not production-approved.
+- The YuNet + SFace ONNX + OpenCV + FastAPI + PostgreSQL/pgvector face pipeline
+  is selected but not implemented or production-approved.
 - One shared password per wedding and extendable expiry are selected decisions,
   not implemented features.
 - Gallery-entry consent is not face-search consent.

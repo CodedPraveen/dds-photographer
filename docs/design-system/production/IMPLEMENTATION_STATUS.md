@@ -77,7 +77,7 @@ Use `docs/design-system/architecture/13-roadmap.md` for the current detailed pla
 | Photo storage | Cloudflare R2 | Selected; not integrated |
 | Background processing | Redis + BullMQ | Selected; not integrated |
 | Video | Cloudflare Stream | On hold; photo-only scope |
-| Face matching | SFace | Evaluation only |
+| Face pipeline | YuNet + SFace ONNX + OpenCV + FastAPI + PostgreSQL/pgvector | Selected; not implemented |
 | Face-search consent | Separate, explicit, optional opt-in | Required before processing |
 
 ## Current data model

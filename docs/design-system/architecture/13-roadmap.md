@@ -62,9 +62,10 @@ R2 and Redis + BullMQ are selected directions; neither is integrated yet.
 
 Default expiry, maximum lifetime, retention/deletion schedule, and password rotation policy remain to be specified. Distinguish gallery availability, gallery-link token expiry (currently 30 days), visitor cookie expiry (currently 12 hours), and permanent retention/deletion.
 
-### Face-search evaluation and privacy
+### Face-recognition architecture and privacy
 
-- Evaluate SFace; evaluation is not production approval
+- Implement the selected YuNet + OpenCV + SFace ONNX pipeline in a separate FastAPI service
+- Store/search embeddings with PostgreSQL + pgvector after schema and migration approval
 - Assess provenance/licensing, accuracy, false matches, bias, security, and operational suitability
 - Design separate gallery-scoped face-search consent before collecting or processing any selfie, face crop, embedding, or match data
 - Record notice/version, purpose, affirmative action, timestamp, and withdrawal
@@ -72,7 +73,9 @@ Default expiry, maximum lifetime, retention/deletion schedule, and password rota
 - Never make ordinary gallery access conditional on face-search opt-in
 - Define deletion of source and derived face-search data
 
-The existing gallery-entry consent is not face-search consent. No face-search functionality is currently implemented.
+The existing gallery-entry consent is not face-search consent. The selected
+architecture is not implemented; no face-search functionality is currently
+implemented.
 
 ### Video
 
@@ -91,7 +94,7 @@ Mobile apps, multi-studio support, payments, and SaaS/multi-tenant features are 
 | Photo storage       | Cloudflare R2                       | Selected; integration pending    |
 | Video               | Cloudflare Stream                   | On hold; photo-only              |
 | Background jobs     | Redis + BullMQ                      | Selected; integration pending    |
-| Face matching       | SFace                               | Evaluation only                  |
+| Face pipeline       | YuNet + SFace ONNX + OpenCV + FastAPI + PostgreSQL/pgvector | Selected; integration pending |
 | Face-search consent | Separate, explicit, optional opt-in | Required before processing       |
 
 ## Change control

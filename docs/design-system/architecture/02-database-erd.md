@@ -88,7 +88,11 @@ Design a separate gallery-scoped consent record before face-search data is colle
 
 `GalleryFaceSearchConsent` is a possible conceptual name only, not a current Prisma model. Do not store face-search consent only in `GalleryVisitor.consent`.
 
-Selfies, face crops, embeddings, and match results are future data categories. Their schema, encryption, isolation, access controls, retention, and deletion need a separate approved design. SFace is evaluation-only.
+Selfies, face crops, embeddings, and match results are future data categories.
+PostgreSQL + pgvector is selected for future embedding storage/search, but its
+schema, indexes, encryption, isolation, access controls, retention, and deletion
+need an approved implementation design and migration. No face-related model
+exists in the current Prisma schema.
 
 ## 3. Future media-processing concepts — not implemented
 Upload batches, processing jobs, media variants, and audit events may be needed for R2 and Redis/BullMQ. Design them after the storage and processing workflows are approved. Do not revive the old generic User/Album/Photo/Face/Download ERD as if it described the current database.

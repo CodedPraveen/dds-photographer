@@ -39,8 +39,10 @@ Requirements for implementation:
 
 ## 3. Face-search consent — mandatory product requirement before processing
 
-Face matching is limited to SFace evaluation. No face-search feature is
-currently implemented or approved for production.
+The selected face-search architecture is YuNet detection, OpenCV processing and
+inference, SFace ONNX embeddings, a separate FastAPI service, and PostgreSQL +
+pgvector similarity search. No face-search feature is currently implemented or
+approved for production.
 
 Before collecting a selfie/face image or creating, storing, comparing, or
 otherwise processing a face embedding or match result:
@@ -59,6 +61,8 @@ otherwise processing a face embedding or match result:
   timestamp, gallery/visitor scope, and later withdrawal.
 - Provide a withdrawal path and delete or de-identify face-search data in
   accordance with the approved retention policy.
+- Treat embeddings and related face-derived data as biometric data; enforce
+  gallery isolation and do not expose raw embeddings to the frontend.
 
 A guest's general gallery-entry consent must never be interpreted as permission
 for face search. Consent must be specific to the face-search purpose.
