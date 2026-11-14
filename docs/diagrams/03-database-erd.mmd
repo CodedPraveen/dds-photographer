@@ -1,0 +1,6 @@
+erDiagram
+  Gallery ||--o{ GalleryMedia : contains
+  Gallery ||--o{ GalleryVisitor : records
+  Gallery { string id PK; string title; boolean isActive; int tokenVersion; datetime opensAt; datetime closesAt; datetime createdAt; datetime updatedAt }
+  GalleryMedia { string id PK; string galleryId FK; string storageKey; string altText; int sortOrder; boolean isCover; datetime createdAt; datetime updatedAt }
+  GalleryVisitor { string id PK; string galleryId FK; string name; string mobile; string email; boolean consent; datetime consentedAt; datetime createdAt; datetime updatedAt }

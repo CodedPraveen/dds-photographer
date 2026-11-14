@@ -1,8 +1,8 @@
 # DDS Photographer — Project Context
 
 > Prepared 2026-10-26 from the `system-design` branch source tree and repository
-> documentation. This is an AI working context, not a replacement for the Eraser
-> architecture workspace.
+> documentation. This is an AI working context; repository architecture records
+> are the source of truth.
 
 ## 1. Product identity
 
@@ -14,15 +14,15 @@ This is not currently an approved multi-studio, multi-tenant SaaS platform.
 
 ## 2. Architecture authority
 
-`AGENTS.md` explicitly identifies the Eraser workspace as the primary approved
-architecture and planning reference. Before implementing a feature:
+`AGENTS.md` identifies repository architecture documents, Mermaid diagrams, and ADRs
+as the primary approved architecture and planning reference. Before implementing a feature:
 
-1. Read the relevant Eraser document.
-2. Review its associated architecture canvas.
+1. Read the relevant repository architecture document.
+2. Review its associated Mermaid diagram.
 3. Review the development roadmap.
 4. Implement only the approved current phase.
 
-Repository docs and code should be used to verify current implementation. If Eraser,
+Repository docs and code should be used to verify current implementation. If documentation,
 repository documentation, and source disagree, stop and report the conflict; do not
 silently select one or rewrite the approved architecture.
 
@@ -80,7 +80,7 @@ SFace remains evaluation-only. Do not represent it as an integrated feature.
 ## 6. Phase boundary
 
 The roadmap in `docs/design-system/architecture/13-roadmap.md` is the current
-repository roadmap, while Eraser remains the approved architecture authority.
+repository roadmap, while repository architecture records remain the approved authority.
 
 Repository implementation status:
 - Foundation and public website: implemented.

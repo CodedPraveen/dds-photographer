@@ -1,0 +1,10 @@
+flowchart LR
+  Admin[Future admin] --> Auth[Future authorization]
+  Auth --> Upload[Future scoped upload authorization]
+  Upload --> R2[(Cloudflare R2\nSELECTED_NOT_INTEGRATED)]
+  R2 --> Queue[Redis + BullMQ\nSELECTED_NOT_INTEGRATED]
+  Queue --> Worker[Future photo worker]
+  Worker --> Derivatives[Future derivatives and metadata]
+  Derivatives --> R2
+  R2 --> Delivery[Future gallery-scoped private delivery]
+  Delivery --> Guest[Guest browser]

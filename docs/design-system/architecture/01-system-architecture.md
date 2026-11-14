@@ -1,6 +1,6 @@
 # System Architecture
 
-> Updated 2026-10-26. Eraser remains the primary approved architecture reference under `AGENTS.md`. This file separates verified current code from owner-selected future direction.
+> Updated 2026-10-26. Repository architecture records are the authority. This file separates verified current code from owner-selected future direction.
 
 ## 1. Product boundary
 DDS Photographer is a single-photographer business website with a public portfolio, private wedding/event galleries, and a future photographer/admin platform. A photo upload pipeline is planned. Face search is limited to SFace evaluation and requires separate privacy approval. This is not currently a multi-studio SaaS product.
@@ -117,4 +117,4 @@ A preselected checkbox is not an affirmative opt-in. A hidden or bundled terms l
 Video (Cloudflare Stream is on hold), production face recognition, admin dashboard/authentication, R2 upload/delivery integration, Redis/BullMQ workers, multi-studio SaaS, mobile app, and payments.
 
 ## 7. Change control
-Before implementing future components, read the relevant Eraser document and canvas, roadmap, and product specification. If approved Eraser architecture conflicts with this file, stop and ask. Never silently promote a planned component to implemented status.
+Before implementing future components, read the relevant repository architecture document, Mermaid diagram, roadmap, and product specification. If records conflict, stop and report the exact conflict. Never silently promote a planned component to implemented status.

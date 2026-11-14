@@ -2,7 +2,7 @@
 
 > **Project:** DDS Photographer
 > **Last verified against repository source:** 2026-10-26
-> **Architecture authority:** Eraser workspace, as specified in `AGENTS.md`
+> **Architecture authority:** Repository architecture documents, Mermaid diagrams, and ADRs.
 
 ## Current stage
 
@@ -150,3 +150,17 @@ See:
 - `docs/design-system/architecture/13-roadmap.md`
 - `docs/design-system/design/MOTION_GUIDELINES.md`
 - `docs/design-system/design/components/HERO_SECTION.md`
+
+## Docker environment — 2026-11-14
+
+| Item | Status |
+| --- | --- |
+| Multi-stage Node 22 Dockerfile with standalone Next.js output and non-root runtime user | Implemented configuration; image build unverified |
+| Docker Compose app and PostgreSQL 16 services with private network and named volume | Implemented configuration; Compose syntax verified |
+| Prisma migration service | Implemented configuration; opt-in only, not run automatically |
+| Runtime database connection | Planned verification; no migrations or container startup run |
+
+`DATABASE_URL` is used by the production application; `DIRECT_URL` is read by
+Prisma CLI configuration. `GALLERY_TOKEN_SECRET` remains required in production.
+The image must be built and tested successfully before this environment is marked
+Implemented end to end.

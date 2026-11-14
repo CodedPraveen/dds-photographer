@@ -43,6 +43,53 @@ Without `DATABASE_URL` in local development, private galleries use an ignored fi
 
 Production setup requires database and signing-secret configuration. Never commit production secrets.
 
+## Docker (local production-like setup)
+
+Prerequisites: Docker Engine with Docker Compose v2. This setup runs the existing
+Next.js application and PostgreSQL only; it does not add R2, Redis, BullMQ,
+uploads, admin authentication, or other planned infrastructure.
+
+1. Copy `.env.docker.example` to `.env.docker` and replace the placeholder
+   database password and `GALLERY_TOKEN_SECRET` (at least 32 characters).
+2. Start PostgreSQL and wait for it to become healthy:
+
+   ```bash
+   docker compose up -d db
+   ```
+
+3. Apply the existing Prisma migrations explicitly:
+
+   ```bash
+   docker compose --profile tools run --rm migrate
+   ```
+
+4. Build and start the app:
+
+   ```bash
+   docker compose up -d --build
+   ```
+
+5. Open http://localhost:3000. The development-only `/gallery/preview` route is
+   intentionally unavailable because the container runs with `NODE_ENV=production`.
+
+Useful commands:
+
+```bash
+docker compose logs -f app
+docker compose ps
+docker compose down
+```
+
+`docker compose down` preserves the named PostgreSQL volume. Run
+`docker compose down -v` only when you explicitly intend to delete local Docker
+database data. The database has no host port mapping, so it is reachable only to
+services on the Docker network.
+
+For deployment, set the same required environment variables in your platform's
+secret manager, run `prisma migrate deploy` as an explicit release step, use a
+managed PostgreSQL service or protected persistent volume, and terminate HTTPS at
+the platform or reverse proxy. Never bake `.env` files or real secrets into images.
+
 ## Validation
 
 ```bash
@@ -63,10 +110,16 @@ Do not mass-format unrelated legacy documentation when making focused edits.
 - `docs/design-system/architecture/17-tech-stack.md` — technology decisions
 - `docs/design-system/architecture/01-system-architecture.md` — architecture
 - `docs/ai/README.md` — AI-agent documentation entry point
+- `docs/README.md` — repository documentation and architecture navigation
 
 ## Source of truth
 
-The Eraser workspace remains the primary approved architecture reference as required by `AGENTS.md`. Verify implementation claims against code, tests, migrations, and deployment configuration. Never describe planned technology or conceptual models as implemented. If Eraser, repository docs, and code conflict, stop and report the conflict instead of silently choosing.
+Repository documentation is the mandatory architecture authority. Start at
+`docs/README.md`, then use the architecture documents, Mermaid diagrams, ADRs,
+roadmap, and implementation-status records. Verify implementation claims against
+code, tests, migrations, and deployment configuration. Never describe planned
+technology or conceptual models as implemented. If documentation and code
+conflict, report the exact conflict instead of silently choosing.
 
 # Photographer website — documentation update package
 

@@ -1,6 +1,6 @@
 # Technology Stack and Decision Status
 
-> Updated 2026-10-26. The Eraser workspace remains the primary approved architecture reference under `AGENTS.md`.
+> Updated 2026-10-26. Repository architecture documents and ADRs are the approved architecture reference.
 
 ## Status vocabulary
 - **Implemented:** Present in repository code and used.

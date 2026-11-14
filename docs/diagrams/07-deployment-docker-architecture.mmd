@@ -1,0 +1,9 @@
+flowchart TD
+  Client[Browser] --> App[Node 22 standalone Next.js container]
+  App --> DB[(PostgreSQL 16 container / managed database)]
+  Migrate[Opt-in Prisma migration service] --> DB
+  App --> Network[Private Compose network]
+  DB --> Volume[(Named postgres_data volume)]
+  Secrets[External secret manager / .env.docker local only] --> App
+  Secrets --> Migrate
+  Verification[Image build and runtime smoke tests unverified] -.-> App

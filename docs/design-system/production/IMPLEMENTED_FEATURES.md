@@ -27,6 +27,9 @@
   projected viewport coordinate of the model's named `Screen` node, and remains
   hidden until the coordinate is available. Runtime visual verification is still
   required before treating the LCD-to-photo journey as fully implemented.
+- **Partially implemented Docker configuration:** a multi-stage production image,
+  local Compose PostgreSQL service, and opt-in Prisma migration command are
+  defined. Container build/startup verification remains pending.
 
 ### Private-gallery foundation
 

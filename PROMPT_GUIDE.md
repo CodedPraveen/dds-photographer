@@ -84,7 +84,7 @@ After editing:
 Update the requested documentation using repository source as evidence.
 Keep implemented, selected, evaluation-only, deferred, and unknown items separate.
 Do not invent routes, models, APIs, environment variables, tests, or integrations.
-Preserve the Eraser workspace as the primary architecture authority.
+Preserve repository architecture documents and ADRs as the primary architecture authority.
 Do not reformat unrelated documents.
 List each file changed and any remaining source-of-truth conflicts.
 ```

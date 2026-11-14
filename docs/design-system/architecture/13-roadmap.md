@@ -1,7 +1,7 @@
 # Development Roadmap
 
 > Reconciled with repository implementation and owner decisions on 2026-10-26.
-> The Eraser workspace remains the primary approved architecture reference under `AGENTS.md`; this file does not replace it.
+> Repository architecture documents and ADRs are the approved architecture reference; this roadmap does not replace them.
 
 ## Phase status
 

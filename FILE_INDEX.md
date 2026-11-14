@@ -7,7 +7,7 @@
 
 | Path | Responsibility |
 | --- | --- |
-| `AGENTS.md` | Agent rules and Eraser architecture authority |
+| `AGENTS.md` | Agent rules and repository architecture authority |
 | `README.md` | Setup, implementation summary, product decisions |
 | `package.json` | Scripts and installed dependencies |
 | `next.config.mjs` | Next.js and image configuration |

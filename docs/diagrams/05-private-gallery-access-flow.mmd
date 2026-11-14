@@ -1,0 +1,17 @@
+sequenceDiagram
+  participant G as Guest
+  participant B as Browser
+  participant N as Next.js gallery route
+  participant R as Gallery repository
+  G->>B: Open signed gallery URL
+  B->>N: GET /gallery/[token]
+  N->>N: Verify signature, expiry, nonce, token version, availability
+  N->>R: Resolve gallery and media in gallery scope
+  alt no valid visitor cookie
+    N-->>B: Entry form
+    G->>N: Submit visitor details and gallery-entry consent
+    N->>R: Upsert GalleryVisitor
+    N-->>B: Signed 12-hour HTTP-only cookie
+  else valid visitor cookie
+    N-->>B: Authorized gallery
+  end

@@ -3,7 +3,7 @@
 **Status:** Product specification  
 **Scope:** Priority 3 — product clarity  
 **Last reconciled:** 2026-10-27  
-**Architecture authority:** Eraser workspace, as required by `AGENTS.md`
+**Architecture authority:** Repository architecture documents, Mermaid diagrams, and ADRs.
 
 ## 1. Product overview
 
@@ -121,7 +121,7 @@ No numeric targets have been approved. Product review should assess:
 
 ## 9. Dependencies and constraints
 
-- Eraser workspace is the primary approved architecture reference.
+- Repository architecture documents are the primary approved architecture reference.
 - Current implementation status is described in `docs/design-system/production/IMPLEMENTATION_STATUS.md`.
 - Current Prisma models are `Gallery`, `GalleryMedia`, and `GalleryVisitor`.
 - Cloudflare R2 and Redis + BullMQ are selected but not integrated.
