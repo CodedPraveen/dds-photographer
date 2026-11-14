@@ -2,7 +2,7 @@
   position: relative;
   min-height: 360svh;
   overflow: clip;
-  background: #0b0b0b;
+  background: var(--dds-color-background);
   color: var(--dds-color-inverse-foreground);
 }
 
@@ -72,7 +72,7 @@
 }
 
 .photoStack:not([data-lcd-ready="true"]) {
-  opacity: 0;
+  opacity: 1;
 }
 
 .photoCard {
@@ -81,7 +81,7 @@
   overflow: hidden;
   border: clamp(0.2rem, 0.35vw, 0.4rem) solid rgb(247 246 242 / 0.96);
   border-radius: var(--dds-radius-xs);
-  background: #111;
+  background: var(--dds-color-surface);
   box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 0.42);
   transform-origin: center;
   will-change: transform, opacity;
@@ -123,7 +123,7 @@
   }
 
   .photoCard:first-child {
-    transform: scale(1.55);
+    transform: scale(1.15);
   }
 
   .photoCard:not(:first-child) {

@@ -1,7 +1,7 @@
 .footer {
   padding-block: var(--dds-space-16) var(--dds-space-8);
   border-top: 1px solid rgb(247 246 242 / 0.14);
-  background: #0c0c0c;
+  background: var(--dds-color-background);
   color: var(--dds-color-inverse-foreground);
 }
 

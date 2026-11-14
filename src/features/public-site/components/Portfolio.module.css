@@ -1,7 +1,7 @@
 .section {
   position: relative;
   overflow: clip;
-  background: var(--dds-color-surface);
+  background: var(--dds-color-background);
 }
 
 .content {
@@ -57,7 +57,7 @@
   justify-content: space-between;
   gap: var(--dds-space-3);
   padding: var(--dds-space-4);
-  background: linear-gradient(transparent, rgb(0 0 0 / 0.72));
+  background: rgb(9 9 9 / 0.78);
   color: var(--dds-color-inverse-foreground);
   font-size: var(--dds-font-size-caption);
 }
@@ -88,9 +88,16 @@
   }
 
   .grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(12, minmax(0, 1fr));
     gap: var(--dds-space-6);
   }
+
+  .item:nth-child(6n + 1) { grid-column: span 5; }
+  .item:nth-child(6n + 2) { grid-column: span 7; margin-top: var(--dds-space-12); }
+  .item:nth-child(6n + 3) { grid-column: span 4; }
+  .item:nth-child(6n + 4) { grid-column: span 4; margin-top: var(--dds-space-8); }
+  .item:nth-child(6n + 5) { grid-column: span 4; }
+  .item:nth-child(6n + 6) { grid-column: 3 / span 7; margin-top: var(--dds-space-8); }
 }
 
 @media (prefers-reduced-motion: reduce) {

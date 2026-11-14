@@ -1,6 +1,9 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+
+import { createGalleryLinkToken } from "@/features/private-gallery/server/gallery-access";
 
 import {
   audit,
@@ -104,4 +107,25 @@ export async function updateGallery(id, formData) {
   });
   await audit(admin.id, "gallery.update", gallery.id, null);
   redirect(`/admin/galleries/${id}`);
+}
+
+export async function revokeGallery(id) {
+  const admin = await getCurrentAdmin();
+  if (!admin) return { error: "Unauthorized." };
+  const gallery = await prisma.gallery.update({
+    where: { id },
+    data: { isActive: false, tokenVersion: { increment: 1 } },
+  });
+  await audit(admin.id, "gallery.revoke", gallery.id, null);
+  revalidatePath(`/admin/galleries/${id}`);
+  redirect(`/admin/galleries/${id}`);
+}
+
+export async function deleteGallery(id) {
+  const admin = await getCurrentAdmin();
+  if (!admin) return { error: "Unauthorized." };
+  await prisma.gallery.delete({ where: { id } });
+  await audit(admin.id, "gallery.delete", id, null);
+  revalidatePath("/admin/galleries");
+  redirect("/admin/galleries");
 }

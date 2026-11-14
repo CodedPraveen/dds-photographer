@@ -12,7 +12,7 @@ html {
   min-height: 100%;
   overflow-x: clip;
   background: var(--dds-color-background);
-  color-scheme: light;
+  color-scheme: dark;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 }
@@ -112,6 +112,10 @@ video {
 :focus-visible {
   outline: 2px solid var(--dds-color-focus);
   outline-offset: 2px;
+}
+
+a:hover {
+  color: var(--dds-color-gold-hover);
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -6,7 +6,9 @@ Signed gallery-link tokens contain gallery ID, nonce, token version, and 30-day
 expiry. Visitor access is a signed HTTP-only cookie with 12-hour lifetime,
 SameSite=Lax, `/gallery` scope, and Secure in production. Media IDs are resolved
 inside the validated gallery; non-cover media requires a gallery-scoped grant.
-Private responses use no-store/no-index protections. The Phase 5 admin foundation
+Private responses use no-store/no-index protections. Admin gallery management now
+supports immediate token-version revocation and cascade-safe deletion. The Phase 5
+admin foundation
 now includes database-backed authentication, TOTP verification, session cookies,
 rate limiting, audit-event writes, and protected dashboard routes. Password-change
 and security-reset flows, audit review UI, guest password, and face-search

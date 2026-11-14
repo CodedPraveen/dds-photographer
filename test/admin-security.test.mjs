@@ -55,3 +55,9 @@ test("TOTP secrets use authenticated encryption with unique IVs", () => {
   assert.equal(decryptTotpSecret(first), "JBSWY3DPEHPK3PXP");
   assert.throws(() => decryptTotpSecret(`${first}x`));
 });
+
+test("TOTP accepts the RFC 6238 six-digit SHA-1 test vector", () => {
+  const secret = "GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ";
+  assert.equal(verifyTotp(secret, "287082", 59_000), true);
+  assert.equal(verifyTotp(secret, "000000", 59_000), false);
+});

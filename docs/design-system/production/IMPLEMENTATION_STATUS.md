@@ -16,7 +16,8 @@ Implemented: approved one-account Argon2id/TOTP authentication, one-time provisi
 CLI, encrypted TOTP storage, hashed database sessions, admin-scoped secure cookies,
 session expiry and revocation, persistent progressive login cooldown, password
 change, audit-event writes/review, protected dashboard routes, gallery
-create/list/edit/activate/deactivate operations, and repeatable session cleanup.
+create/list/edit/activate/deactivate operations, private-link display, immediate
+token revocation, safe gallery deletion, and repeatable session cleanup.
 
 Not implemented: security-reset recovery flow, shared wedding passwords, gallery
 expiry policy, uploads, R2 delivery, and production operational verification.

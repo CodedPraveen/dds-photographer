@@ -8,24 +8,29 @@
 
 ## Purpose
 
-These tokens are the single foundation for DDS Photographer styling. Future
-phases must reuse them instead of introducing section-specific palettes,
+These tokens are the single foundation for DDS Photographer styling. The
+public website uses the approved cinematic black-and-gold palette below;
+admin and gallery surfaces should continue to consume semantic aliases rather
+than introducing section-specific palettes,
 spacing scales, breakpoints, or motion timings.
 
 ## Colors
 
 | Token              | Value     |
 | ------------------ | --------- |
-| Background         | `#F7F6F2` |
-| Foreground         | `#171717` |
-| Muted              | `#6B6B6B` |
-| Surface            | `#FFFFFF` |
-| Border             | `#E5E2DC` |
-| Inverse background | `#171717` |
-| Inverse foreground | `#F7F6F2` |
-| Focus              | `#171717` |
-| Error              | `#B42318` |
-| Success            | `#027A48` |
+| Background         | `#090909` |
+| Foreground         | `#F5F5F5` |
+| Muted              | `#B8B8B8` |
+| Surface            | `#171717` |
+| Border             | `#303030` |
+| Inverse background | `#090909` |
+| Inverse foreground | `#F5F5F5` |
+| Focus              | `#E5A900` |
+| Gold               | `#E5A900` |
+| Gold hover         | `#F2BC24` |
+| Subtle text        | `#858585` |
+| Error              | `#D71932` |
+| Success            | `#078C75` |
 | Warning            | `#B54708` |
 
 No accent color or gradient is part of the Phase 1A system.

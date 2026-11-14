@@ -1,15 +1,24 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { updateGallery } from "@/features/admin/server/actions";
+import {
+  deleteGallery,
+  revokeGallery,
+  updateGallery,
+} from "@/features/admin/server/actions";
 import { requireAdmin } from "@/features/admin/server/auth";
 import { prisma } from "@/features/admin/server/prisma";
+import { createGalleryLinkToken } from "@/features/private-gallery/server/gallery-access";
 
 export default async function GalleryAdminPage({ params }) {
   await requireAdmin();
   const { id } = await params;
   const gallery = await prisma.gallery.findUnique({ where: { id } });
   if (!gallery) notFound();
+  const token = gallery.isActive ? await createGalleryLinkToken(gallery) : null;
+  const galleryUrl = token
+    ? `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/gallery/${encodeURIComponent(token)}`
+    : null;
   return (
     <main style={{ maxWidth: 700, margin: "3rem auto", padding: "2rem" }}>
       <Link href="/admin/galleries">← Galleries</Link>
@@ -37,6 +46,19 @@ export default async function GalleryAdminPage({ params }) {
           {gallery.tokenVersion}
         </p>
         <button>Save changes</button>
+      </form>
+      {galleryUrl ? (
+        <p>
+          Private link: <a href={galleryUrl}>{galleryUrl}</a>
+        </p>
+      ) : (
+        <p>This gallery is revoked and has no active private link.</p>
+      )}
+      <form action={revokeGallery.bind(null, id)}>
+        <button disabled={!gallery.isActive}>Revoke access</button>
+      </form>
+      <form action={deleteGallery.bind(null, id)}>
+        <button>Delete gallery</button>
       </form>
     </main>
   );
