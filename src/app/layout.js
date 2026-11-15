@@ -1,15 +1,15 @@
 import "./globals.css";
 
-import { Manrope } from "next/font/google";
+import localFont from "next/font/local";
 
 import { siteConfig } from "@/config/site";
 
-const manrope = Manrope({
+const manrope = localFont({
+  src: "../assets/fonts/Manrope-Variable.ttf",
   variable: "--font-manrope",
   display: "swap",
   fallback: ["Arial", "Helvetica", "sans-serif"],
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: "400 700",
 });
 
 export const metadata = {
