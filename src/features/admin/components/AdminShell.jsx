@@ -1,26 +1,26 @@
 
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
 import {
-    LayoutDashboard,
-    Images,
-    Image as ImageIcon,
-    Users,
-    ChartNoAxesCombined,
-    HardDrive,
-    ScrollText,
-    ShieldCheck,
-    Settings,
-    Menu,
-    X,
     Bell,
     Camera,
+    ChartNoAxesCombined,
+    HardDrive,
+    Image as ImageIcon,
+    Images,
+    LayoutDashboard,
     LogOut,
-    Sun, Moon
+    Menu,
+    Moon,
+    ScrollText,
+    Settings,
+    ShieldCheck,
+    Sun, Users,
+    X
 } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 import { logout } from "@/features/admin/server/actions";
 
@@ -53,15 +53,13 @@ const navigation = [
 
 export function AdminShell({ children }) {
 
-    const [theme, setTheme] = useState("light");
+    const [theme, setTheme] = useState(() => {
+        if (typeof window === "undefined") return "light";
 
-    useEffect(() => {
         const savedTheme = localStorage.getItem("dds-admin-theme");
 
-        if (savedTheme === "dark" || savedTheme === "light") {
-            setTheme(savedTheme);
-        }
-    }, []);
+        return savedTheme === "dark" ? "dark" : "light";
+    });
 
     useEffect(() => {
         localStorage.setItem("dds-admin-theme", theme);
