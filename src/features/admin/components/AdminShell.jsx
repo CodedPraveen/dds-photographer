@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
     LayoutDashboard,
     Images,
@@ -19,6 +19,7 @@ import {
     Bell,
     Camera,
     LogOut,
+    Sun, Moon
 } from "lucide-react";
 
 import { logout } from "@/features/admin/server/actions";
@@ -51,6 +52,25 @@ const navigation = [
 ];
 
 export function AdminShell({ children }) {
+
+    const [theme, setTheme] = useState("light");
+
+    useEffect(() => {
+        const savedTheme = localStorage.getItem("dds-admin-theme");
+
+        if (savedTheme === "dark" || savedTheme === "light") {
+            setTheme(savedTheme);
+        }
+    }, []);
+
+    useEffect(() => {
+        localStorage.setItem("dds-admin-theme", theme);
+    }, [theme]);
+
+    const toggleTheme = () => {
+        setTheme((current) => current === "light" ? "dark" : "light");
+    };
+
     const pathname = usePathname();
     const [menuOpen, setMenuOpen] = useState(false);
 
@@ -61,7 +81,7 @@ export function AdminShell({ children }) {
         .find((item) => item.href === pathname);
 
     return (
-        <div className="admin-shell">
+        <div className="admin-shell" data-theme={theme}>
             {menuOpen && (
                 <button
                     className="admin-overlay"
@@ -153,10 +173,20 @@ export function AdminShell({ children }) {
                     </div>
 
                     <div className="admin-topbar-actions">
+
                         <span className="admin-status">
                             <span />
                             Studio workspace
                         </span>
+                        <button
+                            type="button"
+                            className="admin-icon-button"
+                            onClick={toggleTheme}
+                            aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+                            title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+                        >
+                            {theme === "light" ? <Moon size={19} /> : <Sun size={19} />}
+                        </button>
                         <button
                             className="admin-icon-button"
                             aria-label="Notifications"

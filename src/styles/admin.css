@@ -1,4 +1,3 @@
-
 .admin-shell {
   --admin-sidebar: #191a1d;
   --admin-sidebar-muted: #96999f;
@@ -95,7 +94,9 @@
   border-radius: 8px;
   color: #b8bbc1;
   text-decoration: none;
-  transition: background 150ms, color 150ms;
+  transition:
+    background 150ms,
+    color 150ms;
 }
 
 .admin-nav-link:hover {
@@ -290,4 +291,82 @@
   .admin-status {
     display: none;
   }
+}
+
+/* Theme transitions */
+.admin-main,
+.admin-topbar,
+.admin-content,
+.admin-shell article,
+.admin-shell input,
+.admin-shell textarea,
+.admin-shell select {
+  transition:
+    background-color 180ms ease,
+    color 180ms ease,
+    border-color 180ms ease;
+}
+
+/* Dark workspace */
+.admin-shell[data-theme="dark"] {
+  --admin-bg: #111317;
+  --admin-card: #1b1e24;
+  --admin-text: #f1f2f4;
+  --admin-muted: #a0a5af;
+  --admin-border: #30343c;
+}
+
+.admin-shell[data-theme="dark"] .admin-topbar {
+  background: rgb(27 30 36 / 94%);
+}
+
+.admin-shell[data-theme="dark"] .admin-icon-button {
+  background: #252932;
+  border-color: #383d47;
+  color: #f1f2f4;
+}
+
+/* Dashboard Tailwind utility compatibility */
+.admin-shell[data-theme="dark"] .bg-white {
+  background-color: var(--admin-card);
+}
+
+.admin-shell[data-theme="dark"] .text-gray-900,
+.admin-shell[data-theme="dark"] .text-gray-800 {
+  color: #f1f2f4;
+}
+
+.admin-shell[data-theme="dark"] .text-gray-500 {
+  color: #a0a5af;
+}
+
+.admin-shell[data-theme="dark"] .border-gray-200,
+.admin-shell[data-theme="dark"] .divide-gray-100 > :not(:last-child) {
+  border-color: var(--admin-border);
+}
+
+.admin-shell[data-theme="dark"] .bg-gray-100 {
+  background-color: #30343c;
+  color: #d7d9de;
+}
+
+.admin-shell[data-theme="dark"] .bg-emerald-50 {
+  background-color: #153b30;
+}
+
+.admin-shell[data-theme="dark"] .text-emerald-700 {
+  color: #72d6ac;
+}
+
+.admin-shell[data-theme="dark"] input,
+.admin-shell[data-theme="dark"] textarea,
+.admin-shell[data-theme="dark"] select {
+  background-color: #252932;
+  border-color: #383d47;
+  color: #f1f2f4;
+}
+
+.admin-shell[data-theme="dark"] input::placeholder,
+.admin-shell[data-theme="dark"] textarea::placeholder {
+  color: #9298a3;
 }
