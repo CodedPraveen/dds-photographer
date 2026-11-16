@@ -1,8 +1,7 @@
 import "server-only";
 
 import { PrismaPg } from "@prisma/adapter-pg";
-
-import { PrismaClient } from "../../../generated/prisma/client";
+import { PrismaClient } from "../../../generated/prisma/index.js";
 
 const prisma =
   globalThis.__ddsPrisma ??

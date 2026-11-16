@@ -4,7 +4,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import argon2 from "argon2";
 
 import { encryptTotpSecret } from "../src/features/admin/server/totp-secrets.mjs";
-import { PrismaClient } from "../src/generated/prisma/client/index.js";
+import { PrismaClient } from "../src/generated/prisma/index.js";
 
 const [email, password, totpSecret] = process.argv.slice(2);
 if (!email || !password || !totpSecret)
