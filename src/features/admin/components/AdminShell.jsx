@@ -53,17 +53,21 @@ const navigation = [
 
 export function AdminShell({ children }) {
 
-    const [theme, setTheme] = useState(() => {
-        if (typeof window === "undefined") return "light";
-
-        const savedTheme = localStorage.getItem("dds-admin-theme");
-
-        return savedTheme === "dark" ? "dark" : "light";
-    });
+    const [theme, setTheme] = useState("light");
+    const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
-        localStorage.setItem("dds-admin-theme", theme);
-    }, [theme]);
+        const savedTheme = localStorage.getItem("dds-admin-theme");
+
+        setTheme(savedTheme === "dark" ? "dark" : "light");
+        setMounted(true);
+    }, []);
+
+    useEffect(() => {
+        if (mounted) {
+            localStorage.setItem("dds-admin-theme", theme);
+        }
+    }, [theme, mounted]);
 
     const toggleTheme = () => {
         setTheme((current) => current === "light" ? "dark" : "light");
@@ -72,7 +76,7 @@ export function AdminShell({ children }) {
     const pathname = usePathname();
     const [menuOpen, setMenuOpen] = useState(false);
 
-    if (pathname === "/admin/login") return children;
+    if (!mounted || pathname === "/admin/login") return children;
 
     const currentPage = navigation
         .flatMap((group) => group.items)
