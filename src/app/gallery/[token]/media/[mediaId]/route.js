@@ -2,6 +2,7 @@ import {
   getAuthorizedGalleryVisitor,
   resolveGalleryToken,
 } from "@/features/private-gallery/server/gallery-access";
+import { downloadFile } from "@/lib/storage";
 
 export const dynamic = "force-dynamic";
 
@@ -74,32 +75,69 @@ export async function GET(_request, { params }) {
   }
 
   const media = gallery.media.find((item) => item.id === mediaId);
+
   if (!media) {
     return denied();
   }
 
   if (!media.isCover) {
     const visitor = await getAuthorizedGalleryVisitor(gallery.id);
+
     if (!visitor) {
       return denied();
     }
   }
 
-  if (!media.storageKey.startsWith("development/")) {
-    return new Response("Media unavailable", {
-      status: 503,
-      headers: { "Cache-Control": "private, no-store" },
+  const headers = {
+    "Cache-Control": "private, no-store, max-age=0",
+    "X-Content-Type-Options": "nosniff",
+    "X-Robots-Tag": "noindex, nofollow, noarchive",
+    "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'",
+  };
+
+  // Preserve existing development placeholders.
+  if (media.storageKey.startsWith("development/")) {
+    return new Response(renderDevelopmentMedia(gallery, media), {
+      headers: {
+        ...headers,
+        "Content-Type": "image/svg+xml; charset=utf-8",
+      },
     });
   }
 
-  return new Response(renderDevelopmentMedia(gallery, media), {
-    headers: {
-      "Cache-Control": "private, no-store, max-age=0",
-      "Content-Security-Policy":
-        "default-src 'none'; style-src 'unsafe-inline'",
-      "Content-Type": "image/svg+xml; charset=utf-8",
-      "X-Content-Type-Options": "nosniff",
-      "X-Robots-Tag": "noindex, nofollow, noarchive",
-    },
-  });
+  try {
+    const body = await downloadFile(
+      media.storageKey,
+      media.storageProvider,
+    );
+
+    const allowedTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+      "image/avif",
+      "image/gif",
+    ];
+
+    const contentType = media.mimeType?.toLowerCase();
+
+    if (!allowedTypes.includes(contentType)) {
+      return denied();
+    }
+
+    return new Response(body, {
+      headers: {
+        ...headers,
+        "Content-Type": contentType,
+      },
+    });
+  } catch {
+    return new Response("Media unavailable", {
+      status: 503,
+      headers: {
+        "Cache-Control": "private, no-store, max-age=0",
+        "X-Content-Type-Options": "nosniff",
+      },
+    });
+  }
 }

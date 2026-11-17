@@ -76,5 +76,9 @@ export async function downloadFile(key) {
         }),
     );
 
-    return response.Body;
+    if (!response.Body) {
+        throw new Error("R2 returned an empty file.");
+    }
+
+    return response.Body.transformToWebStream();
 }
