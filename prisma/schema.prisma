@@ -13,6 +13,11 @@ datasource db {
 //   directUrl = env("DIRECT_URL")
 // }
 
+enum StorageProvider {
+  SUPABASE
+  R2
+}
+
 model Gallery {
   id           String           @id @default(cuid())
   title        String
@@ -27,15 +32,21 @@ model Gallery {
 }
 
 model GalleryMedia {
-  id         String   @id @default(cuid())
-  galleryId  String
-  storageKey String
-  altText    String
-  sortOrder  Int      @default(0)
-  isCover    Boolean  @default(false)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  gallery    Gallery  @relation(fields: [galleryId], references: [id], onDelete: Cascade)
+  id              String          @id @default(cuid())
+  galleryId       String
+  storageProvider StorageProvider @default(SUPABASE)
+  storageKey      String
+  altText         String
+  mimeType        String?
+  sizeBytes       Int?
+  width           Int?
+  height          Int?
+  sortOrder       Int             @default(0)
+  isCover         Boolean         @default(false)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  gallery Gallery @relation(fields: [galleryId], references: [id], onDelete: Cascade)
 
   @@index([galleryId, sortOrder])
 }
