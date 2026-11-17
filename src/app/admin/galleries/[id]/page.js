@@ -1,4 +1,3 @@
-
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -10,6 +9,7 @@ import {
 import { requireAdmin } from "@/features/admin/server/auth";
 import { prisma } from "@/features/admin/server/prisma";
 import { createGalleryLinkToken } from "@/features/private-gallery/server/gallery-access";
+import GalleryMediaManager from "@/features/admin/components/GalleryMediaManager";
 
 export default async function GalleryAdminPage({ params }) {
   await requireAdmin();
@@ -74,6 +74,8 @@ export default async function GalleryAdminPage({ params }) {
           <strong>{gallery.tokenVersion}</strong>
         </div>
       </div>
+
+      <GalleryMediaManager galleryId={gallery.id} />
 
       <section className="admin-card gallery-detail-card">
         <div className="admin-section-heading">
