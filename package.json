@@ -19,6 +19,7 @@
     "format:check:foundation": "prettier --check \"src/**/*.{js,jsx,css}\" \"*.{js,mjs,json}\" README.md docs/design-system/design/TOKENS.md docs/design-system/development/CURRENT_TASK.md docs/design-system/production/IMPLEMENTATION_STATUS.md docs/design-system/production/IMPLEMENTED_FEATURES.md docs/design-system/production/ENVIRONMENTS.md"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1170.0",
     "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "^7.9.1",
     "@react-three/drei": "^10.7.7",
