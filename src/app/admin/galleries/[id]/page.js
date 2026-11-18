@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import GalleryMediaManager from "@/features/admin/components/GalleryMediaManager";
 import {
   deleteGallery,
   revokeGallery,
@@ -9,7 +10,6 @@ import {
 import { requireAdmin } from "@/features/admin/server/auth";
 import { prisma } from "@/features/admin/server/prisma";
 import { createGalleryLinkToken } from "@/features/private-gallery/server/gallery-access";
-import GalleryMediaManager from "@/features/admin/components/GalleryMediaManager";
 
 export default async function GalleryAdminPage({ params }) {
   await requireAdmin();

@@ -59,7 +59,12 @@ export function AdminShell({ children }) {
     useEffect(() => {
         const savedTheme = localStorage.getItem("dds-admin-theme");
 
-        setTheme(savedTheme === "dark" ? "dark" : "light");
+        if (savedTheme === "dark") {
+            document.documentElement.dataset.adminTheme = "dark";
+        } else {
+            document.documentElement.dataset.adminTheme = "light";
+        }
+
         setMounted(true);
     }, []);
 

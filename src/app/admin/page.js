@@ -1,16 +1,16 @@
 
-import Link from "next/link";
 import {
-  Images,
-  Image,
-  Users,
-  CheckCircle2,
-  Plus,
   ArrowUpRight,
-  ShieldCheck,
-  HardDrive,
   Camera,
+  CheckCircle2,
+  HardDrive,
+  Image,
+  Images,
+  Plus,
+  ShieldCheck,
+  Users,
 } from "lucide-react";
+import Link from "next/link";
 
 import { requireAdmin } from "@/features/admin/server/auth";
 import { prisma } from "@/features/admin/server/prisma";
@@ -71,7 +71,7 @@ export default async function AdminPage() {
             Welcome back
           </h1>
           <p className="mt-2 text-sm text-gray-500">
-            Here's what's happening with your photography studio.
+            Here&apos;s what&apos;s happening with your photography studio.
           </p>
         </div>
 

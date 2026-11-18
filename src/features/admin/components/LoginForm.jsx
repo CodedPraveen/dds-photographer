@@ -1,8 +1,8 @@
 
 "use client";
 
+import { ArrowRight,Camera, ShieldCheck } from "lucide-react";
 import { useActionState } from "react";
-import { Camera, ShieldCheck, ArrowRight } from "lucide-react";
 
 import { login } from "@/features/admin/server/actions";
 

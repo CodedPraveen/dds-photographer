@@ -1,7 +1,7 @@
 "use client";
 
-import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useRef, useState } from "react";
 
 export default function GalleryMediaManager({ galleryId }) {
     const router = useRouter();
