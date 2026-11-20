@@ -20,9 +20,23 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
-
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { logout } from "@/features/admin/server/actions";
+
+const subscribeToTheme = (callback) => {
+    window.addEventListener("storage", callback);
+    window.addEventListener("dds-admin-theme-change", callback);
+
+    return () => {
+        window.removeEventListener("storage", callback);
+        window.removeEventListener("dds-admin-theme-change", callback);
+    };
+};
+
+const getThemeSnapshot = () =>
+    localStorage.getItem("dds-admin-theme") === "dark" ? "dark" : "light";
+
+const getThemeServerSnapshot = () => "light";
 
 const navigation = [
     {
@@ -53,35 +67,27 @@ const navigation = [
 
 export function AdminShell({ children }) {
 
-    const [theme, setTheme] = useState("light");
-    const [mounted, setMounted] = useState(false);
+    const theme = useSyncExternalStore(
+        subscribeToTheme,
+        getThemeSnapshot,
+        getThemeServerSnapshot
+    );
 
     useEffect(() => {
-        const savedTheme = localStorage.getItem("dds-admin-theme");
-
-        if (savedTheme === "dark") {
-            document.documentElement.dataset.adminTheme = "dark";
-        } else {
-            document.documentElement.dataset.adminTheme = "light";
-        }
-
-        setMounted(true);
-    }, []);
-
-    useEffect(() => {
-        if (mounted) {
-            localStorage.setItem("dds-admin-theme", theme);
-        }
-    }, [theme, mounted]);
+        document.documentElement.dataset.adminTheme = theme;
+    }, [theme]);
 
     const toggleTheme = () => {
-        setTheme((current) => current === "light" ? "dark" : "light");
+        const nextTheme = theme === "light" ? "dark" : "light";
+
+        localStorage.setItem("dds-admin-theme", nextTheme);
+        window.dispatchEvent(new Event("dds-admin-theme-change"));
     };
 
     const pathname = usePathname();
     const [menuOpen, setMenuOpen] = useState(false);
 
-    if (!mounted || pathname === "/admin/login") return children;
+    if (pathname === "/admin/login") return children;
 
     const currentPage = navigation
         .flatMap((group) => group.items)
