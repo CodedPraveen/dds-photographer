@@ -34,7 +34,7 @@ export function Services({ items }) {
       <Container className={styles.content}>
         <div className={styles.header} data-motion-reveal>
           <Text as="p" className={styles.eyebrow} size="caption" tone="inverse">
-            Services · temporary content
+            Services · what I offer
           </Text>
           <Heading as="h2" className={styles.heading}>
             Photography shaped around the story.

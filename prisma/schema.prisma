@@ -13,6 +13,11 @@ datasource db {
 //   directUrl = env("DIRECT_URL")
 // }
 
+enum StorageProvider {
+  SUPABASE
+  R2
+}
+
 model Gallery {
   id           String           @id @default(cuid())
   title        String
@@ -27,15 +32,21 @@ model Gallery {
 }
 
 model GalleryMedia {
-  id         String   @id @default(cuid())
-  galleryId  String
-  storageKey String
-  altText    String
-  sortOrder  Int      @default(0)
-  isCover    Boolean  @default(false)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  gallery    Gallery  @relation(fields: [galleryId], references: [id], onDelete: Cascade)
+  id              String          @id @default(cuid())
+  galleryId       String
+  storageProvider StorageProvider @default(SUPABASE)
+  storageKey      String
+  altText         String
+  mimeType        String?
+  sizeBytes       Int?
+  width           Int?
+  height          Int?
+  sortOrder       Int             @default(0)
+  isCover         Boolean         @default(false)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  gallery Gallery @relation(fields: [galleryId], references: [id], onDelete: Cascade)
 
   @@index([galleryId, sortOrder])
 }
@@ -60,11 +71,20 @@ model AdminUser {
   id           String         @id @default(cuid())
   email        String         @unique
   passwordHash String
-  totpSecret   String
+  totpSecret   String?
+  totpSecretEncrypted String?
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
   sessions     AdminSession[]
   auditEvents  AdminAuditEvent[]
+}
+
+model AdminLoginRateLimit {
+  keyHash         String   @id
+  windowStartedAt DateTime
+  failures        Int      @default(0)
+  cooldownUntil   DateTime?
+  updatedAt       DateTime @updatedAt
 }
 
 model AdminSession {

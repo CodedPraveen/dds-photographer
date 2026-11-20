@@ -4,6 +4,13 @@ FROM node:22-bookworm-slim AS base
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 
+# Prisma's native client requires OpenSSL detection in the build and runtime
+# stages. Keep the Debian Bookworm runtime explicit instead of relying on the
+# base image's transitive packages.
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends openssl ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
+
 FROM base AS dependencies
 COPY package.json package-lock.json ./
 # Prisma's postinstall requires configuration that is only available after the

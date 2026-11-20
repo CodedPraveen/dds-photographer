@@ -78,8 +78,9 @@ No production admin/user/face-search/job/upload model should be assumed to exist
   logout/all-session revocation, progressive login cooldown, and protected routes
   are implemented.
 - Dashboard overview and gallery listing/creation/editing/activation controls are
-  implemented. Shared wedding passwords, gallery expiry policy, uploads, and
-  production media delivery remain unimplemented.
+  implemented, including private-link display, immediate token revocation, and
+  safe gallery deletion. Shared wedding passwords, gallery expiry policy, uploads,
+  and production media delivery remain unimplemented.
 - Production uploads and private media delivery pipeline.
 - QR-code generation.
 

@@ -1,5 +1,6 @@
 import { MotionExperience } from "@/features/motion/components/MotionExperience";
 import { About } from "@/features/public-site/components/About";
+import { Contact } from "@/features/public-site/components/Contact";
 import { Footer } from "@/features/public-site/components/Footer";
 import { Hero } from "@/features/public-site/components/Hero";
 import { Navbar } from "@/features/public-site/components/Navbar";
@@ -31,6 +32,7 @@ export default function Home() {
         <About content={publicSiteContent.about} />
         <Portfolio items={publicSiteContent.portfolio} />
         <Services items={publicSiteContent.services} />
+      <Contact content={publicSiteContent.contact} headingLevel="h2" />
       </main>
       <Footer
         contact={publicSiteContent.contact}

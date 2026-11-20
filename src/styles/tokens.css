@@ -75,16 +75,21 @@
 }
 
 :root {
-  --dds-color-background: #f7f6f2;
-  --dds-color-foreground: #171717;
-  --dds-color-muted: #6b6b6b;
-  --dds-color-surface: #ffffff;
-  --dds-color-border: #e5e2dc;
-  --dds-color-inverse-background: #171717;
-  --dds-color-inverse-foreground: #f7f6f2;
-  --dds-color-focus: #171717;
-  --dds-color-error: #b42318;
-  --dds-color-success: #027a48;
+  --dds-color-background: #090909;
+  --dds-color-foreground: #f5f5f5;
+  --dds-color-muted: #b8b8b8;
+  --dds-color-surface: #171717;
+  --dds-color-border: #303030;
+  --dds-color-inverse-background: #090909;
+  --dds-color-inverse-foreground: #f5f5f5;
+  --dds-color-focus: #e5a900;
+  --dds-color-surface-raised: #222222;
+  --dds-color-gold: #e5a900;
+  --dds-color-gold-hover: #f2bc24;
+  --dds-color-text-subtle: #858585;
+  --dds-color-white: #ffffff;
+  --dds-color-error: #d71932;
+  --dds-color-success: #078c75;
   --dds-color-warning: #b54708;
 
   --dds-font-size-display: clamp(3rem, 7vw, 7rem);

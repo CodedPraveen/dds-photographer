@@ -77,7 +77,9 @@ See `prisma/schema.prisma` and `docs/design-system/architecture/02-database-erd.
   cookies, 12-hour idle and 7-day absolute expiry, logout revocation, and
   progressive cooldown after five failed attempts per 15-minute window.
 - Server-side protected dashboard routes, one-year audit-event storage, and
-  gallery listing, creation, editing, activation, and deactivation.
+  gallery listing, creation, editing, activation, and deactivation. Admin gallery
+  pages also display private links, revoke token versions, and support
+  cascade-safe deletion.
 
 Password-change/security-reset flows, shared wedding passwords, expiry policy,
 uploads, and production media delivery remain unimplemented.

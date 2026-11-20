@@ -17,7 +17,7 @@ export function Contact({ content, headingLevel = "h1" }) {
           size="caption"
           tone="inverse"
         >
-          {content.eyebrow} · temporary details
+          {content.eyebrow} · availability
         </Text>
         <div className={styles.layout}>
           <Heading

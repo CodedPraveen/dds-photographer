@@ -1,6 +1,7 @@
 import Image from "next/image";
 
 import { Container } from "@/components/ui/container/Container";
+import { Link } from "@/components/ui/link/Link";
 import { Section } from "@/components/ui/section/Section";
 import { Heading } from "@/components/ui/typography/Heading";
 import { Text } from "@/components/ui/typography/Text";
@@ -14,7 +15,7 @@ export function About({ content }) {
         <div className={styles.layout}>
           <div className={styles.copy} data-motion-reveal>
             <Text as="p" className={styles.eyebrow} size="caption" tone="muted">
-              {content.eyebrow} · temporary content
+              {content.eyebrow} · photographer profile
             </Text>
             <Heading as="h2" className={styles.title}>
               {content.title}
@@ -26,18 +27,21 @@ export function About({ content }) {
                 </Text>
               ))}
             </div>
+            <Link className={styles.cta} href="#portfolio">
+              View selected work <span aria-hidden="true">↗</span>
+            </Link>
           </div>
 
           <figure className={styles.figure} data-motion-reveal>
             <Image
-              alt="Temporary abstract image for the About section"
+              alt="Placeholder image for the photographer profile"
               className={styles.image}
               fill
               sizes="(max-width: 767px) 100vw, 46vw"
-              src="/placeholders/portfolio-04.svg"
+              src={content.image}
             />
             <figcaption className={styles.caption}>
-              Temporary studio image
+              {content.imageCaption}
             </figcaption>
           </figure>
         </div>

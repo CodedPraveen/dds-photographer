@@ -75,6 +75,8 @@ export const publicSiteContent = Object.freeze({
       "Temporary copy: a calm, considered photography experience for moments, people, and stories worth preserving.",
       "Final biography, studio approach, and approved imagery will replace this preview content without changing the section layout.",
     ],
+    image: "/placeholders/portfolio-04.svg",
+    imageCaption: "Profile image placeholder — replace with approved portrait",
   },
   portfolio,
   services: [

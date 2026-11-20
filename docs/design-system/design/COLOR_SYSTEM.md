@@ -1,6 +1,6 @@
 # DDS Films --- Website Color System
 
-> **Status:** Proposed website color guide\
+> **Status:** Active website color guide\
 > **Brand reference:** Client-provided DDS Films logo\
 > **Purpose:** Define the website color palette and exactly where each
 > color belongs.

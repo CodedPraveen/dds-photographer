@@ -92,7 +92,9 @@ Repository implementation status:
 - Foundation and public website: implemented.
 - Camera-led motion experience: implemented.
 - Private-gallery foundation: implemented, not a complete production delivery platform.
-- Admin dashboard and production readiness: not started.
+- Admin dashboard and production readiness: partially implemented; password-change/
+  security-reset flows, audit review UI, guest passwords, uploads, and operational
+  verification remain pending.
 - Admin authentication architecture: approved in ADR-001 on 2026-11-14; admin
   authentication, sessions, MFA, rate limiting, audit logging, and dashboard
   routes are not implemented.

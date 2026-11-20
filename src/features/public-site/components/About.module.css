@@ -34,11 +34,24 @@
   margin-top: var(--dds-space-8);
 }
 
+.cta {
+  display: inline-flex;
+  gap: var(--dds-space-3);
+  align-items: center;
+  margin-top: var(--dds-space-8);
+  color: var(--dds-color-gold);
+  font-size: var(--dds-font-size-small);
+  font-weight: var(--dds-font-weight-semibold);
+  text-decoration: none;
+}
+
 .figure {
   position: relative;
   min-height: 32rem;
   overflow: hidden;
   background: var(--dds-color-border);
+  border-radius: var(--dds-radius-sm);
+  box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 0.24);
 }
 
 .image {
@@ -49,7 +62,7 @@
   position: absolute;
   inset: auto var(--dds-space-4) var(--dds-space-4) auto;
   padding: var(--dds-space-2) var(--dds-space-3);
-  background: rgb(23 23 23 / 0.8);
+  background: rgb(9 9 9 / 0.82);
   color: var(--dds-color-inverse-foreground);
   font-size: var(--dds-font-size-caption);
 }

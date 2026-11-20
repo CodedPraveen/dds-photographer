@@ -13,17 +13,19 @@ implemented; production readiness and remaining policy work are not complete.
 ### Phase 5 admin foundation — Partially Implemented
 
 Implemented: approved one-account Argon2id/TOTP authentication, one-time provisioning
-CLI, hashed database sessions, admin-scoped secure cookies, session expiry and
-revocation, progressive login cooldown, audit-event writes, protected dashboard
-routes, and gallery create/list/edit/activate/deactivate operations.
+CLI, encrypted TOTP storage, hashed database sessions, admin-scoped secure cookies,
+session expiry and revocation, persistent progressive login cooldown, password
+change, audit-event writes/review, protected dashboard routes, gallery
+create/list/edit/activate/deactivate operations, private-link display, immediate
+token revocation, safe gallery deletion, and repeatable session cleanup.
 
-Not implemented: password-change/security-reset UI, audit-event review UI, shared
-wedding passwords, gallery expiry policy, uploads, R2 delivery, and production
-operational verification.
+Not implemented: security-reset recovery flow, shared wedding passwords, gallery
+expiry policy, uploads, R2 delivery, and production operational verification.
 
 ## Implemented scope
 
 ### Foundation and public website
+
 - Next.js 16, React 19, JavaScript, and App Router under `src/app/`.
 - Tailwind CSS v4, global CSS, CSS Modules, and design tokens.
 - Public homepage and `/contact`.
@@ -31,6 +33,7 @@ operational verification.
 - Centralized replaceable development content and placeholder photography.
 
 ### Camera-led motion
+
 - Lazy React Three Fiber camera scene using `public/cameras/camera.glb`.
 - GSAP / ScrollTrigger choreography.
 - Demand-rendered camera canvas.
@@ -38,6 +41,7 @@ operational verification.
 - Services interaction can update the camera composition.
 
 ### Private-gallery foundation
+
 - Private gallery route at `/gallery/[token]`.
 - Signed 30-day gallery-link token with nonce, gallery ID, and token version.
 - Token-version validation supports revoking earlier links.
@@ -54,35 +58,36 @@ delivery is not implemented.
 
 ## Roadmap status
 
-| Workstream | Status |
-| --- | --- |
-| Phase 0 — Architecture and baseline audit | Complete |
-| Phase 1A / 1B — Application foundation | Complete |
-| Phase 2 — Public marketing website | Complete |
-| Phase 3 — Camera-led motion experience | Complete |
-| Phase 4 — Private-gallery foundation | Complete |
-| Phase 5 — Admin dashboard and production readiness | Partially implemented |
-| Production photo upload / processing pipeline | Not implemented |
-| Face-search implementation | Evaluation only |
-| Video | On hold |
+| Workstream                                         | Status                                             |
+| -------------------------------------------------- | -------------------------------------------------- |
+| Phase 0 — Architecture and baseline audit          | Complete                                           |
+| Phase 1A / 1B — Application foundation             | Complete                                           |
+| Phase 2 — Public marketing website                 | Complete                                           |
+| Phase 3 — Camera-led motion experience             | Partially implemented; visual verification pending |
+| Phase 4 — Private-gallery foundation               | Complete                                           |
+| Phase 5 — Admin dashboard and production readiness | Partially implemented                              |
+| Production photo upload / processing pipeline      | Not implemented                                    |
+| Face-search implementation                         | Selected architecture; not implemented             |
+| Video                                              | On hold                                            |
 
 Use `docs/design-system/architecture/13-roadmap.md` for the current detailed plan.
 
 ## Owner decisions
 
-| Area | Direction | Status |
-| --- | --- | --- |
-| Wedding guest password | One shared password per wedding | Selected; not implemented |
-| Gallery expiry | Extendable | Selected; policy details pending |
-| Photo storage | Cloudflare R2 | Selected; not integrated |
-| Background processing | Redis + BullMQ | Selected; not integrated |
-| Video | Cloudflare Stream | On hold; photo-only scope |
-| Face pipeline | YuNet + SFace ONNX + OpenCV + FastAPI + PostgreSQL/pgvector | Selected; not implemented |
-| Face-search consent | Separate, explicit, optional opt-in | Required before processing |
+| Area                   | Direction                                                   | Status                           |
+| ---------------------- | ----------------------------------------------------------- | -------------------------------- |
+| Wedding guest password | One shared password per wedding                             | Selected; not implemented        |
+| Gallery expiry         | Extendable                                                  | Selected; policy details pending |
+| Photo storage          | Cloudflare R2                                               | Selected; not integrated         |
+| Background processing  | Redis + BullMQ                                              | Selected; not integrated         |
+| Video                  | Cloudflare Stream                                           | On hold; photo-only scope        |
+| Face pipeline          | YuNet + SFace ONNX + OpenCV + FastAPI + PostgreSQL/pgvector | Selected; not implemented        |
+| Face-search consent    | Separate, explicit, optional opt-in                         | Required before processing       |
 
 ## Current data model
 
 `prisma/schema.prisma` currently defines:
+
 - `Gallery`
 - `GalleryMedia`
 - `GalleryVisitor`
@@ -111,6 +116,7 @@ used as face-search consent.
 ## Verification notes
 
 `package.json` defines:
+
 - `npm run lint`
 - `npm test` (`node --test`)
 - `npm run format:check`
@@ -122,21 +128,22 @@ deployment does not prove lint, test, formatting, or build checks all passed.
 For the PR head reviewed on 2026-10-26, GitHub returned a successful Vercel deployment
 status and no GitHub Actions lint/test/format/build check-runs. Do not report full CI
 as passing based on that result.
+
 ## Public experience refinement — status update (2026-11-13)
 
 The camera-led motion foundation remains implemented as described in the existing status record. A follow-on cinematic refinement has now been documented, but **the refinement itself is not implemented or verified**.
 
-| Refinement item | Status |
-| --- | --- |
-| Existing R3F / Three.js camera scene and GSAP / ScrollTrigger foundation | Implemented (baseline) |
-| Camera LCD anchor projected to a responsive screen coordinate for image spawning | Planned; not verified as implemented |
-| First photograph visibly emerging from the LCD | Planned; not verified as implemented |
-| Repeatable LCD preview and curved upward photo reveal sequence | Planned; not verified as implemented |
-| Layered printed-photo landing composition | Planned; not verified as implemented |
-| Camera remains a companion across all public sections | Design requirement; end-to-end behavior not verified |
-| Section-specific camera behavior for About / Experience | Planned refinement; not verified |
-| Camera-lens-inspired Contact call to action | Design requirement; implementation not verified |
-| Shutter-inspired footer ending | Design requirement; implementation not verified |
+| Refinement item                                                                  | Status                                               |
+| -------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| Existing R3F / Three.js camera scene and GSAP / ScrollTrigger foundation         | Implemented (baseline)                               |
+| Camera LCD anchor projected to a responsive screen coordinate for image spawning | Planned; not verified as implemented                 |
+| First photograph visibly emerging from the LCD                                   | Planned; not verified as implemented                 |
+| Repeatable LCD preview and curved upward photo reveal sequence                   | Planned; not verified as implemented                 |
+| Layered printed-photo landing composition                                        | Planned; not verified as implemented                 |
+| Camera remains a companion across all public sections                            | Design requirement; end-to-end behavior not verified |
+| Section-specific camera behavior for About / Experience                          | Planned refinement; not verified                     |
+| Camera-lens-inspired Contact call to action                                      | Design requirement; implementation not verified      |
+| Shutter-inspired footer ending                                                   | Design requirement; implementation not verified      |
 
 ### Public-camera refinement implementation attempt — 2026-11-13
 
@@ -161,18 +168,24 @@ verification succeed.
 Code and local checks changed as recorded above; no deployment changed. Do not infer implementation completion from the design specifications. Verify each item against source and runtime behavior before moving it to Implemented.
 
 See:
+
 - `docs/design-system/architecture/13-roadmap.md`
 - `docs/design-system/design/MOTION_GUIDELINES.md`
 - `docs/design-system/design/components/HERO_SECTION.md`
 
-## Docker environment — 2026-11-14
+## Docker environment — 2026-11-14 (historical) / 2026-11-15 verification
 
-| Item | Status |
-| --- | --- |
-| Multi-stage Node 22 Dockerfile with standalone Next.js output and non-root runtime user | Implemented configuration; image build unverified |
-| Docker Compose app and PostgreSQL 16 services with private network and named volume | Implemented configuration; Compose syntax verified |
-| Prisma migration service | Implemented configuration; opt-in only, not run automatically |
-| Runtime database connection | Planned verification; no migrations or container startup run |
+| Item                                                                                    | Status                                                        |
+| --------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| Multi-stage Node 22 Dockerfile with standalone Next.js output and non-root runtime user | Implemented configuration; image build unverified             |
+| Docker Compose app and PostgreSQL 16 services with private network and named volume     | Implemented configuration; Compose syntax verified            |
+| Prisma migration service                                                                | Implemented configuration; opt-in only, not run automatically |
+| Runtime database connection                                                             | Planned verification; no migrations or container startup run  |
+
+On 2026-11-15, Docker CLI was present but the Docker Desktop Linux engine was
+inaccessible and `.env.docker` was not present, so image build, PostgreSQL health,
+migration, application startup, HTTP smoke, and non-root runtime checks were not
+run. The prior Compose syntax check remains historical evidence only.
 
 `DATABASE_URL` is used by the production application; `DIRECT_URL` is read by
 Prisma CLI configuration. `GALLERY_TOKEN_SECRET` remains required in production.

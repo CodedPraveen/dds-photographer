@@ -7,6 +7,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { prisma } from "./prisma";
+import { decryptTotpSecret } from "./totp-secrets.mjs";
 
 const COOKIE = "dds_admin_session";
 const IDLE_MS = 12 * 60 * 60 * 1000;
@@ -86,4 +87,10 @@ export async function audit(adminId, action, targetId, metadata) {
   await prisma.adminAuditEvent.create({
     data: { adminId, action, targetId, metadata },
   });
+}
+
+export function getAdminTotpSecret(admin) {
+  if (admin.totpSecretEncrypted)
+    return decryptTotpSecret(admin.totpSecretEncrypted);
+  throw new Error("Admin TOTP secret requires secure migration.");
 }
