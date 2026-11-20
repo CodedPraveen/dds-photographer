@@ -1,4 +1,3 @@
-"""Planned FastAPI application entry point; not implemented yet."""
 from fastapi import FastAPI
 
 from app.api.health import router as health_router

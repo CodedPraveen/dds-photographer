@@ -1,3 +1,4 @@
+
 services:
   app:
     build:
@@ -13,6 +14,29 @@ services:
       PORT: 8000
     ports:
       - "8000:8000"
+    restart: unless-stopped
+    networks:
+      - dds_internal
+
+  ai-service:
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+    environment:
+      APP_NAME: DDS AI Service
+      APP_ENV: production
+    ports:
+      - "127.0.0.1:8001:8000"
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health', timeout=3)"
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     restart: unless-stopped
     networks:
       - dds_internal

@@ -1,4 +1,3 @@
-"""Planned /api/v1/health endpoint; not implemented yet."""
 from fastapi import APIRouter
 
 router = APIRouter()

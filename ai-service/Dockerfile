@@ -1,8 +1,9 @@
-# Docker support will be implemented in the Phase 1 Docker setup step.
-# This scaffold is not a buildable container image yet.
 FROM python:3.12-slim
 
 WORKDIR /app
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
 COPY requirements.txt .
 
