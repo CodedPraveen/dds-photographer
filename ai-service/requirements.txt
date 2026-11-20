@@ -1,1 +1,4 @@
-# Dependencies will be added during the Phase 1 FastAPI/Uvicorn setup.
+fastapi
+uvicorn[standard]
+pytest
+httpx
