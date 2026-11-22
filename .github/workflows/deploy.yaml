@@ -10,38 +10,38 @@ permissions:
 
 jobs:
   validate:
-  name: Validate application
-  runs-on: ubuntu-latest
+    name: Validate application
+    runs-on: ubuntu-latest
 
-  env:
-    DIRECT_URL: postgresql://user:password@localhost:5432/ci_db
+    env:
+      DIRECT_URL: postgresql://user:password@localhost:5432/ci_db
 
-  steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 22
-        cache: npm
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
 
-    - name: Install dependencies
-      run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-    - name: Generate Prisma Client
-      run: npm run prisma:generate
+      - name: Generate Prisma Client
+        run: npm run prisma:generate
 
-    - name: Run ESLint
-      run: npm run lint
+      - name: Run ESLint
+        run: npm run lint
 
-    - name: Run tests
-      run: npm test
+      - name: Run tests
+        run: npm test
 
-    - name: Check formatting
-      run: npm run format:check
+      - name: Check formatting
+        run: npm run format:check
 
-    - name: Build application
-      run: npm run build
-      env:
-        NEXT_PUBLIC_SITE_URL: https://example.com
+      - name: Build application
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SITE_URL: https://example.com

@@ -44,6 +44,10 @@ test("producer and worker use distinct retry policies", async () => {
   assert.equal(worker.options.maxRetriesPerRequest, null);
   assert.equal(producer.options.keyPrefix, "");
   assert.equal(worker.options.keyPrefix, "");
+  assert.equal(producer.options.retryStrategy(1), 250);
+  assert.equal(producer.options.retryStrategy(3), 750);
+  assert.equal(producer.options.retryStrategy(4), null);
+  assert.equal(worker.options.retryStrategy(4), 2000);
   await producer.quit();
   await worker.quit();
 });

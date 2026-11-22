@@ -21,8 +21,9 @@ the reverse proxy, and Docker Compose managing the existing Next.js application
 plus a separate photo-worker process/container from the same repository. The
 Next.js application remains both frontend and backend. Supabase PostgreSQL
 remains the database; Cloudflare R2 stores private originals and derivatives;
-Upstash Redis is intended for BullMQ, subject to compatibility and connectivity
-validation.
+Upstash Redis is configured as the BullMQ TCP/TLS backend through the
+server-only `UPSTASH_REDIS_URL`. Local connection configuration and factories
+are implemented; deployed connectivity remains unverified.
 
 Planned subdomains are `www.yourdomain.com`, `admin.yourdomain.com`, and
 `api.yourdomain.com`. Nginx will route all three to the same Next.js application.
@@ -30,7 +31,7 @@ This target is not evidence that Lightsail, Nginx, DNS, R2, Upstash, BullMQ, or
 the worker has been provisioned or deployed.
 
 Production rollout requires environment and secret configuration, private R2
-bucket/access-policy verification, Upstash/BullMQ compatibility validation,
+bucket/access-policy verification, Upstash/BullMQ deployed connectivity,
 worker health checks and graceful shutdown, approved database migrations,
 backups and restore verification, retention/deletion jobs, logging, monitoring,
 alerting, and deployment/rollback checks.

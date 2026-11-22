@@ -25,7 +25,7 @@ export function createProducerConnection(value = process.env[REDIS_ENV]) {
     maxRetriesPerRequest: 1,
     connectTimeout: 5000,
     enableReadyCheck: true,
-    retryStrategy: (attempt) => Math.min(attempt * 250, 2000),
+    retryStrategy: (attempt) => attempt <= 3 ? Math.min(attempt * 250, 2000) : null,
   });
 }
 
