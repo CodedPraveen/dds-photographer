@@ -1,19 +1,95 @@
 flowchart LR
-  Admin[Future admin] --> Auth[Future authorization]
-  Auth --> Upload[Future scoped upload authorization]
-  Upload --> R2[(Cloudflare R2\nSELECTED_NOT_INTEGRATED)]
-  R2 --> Queue[Redis + BullMQ\nSELECTED_NOT_INTEGRATED]
-  Queue --> Worker[Future photo worker]
-  Worker --> Derivatives[Future derivatives and metadata]
-  Derivatives --> R2
-  R2 --> Delivery[Future gallery-scoped private delivery]
-  Delivery --> Guest[Guest browser]
+  Admin[Admin] --> Open[Open gallery]
+  Open --> Auth[Next.js authenticates Admin]
+  Auth --> Scope{Role and gallery scope valid?}
+  Scope -- No --> Deny[Reject and audit]
+  Scope -- Yes --> Select[Select JPEG photos]
 
-  Upload --> FaceAPI[FastAPI face service\nSELECTED_NOT_INTEGRATED]
-  FaceAPI --> CV[OpenCV processing/inference\nSELECTED_NOT_INTEGRATED]
-  CV --> Detect[YuNet detection\nSELECTED_NOT_INTEGRATED]
-  Detect --> Align[Face alignment/cropping]
-  Align --> Embed[SFace ONNX embeddings\nSELECTED_NOT_INTEGRATED]
-  Embed --> Vector[(PostgreSQL + pgvector\nSELECTED_NOT_INTEGRATED)]
-  Vector --> Search[Embedding similarity search]
-  Search --> Guest
+  Select --> Session[Next.js creates/resumes owner upload session]
+  Session --> Owner{Creating Admin owns session?}
+  Owner -- No --> SessionDeny[Reject resume/cancel]
+  Owner -- Yes --> Sign[Generate 15-minute signed R2 authorization]
+  Sign --> Browser[Browser uploads directly]
+  Browser --> Mode{File size}
+  Mode -- Up to 10 MB --> Single[Single upload]
+  Mode -- Over 10 MB --> Multi[Multipart upload: 8 MB parts]
+  Multi --> PartRetry[Retry failed parts independently]
+  PartRetry --> Complete[Browser signals completion]
+  Single --> Complete
+
+  Complete --> Verify[Next.js verifies R2 object, size, SHA-256, valid JPEG]
+  Verify -- Invalid/incomplete --> Reject[Reject upload]
+  Reject --> Cleanup[Track and retry object/multipart cleanup]
+  Verify -- Valid --> Record[Record verified photo in PostgreSQL]
+  Record --> Queue[Enqueue BullMQ job in Upstash Redis]
+  Queue --> Worker[Separate photo worker]
+  Worker --> Read[R2: read unchanged original]
+  Read --> Sharp[Sharp derivative processing]
+  Sharp --> Outputs[Download JPEG q92<br/>Gallery WebP max 2000px q80<br/>Thumbnail WebP max 500px 4:3 crop q65]
+  Outputs --> Status[Update independent derivative statuses in PostgreSQL]
+  Status --> ProcessRetry{Processing failure?}
+  ProcessRetry -- Yes --> Retry[Up to 3 automatic attempts<br/>or manual Admin retry]
+  Retry --> Queue
+  ProcessRetry -- No --> Review[Admin reviews]
+  Review --> Publish[Publish individual or bulk]
+  Publish --> GuestRequest[Guest requests derivative]
+
+  GuestRequest --> GuestAuth[Next.js rechecks gallery and visitor authorization]
+  GuestAuth -- Unauthorized --> GuestDeny[Reject]
+  GuestAuth -- Authorized and ready --> SignedDelivery[Issue 15-minute signed derivative URL]
+  SignedDelivery --> Guest[Guest receives optimized image only]
+  GuestAuth -- Missing derivative --> NoUrl[No URL; fail closed]
+
+  Review --> Replace[Admin starts replacement]
+  Replace --> NewVersion[Create new versioned R2 keys]
+  NewVersion --> ReplaceProcess[Verify and process replacement]
+  ReplaceProcess -- Success --> NewActive[New version becomes active/published]
+  ReplaceProcess -- Failure --> OldActive[Keep old published version active]
+  OldActive --> Retry
+
+  Review --> Trash[Admin soft-deletes photo]
+  Trash --> RemoveAccess[Remove guest access immediately]
+  RemoveAccess --> RetainTrash[Trash retention: 30 days]
+  RetainTrash --> Restore[Master Admin restores]
+  RetainTrash --> Permanent[Master Admin permanently deletes]
+  Permanent --> DeleteAll[Delete original, derivatives, thumbnails,<br/>processing records]
+  DeleteAll --> DeleteRetry[Retry and audit cleanup failures]
+
+  subgraph N[Next.js application]
+    Auth
+    Scope
+    Session
+    Sign
+    Verify
+    Record
+    Queue
+    GuestAuth
+  end
+
+  subgraph P[Supabase PostgreSQL]
+    Record
+    Status
+    Session
+    Publish
+    RetainTrash
+  end
+
+  subgraph R[Private Cloudflare R2]
+    Single
+    Multi
+    Read
+    Outputs
+    SignedDelivery
+    Cleanup
+    DeleteAll
+  end
+
+  subgraph Q[Upstash Redis and BullMQ]
+    Queue
+    Retry
+  end
+
+  subgraph W[Separate photo worker]
+    Worker
+    Sharp
+  end
