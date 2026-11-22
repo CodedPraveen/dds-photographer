@@ -9,12 +9,71 @@ from app.db.connection import verify_database_isolation
 
 
 TEST_DATABASE_URL = os.getenv("AI_TEST_DATABASE_URL")
-pytestmark = pytest.mark.skipif(
+def cleanup_test_resources(cursor, created_roles, created_schemas):
+    failures = []
+
+    def cleanup(label, statement):
+        try:
+            cursor.execute(statement)
+        except Exception as error:
+            failures.append(RuntimeError(f"cleanup failed for {label}: {error}"))
+
+    cleanup("RESET ROLE", "RESET ROLE")
+    memberships = (
+        ("elevated -> runtime", "ai_elevated_test_", "ai_runtime_test_"),
+        ("outside-writer -> runtime", "ai_writer_test_", "ai_runtime_test_"),
+        ("outside-writer -> migration", "ai_writer_test_", "ai_migrator_test_"),
+    )
+    for label, member_prefix, recipient_prefix in memberships:
+        member = next((role for role in created_roles if role.startswith(member_prefix)), None)
+        recipient = next((role for role in created_roles if role.startswith(recipient_prefix)), None)
+        if member and recipient:
+            cleanup(
+                label,
+                sql.SQL("REVOKE {} FROM {}").format(
+                    sql.Identifier(member), sql.Identifier(recipient)
+                ),
+            )
+    for schema in reversed(created_schemas):
+        cleanup(
+            f"drop schema {schema}",
+            sql.SQL("DROP SCHEMA {} CASCADE").format(sql.Identifier(schema)),
+        )
+    for role in reversed(created_roles):
+        cleanup(
+            f"drop role {role}",
+            sql.SQL("DROP ROLE IF EXISTS {}").format(sql.Identifier(role)),
+        )
+    return failures
+
+
+class FailingCleanupCursor:
+    def __init__(self):
+        self.calls = []
+
+    def execute(self, statement):
+        self.calls.append(statement)
+        raise RuntimeError("synthetic cleanup failure")
+
+
+def test_cleanup_reports_failures_and_continues():
+    cursor = FailingCleanupCursor()
+    failures = cleanup_test_resources(
+        cursor,
+        ["ai_runtime_test_x", "ai_migrator_test_x", "ai_elevated_test_x", "ai_writer_test_x"],
+        ["ai_private_test_x", "app_private_test_x"],
+    )
+    assert len(failures) == len(cursor.calls)
+    assert len(failures) >= 7
+    assert any("RESET ROLE" in str(failure) for failure in failures)
+    assert any("drop schema" in str(failure) for failure in failures)
+    assert any("drop role" in str(failure) for failure in failures)
+
+
+@pytest.mark.skipif(
     not TEST_DATABASE_URL,
     reason="AI_TEST_DATABASE_URL is not configured for PostgreSQL integration tests",
 )
-
-
 def test_restricted_roles_have_effective_ai_private_boundary():
     suffix = uuid.uuid4().hex[:10]
     runtime = f"ai_runtime_test_{suffix}"
@@ -27,6 +86,7 @@ def test_restricted_roles_have_effective_ai_private_boundary():
     created_schemas = []
 
     with psycopg.connect(TEST_DATABASE_URL, autocommit=True) as connection:
+        original_error = None
         try:
             with connection.cursor() as cursor:
                 for role, definition in (
@@ -91,36 +151,25 @@ def test_restricted_roles_have_effective_ai_private_boundary():
                 with pytest.raises(RuntimeError):
                     verify_database_isolation(cursor, migrator, True, ai_schema)
                 cursor.execute("RESET ROLE")
+        except BaseException as error:
+            original_error = error
         finally:
-            with connection.cursor() as cursor:
-                def cleanup(statement):
-                    try:
-                        cursor.execute(statement)
-                    except psycopg.Error:
-                        pass
-
-                cleanup("RESET ROLE")
-                memberships = (
-                    (elevated, runtime),
-                    (outside_writer, runtime),
-                    (outside_writer, migrator),
+            cleanup_failures = []
+            try:
+                with connection.cursor() as cursor:
+                    cleanup_failures = cleanup_test_resources(
+                        cursor, created_roles, created_schemas
+                    )
+            except Exception as error:
+                cleanup_failures.append(
+                    RuntimeError(f"cleanup cursor setup failed: {error}")
                 )
-                for member, recipient in memberships:
-                    if member in created_roles and recipient in created_roles:
-                        cleanup(
-                            sql.SQL("REVOKE {} FROM {}").format(
-                                sql.Identifier(member), sql.Identifier(recipient)
-                            )
-                        )
-                for schema in reversed(created_schemas):
-                    cleanup(
-                        sql.SQL("DROP SCHEMA {} CASCADE").format(
-                            sql.Identifier(schema)
-                        )
-                    )
-                for role in reversed(created_roles):
-                    cleanup(
-                        sql.SQL("DROP ROLE IF EXISTS {}").format(
-                            sql.Identifier(role)
-                        )
-                    )
+            if original_error is not None and cleanup_failures:
+                raise ExceptionGroup(
+                    "integration test and cleanup failed",
+                    [original_error, *cleanup_failures],
+                )
+            if cleanup_failures:
+                raise ExceptionGroup("integration test cleanup failed", cleanup_failures)
+            if original_error is not None:
+                raise original_error
