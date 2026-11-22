@@ -1,6 +1,6 @@
 # DDS Photographer — Current State
 
-> Verified against the `system-design` branch source tree on 2026-10-26.
+> Verified against the `admin-work` branch source tree on 2026-11-22.
 > Update this file whenever implementation status changes.
 
 ## Status definitions
@@ -55,6 +55,7 @@ Current Prisma models:
 - `GalleryMedia`
 - `GalleryVisitor`
 - `AdminUser`
+- `AdminLoginRateLimit`
 - `AdminSession`
 - `AdminAuditEvent`
 
@@ -83,6 +84,22 @@ No production admin/user/face-search/job/upload model should be assumed to exist
   and production media delivery remain unimplemented.
 - Production uploads and private media delivery pipeline.
 - QR-code generation.
+
+## Phase 6 — Approved / Planned, not implemented
+
+Documentation for the Photo Upload & Processing Pipeline is complete:
+
+- Product specification completed.
+- Storage and processing architecture documented.
+- Database proposal and ERD documented.
+- Security architecture and upload workflow documented.
+- Roadmap and deployment documentation updated.
+
+Actual Phase 6 implementation remains pending. Do not claim R2, BullMQ, upload
+sessions, a photo worker, derivative processing, or a direct R2 upload workflow
+as implemented Phase 6 features. Cloudflare R2 and Redis/BullMQ remain selected
+but not integrated; Upstash/BullMQ compatibility remains to be validated, and
+the separate worker is still pending.
 
 ## Selected — not implemented: face-recognition architecture
 
