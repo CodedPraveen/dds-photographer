@@ -324,6 +324,6 @@ model MediaTrash {
   cleanupAttempts Int @default(0)
   cleanupLastError String?
   cleanupLastAttemptAt DateTime?
-  media GalleryMedia @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  media GalleryMedia @relation(fields: [mediaId], references: [id], onDelete: Restrict)
   @@index([status, retentionUntil])
 }
