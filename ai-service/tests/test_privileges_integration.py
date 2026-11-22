@@ -9,6 +9,20 @@ from app.db.connection import verify_database_isolation
 
 
 TEST_DATABASE_URL = os.getenv("AI_TEST_DATABASE_URL")
+
+
+def raise_test_and_cleanup_errors(original_error, cleanup_failures):
+    if original_error is not None and cleanup_failures:
+        raise ExceptionGroup(
+            "integration test and cleanup failed",
+            [original_error, *cleanup_failures],
+        )
+    if cleanup_failures:
+        raise ExceptionGroup("integration test cleanup failed", cleanup_failures)
+    if original_error is not None:
+        raise original_error
+
+
 def cleanup_test_resources(cursor, created_roles, created_schemas):
     failures = []
 
@@ -68,6 +82,16 @@ def test_cleanup_reports_failures_and_continues():
     assert any("RESET ROLE" in str(failure) for failure in failures)
     assert any("drop schema" in str(failure) for failure in failures)
     assert any("drop role" in str(failure) for failure in failures)
+
+
+def test_exception_group_preserves_original_and_cleanup_failures():
+    original = ValueError("original test failure")
+    cleanup_failures = [RuntimeError("cleanup failure 1"), RuntimeError("cleanup failure 2")]
+
+    with pytest.raises(ExceptionGroup) as raised:
+        raise_test_and_cleanup_errors(original, cleanup_failures)
+
+    assert list(raised.value.exceptions) == [original, *cleanup_failures]
 
 
 @pytest.mark.skipif(
@@ -151,7 +175,7 @@ def test_restricted_roles_have_effective_ai_private_boundary():
                 with pytest.raises(RuntimeError):
                     verify_database_isolation(cursor, migrator, True, ai_schema)
                 cursor.execute("RESET ROLE")
-        except BaseException as error:
+        except Exception as error:
             original_error = error
         finally:
             cleanup_failures = []
@@ -164,12 +188,4 @@ def test_restricted_roles_have_effective_ai_private_boundary():
                 cleanup_failures.append(
                     RuntimeError(f"cleanup cursor setup failed: {error}")
                 )
-            if original_error is not None and cleanup_failures:
-                raise ExceptionGroup(
-                    "integration test and cleanup failed",
-                    [original_error, *cleanup_failures],
-                )
-            if cleanup_failures:
-                raise ExceptionGroup("integration test cleanup failed", cleanup_failures)
-            if original_error is not None:
-                raise original_error
+            raise_test_and_cleanup_errors(original_error, cleanup_failures)
