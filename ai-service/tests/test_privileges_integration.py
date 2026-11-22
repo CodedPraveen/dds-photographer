@@ -13,12 +13,12 @@ TEST_DATABASE_URL = os.getenv("AI_TEST_DATABASE_URL")
 
 def raise_test_and_cleanup_errors(original_error, cleanup_failures):
     if original_error is not None and cleanup_failures:
-        raise ExceptionGroup(
+        raise BaseExceptionGroup(
             "integration test and cleanup failed",
             [original_error, *cleanup_failures],
         )
     if cleanup_failures:
-        raise ExceptionGroup("integration test cleanup failed", cleanup_failures)
+        raise BaseExceptionGroup("integration test cleanup failed", cleanup_failures)
     if original_error is not None:
         raise original_error
 
@@ -37,6 +37,8 @@ def cleanup_test_resources(cursor, created_roles, created_schemas):
         ("elevated -> runtime", "ai_elevated_test_", "ai_runtime_test_"),
         ("outside-writer -> runtime", "ai_writer_test_", "ai_runtime_test_"),
         ("outside-writer -> migration", "ai_writer_test_", "ai_migrator_test_"),
+        ("view-writer -> runtime", "ai_view_writer_test_", "ai_runtime_test_"),
+        ("view-writer -> migration", "ai_view_writer_test_", "ai_migrator_test_"),
     )
     for label, member_prefix, recipient_prefix in memberships:
         member = next((role for role in created_roles if role.startswith(member_prefix)), None)
@@ -88,10 +90,21 @@ def test_exception_group_preserves_original_and_cleanup_failures():
     original = ValueError("original test failure")
     cleanup_failures = [RuntimeError("cleanup failure 1"), RuntimeError("cleanup failure 2")]
 
-    with pytest.raises(ExceptionGroup) as raised:
+    with pytest.raises(BaseExceptionGroup) as raised:
         raise_test_and_cleanup_errors(original, cleanup_failures)
 
     assert list(raised.value.exceptions) == [original, *cleanup_failures]
+
+
+def test_base_exception_group_preserves_system_exit_and_cleanup_failures():
+    original = KeyboardInterrupt()
+    cleanup_failures = [RuntimeError("cleanup failure")]
+
+    with pytest.raises(BaseExceptionGroup) as raised:
+        raise_test_and_cleanup_errors(original, cleanup_failures)
+
+    assert isinstance(raised.value.exceptions[0], KeyboardInterrupt)
+    assert raised.value.exceptions[1:] == tuple(cleanup_failures)
 
 
 @pytest.mark.skipif(
@@ -104,6 +117,7 @@ def test_restricted_roles_have_effective_ai_private_boundary():
     migrator = f"ai_migrator_test_{suffix}"
     elevated = f"ai_elevated_test_{suffix}"
     outside_writer = f"ai_writer_test_{suffix}"
+    view_writer = f"ai_view_writer_test_{suffix}"
     ai_schema = f"ai_private_test_{suffix}"
     outside_schema = f"app_private_test_{suffix}"
     created_roles = []
@@ -118,6 +132,7 @@ def test_restricted_roles_have_effective_ai_private_boundary():
                     (migrator, "NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT"),
                     (elevated, "NOLOGIN NOSUPERUSER CREATEDB NOCREATEROLE INHERIT"),
                     (outside_writer, "NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT"),
+                    (view_writer, "NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT"),
                 ):
                     cursor.execute(
                         sql.SQL("CREATE ROLE {} " + definition).format(
@@ -135,6 +150,9 @@ def test_restricted_roles_have_effective_ai_private_boundary():
                 cursor.execute(sql.SQL("GRANT USAGE ON SCHEMA {} TO {}").format(sql.Identifier(ai_schema), sql.Identifier(runtime)))
                 cursor.execute(sql.SQL("GRANT USAGE, CREATE ON SCHEMA {} TO {}").format(sql.Identifier(ai_schema), sql.Identifier(migrator)))
                 cursor.execute(sql.SQL("GRANT CREATE ON SCHEMA {} TO {}").format(sql.Identifier(outside_schema), sql.Identifier(outside_writer)))
+                cursor.execute(sql.SQL("CREATE TABLE {}.view_base (id integer, value integer)").format(sql.Identifier(outside_schema)))
+                cursor.execute(sql.SQL("CREATE VIEW {}.updatable_view AS SELECT id, value FROM {}.view_base").format(sql.Identifier(outside_schema), sql.Identifier(outside_schema)))
+                cursor.execute(sql.SQL("GRANT UPDATE ON TABLE {}.updatable_view TO {}").format(sql.Identifier(outside_schema), sql.Identifier(view_writer)))
 
                 cursor.execute(sql.SQL("SET ROLE {}").format(sql.Identifier(runtime)))
                 verify_database_isolation(cursor, runtime, False, ai_schema)
@@ -171,6 +189,16 @@ def test_restricted_roles_have_effective_ai_private_boundary():
                     verify_database_isolation(cursor, runtime, False, ai_schema)
                 cursor.execute("RESET ROLE")
                 cursor.execute(sql.SQL("GRANT {} TO {}").format(sql.Identifier(outside_writer), sql.Identifier(migrator)))
+                cursor.execute(sql.SQL("SET ROLE {}").format(sql.Identifier(migrator)))
+                with pytest.raises(RuntimeError):
+                    verify_database_isolation(cursor, migrator, True, ai_schema)
+                cursor.execute("RESET ROLE")
+                cursor.execute(sql.SQL("GRANT {} TO {}").format(sql.Identifier(view_writer), sql.Identifier(runtime)))
+                cursor.execute(sql.SQL("SET ROLE {}").format(sql.Identifier(runtime)))
+                with pytest.raises(RuntimeError):
+                    verify_database_isolation(cursor, runtime, False, ai_schema)
+                cursor.execute("RESET ROLE")
+                cursor.execute(sql.SQL("GRANT {} TO {}").format(sql.Identifier(view_writer), sql.Identifier(migrator)))
                 cursor.execute(sql.SQL("SET ROLE {}").format(sql.Identifier(migrator)))
                 with pytest.raises(RuntimeError):
                     verify_database_isolation(cursor, migrator, True, ai_schema)
