@@ -33,6 +33,7 @@ function fixture() {
             findMany: async () => [{ id: "file" }],
             findFirst: async () => file.multipartUploadId && file.status === "UPLOADING" ? file : null,
             update: async ({ data }) => Object.assign(file, data),
+            updateMany: async ({ data }) => Object.assign(file, data),
         },
         uploadSession: { updateMany: async () => ({ count: 1 }) },
     };
@@ -86,10 +87,45 @@ test("duplicate aborts are idempotent and expired cleanup retries failures", asy
     const abort = expired.storage.abortMultipart;
     expired.storage.abortMultipart = async () => { throw new Error("unavailable"); };
     assert.deepEqual(await cleanupExpiredMultipart(expired.db, expired.storage), { aborted: 0, failed: 1 });
+    assert.equal(expired.file.partMetadata.state, "cleanup_retry_required");
     expired.storage.abortMultipart = abort;
     assert.deepEqual(await cleanupExpiredMultipart(expired.db, expired.storage), { aborted: 1, failed: 0 });
     assert.deepEqual(await cleanupExpiredMultipart(expired.db, expired.storage), { aborted: 0, failed: 0 });
 });
+
+test("start compensates when the upload ID cannot be persisted", async () => {
+    const f = fixture();
+    f.db.uploadFile.update = async () => { throw new Error("database unavailable"); };
+    await assert.rejects(f.run("start"), /database unavailable/);
+    assert.equal(f.calls.starts, 1);
+    assert.equal(f.calls.aborts, 1);
+    assert.equal(f.file.multipartUploadId, undefined);
+});
+
+for (const action of ["complete", "abort", "cleanup"]) {
+    test(`${action} recovers when R2 succeeds and the database update fails`, async () => {
+        const f = fixture();
+        await f.run("start");
+        const update = f.db.uploadFile.update;
+        f.db.uploadFile.update = async () => { throw new Error("database unavailable"); };
+        if (action === "cleanup") {
+            f.session.expiresAt = new Date(0);
+            assert.deepEqual(await cleanupExpiredMultipart(f.db, f.storage), { aborted: 0, failed: 1 });
+            assert.equal(f.file.partMetadata.state, "cleanup_retry_required");
+        } else {
+            await assert.rejects(f.run(action), /database unavailable/);
+        }
+        assert.equal(f.file.multipartUploadId, "r2-id");
+        f.db.uploadFile.update = update;
+        if (action === "cleanup") {
+            assert.deepEqual(await cleanupExpiredMultipart(f.db, f.storage), { aborted: 1, failed: 0 });
+        } else {
+            assert.equal((await f.run(action)).success, true);
+        }
+        assert.equal(f.file.status, action === "complete" ? "UPLOADED" : "CANCELLED");
+        assert.equal(f.calls.finishes, action === "complete" ? 1 : 0);
+    });
+}
 
 test("cleanup preserves a finalized object after a lost completion response", async () => {
     const f = fixture();

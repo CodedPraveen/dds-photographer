@@ -135,6 +135,15 @@ export async function cleanupExpiredMultipart(db, storage, now = new Date()) {
             if (removed) aborted++;
         } catch {
             failed++;
+            try {
+                await db.uploadFile.updateMany({
+                    where: { ...where, id },
+                    data: { partMetadata: { state: "cleanup_retry_required", lastFailedAt: new Date().toISOString() } },
+                });
+            } catch {
+                // The unchanged upload ID keeps the file eligible on the next run.
+                console.error("Could not record cleanup failure for upload file", id);
+            }
         }
     }
     return { aborted, failed };

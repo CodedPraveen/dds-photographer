@@ -50,7 +50,7 @@ export async function createUploadSession({ galleryId, files, dependencies = {} 
                     uploadSessionId: session.id,
                     originalFilename: file.filename,
                     sizeBytes: file.sizeBytes,
-                    sha256: typeof file.sha256 === "string" ? file.sha256 : "",
+                    sha256: file.sha256.toLowerCase(),
                     uploadMode,
                     r2ObjectKey: key,
                 },

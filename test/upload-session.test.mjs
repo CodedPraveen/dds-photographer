@@ -4,7 +4,14 @@ import test from "node:test";
 import { MAX_ORIGINAL_SIZE, SESSION_TTL_MS, UPLOAD_URL_TTL_SECONDS, validateUploadFileInput } from "../src/features/admin/server/upload-policy.js";
 import { createUploadSession } from "../src/features/admin/server/upload-sessions.js";
 
-const valid = { filename: "photo.jpg", mimeType: "image/jpeg", sizeBytes: 1024 };
+const valid = { filename: "photo.jpg", mimeType: "image/jpeg", sizeBytes: 1024, sha256: "ab".repeat(32) };
+
+test("upload inputs require exactly 64 hexadecimal checksum characters", () => {
+  for (const sha256 of [undefined, null, "", "a".repeat(63), "z".repeat(64), "a".repeat(64) + "\n"]) {
+    assert.match(validateUploadFileInput({ ...valid, sha256 }), /SHA-256/);
+  }
+  assert.equal(validateUploadFileInput({ ...valid, sha256: valid.sha256.toUpperCase() }), null);
+});
 
 test("upload session policy accepts JPEGs through 50 MB and rejects other types", () => {
   assert.equal(validateUploadFileInput({ ...valid, sizeBytes: MAX_ORIGINAL_SIZE }), null);

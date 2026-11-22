@@ -50,6 +50,53 @@ test("R2 existence check preserves non-not-found errors", async () => {
   await assert.rejects(storage.objectExists("private/key"), /denied/);
 });
 
+test("R2 multipart commands use the private bucket and paginate authoritative parts", async () => {
+  const calls = [];
+  const parts = [{ PartNumber: 1, Size: 8 * 1024 * 1024, ETag: "first" }, { PartNumber: 2, Size: 7, ETag: "last" }];
+  const client = { async send(command) {
+    const name = command.constructor.name;
+    calls.push([name, command.input]);
+    if (name === "CreateMultipartUploadCommand") return { UploadId: "upload" };
+    if (name === "ListPartsCommand") return command.input.PartNumberMarker === undefined
+      ? { Parts: [parts[0]], IsTruncated: true, NextPartNumberMarker: "1" }
+      : { Parts: [parts[1]], IsTruncated: false };
+    if (name === "AbortMultipartUploadCommand" && command.input.UploadId === "gone") {
+      throw Object.assign(new Error("gone"), { name: "NoSuchUpload" });
+    }
+    return {};
+  } };
+  const storage = createR2Storage({ client, config });
+  const key = "original.jpg";
+  const common = { Bucket: config.bucket, Key: key };
+  assert.equal(await storage.startMultipart(key), "upload");
+  assert.deepEqual(await storage.listParts(key, "upload"), parts);
+  const manifest = parts.map(({ PartNumber, ETag }) => ({ PartNumber, ETag }));
+  await storage.finishMultipart(key, "upload", manifest);
+  await storage.abortMultipart(key, "upload");
+  await storage.abortMultipart(key, "gone");
+  assert.deepEqual(calls, [
+    ["CreateMultipartUploadCommand", { ...common, ContentType: "image/jpeg" }],
+    ["ListPartsCommand", { ...common, UploadId: "upload", PartNumberMarker: undefined }],
+    ["ListPartsCommand", { ...common, UploadId: "upload", PartNumberMarker: "1" }],
+    ["CompleteMultipartUploadCommand", { ...common, UploadId: "upload", MultipartUpload: { Parts: manifest } }],
+    ["AbortMultipartUploadCommand", { ...common, UploadId: "upload" }],
+    ["AbortMultipartUploadCommand", { ...common, UploadId: "gone" }],
+  ]);
+});
+
+test("UploadPart signing binds the part number, upload ID, expiry and Content-Length", async () => {
+  const storage = createR2Storage({ config });
+  const input = { key: "original.jpg", uploadId: "upload", partNumber: 2, size: 8 * 1024 * 1024, expiresIn: 60 };
+  const url = new URL(await storage.signPart(input));
+  assert.equal(url.searchParams.get("partNumber"), "2");
+  assert.equal(url.searchParams.get("uploadId"), "upload");
+  assert.equal(url.searchParams.get("X-Amz-Expires"), "60");
+  assert.match(url.searchParams.get("X-Amz-SignedHeaders"), /\bcontent-length\b/);
+  assert.equal([...url.searchParams.keys()].some((key) => key.toLowerCase().startsWith("x-amz-checksum-")), false);
+  const other = new URL(await storage.signPart({ ...input, size: input.size - 1 }));
+  assert.notEqual(url.searchParams.get("X-Amz-Signature"), other.searchParams.get("X-Amz-Signature"));
+});
+
 test("R2 signed upload URL is generated server-side with a bounded expiry", async () => {
   const storage = createR2Storage({ client: new (await import("@aws-sdk/client-s3")).S3Client({ region: "auto", endpoint: config.endpoint, credentials: { accessKeyId: "key", secretAccessKey: "secret" } }), config });
   const url = await storage.createUploadUrl({ key: "galleries/g1/p1/versions/v1/original.jpg", contentType: "image/jpeg", expiresIn: 900 });

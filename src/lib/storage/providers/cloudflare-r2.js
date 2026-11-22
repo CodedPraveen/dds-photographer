@@ -29,7 +29,7 @@ export function buildVersionedObjectKey({ galleryId, photoId, versionId, derivat
 }
 
 function createDefaultClient(config) {
-    return new S3Client({ region: "auto", endpoint: config.endpoint, credentials: { accessKeyId: config.accessKeyId, secretAccessKey: config.secretAccessKey } });
+    return new S3Client({ region: "auto", endpoint: config.endpoint, requestChecksumCalculation: "WHEN_REQUIRED", credentials: { accessKeyId: config.accessKeyId, secretAccessKey: config.secretAccessKey } });
 }
 
 export function createR2Storage({ client, config = getR2Config() } = {}) {
