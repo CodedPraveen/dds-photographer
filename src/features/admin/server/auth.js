@@ -3,8 +3,8 @@ import "server-only";
 import { createHash, randomBytes } from "node:crypto";
 
 import argon2 from "argon2";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+import { cookies } from "next/headers.js";
+import { redirect } from "next/navigation.js";
 
 import { prisma } from "./prisma.js";
 import { decryptTotpSecret } from "./totp-secrets.mjs";

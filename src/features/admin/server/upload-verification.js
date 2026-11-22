@@ -13,7 +13,8 @@ export async function verifyUploadedObject({ bytes, expectedSize, expectedSha256
         if (actualSha256.toLowerCase() !== expectedSha256.toLowerCase()) throw new Error("Uploaded object checksum does not match.");
     }
 
-    const metadata = await sharp(bytes).metadata();
+    await sharp(bytes, { failOn: "error" }).rotate().toBuffer();
+    const metadata = await sharp(bytes, { failOn: "error" }).metadata();
     if (metadata.format !== "jpeg") throw new Error("Uploaded object is not a valid JPEG.");
     return { sizeBytes: bytes.length, sha256: createHash("sha256").update(bytes).digest("hex"), width: metadata.width ?? null, height: metadata.height ?? null };
 }
