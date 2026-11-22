@@ -1,17 +1,17 @@
 
 import "server-only";
 
-import { getStorageProvider } from "./storage-config";
+import { getStorageProvider } from "./storage-config.js";
 
 async function getAdapter(provider) {
     const selectedProvider = (provider || getStorageProvider()).toLowerCase();
 
     if (selectedProvider === "supabase") {
-        return import("./providers/supabase");
+        return import("./providers/supabase.js");
     }
 
     if (selectedProvider === "r2") {
-        return import("./providers/cloudflare-r2");
+        return import("./providers/cloudflare-r2.js");
     }
 
     throw new Error(`Unsupported storage provider: ${selectedProvider}`);

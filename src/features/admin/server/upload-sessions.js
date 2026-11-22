@@ -5,11 +5,11 @@ import { randomUUID } from "node:crypto";
 import { createUploadUrl } from "@/lib/storage";
 import { buildVersionedObjectKey } from "@/lib/storage/providers/cloudflare-r2";
 
-import { audit, getCurrentAdmin } from "./auth";
-import { prisma } from "./prisma";
-import { MAX_ORIGINAL_SIZE, SESSION_TTL_MS, UPLOAD_URL_TTL_SECONDS, validateUploadFileInput } from "./upload-policy";
+import { audit, getCurrentAdmin } from "./auth.js";
+import { prisma } from "./prisma.js";
+import { MAX_ORIGINAL_SIZE, SESSION_TTL_MS, UPLOAD_URL_TTL_SECONDS, validateUploadFileInput } from "./upload-policy.js";
 
-export { MAX_ORIGINAL_SIZE, SESSION_TTL_MS, UPLOAD_URL_TTL_SECONDS, validateUploadFileInput } from "./upload-policy";
+export { MAX_ORIGINAL_SIZE, SESSION_TTL_MS, UPLOAD_URL_TTL_SECONDS, validateUploadFileInput } from "./upload-policy.js";
 
 export async function createUploadSession({ galleryId, files }) {
     const admin = await getCurrentAdmin();
