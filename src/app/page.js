@@ -32,7 +32,7 @@ export default function Home() {
         <About content={publicSiteContent.about} />
         <Portfolio items={publicSiteContent.portfolio} />
         <Services items={publicSiteContent.services} />
-      <Contact content={publicSiteContent.contact} headingLevel="h2" />
+        <Contact content={publicSiteContent.contact} headingLevel="h2" />
       </main>
       <Footer
         contact={publicSiteContent.contact}

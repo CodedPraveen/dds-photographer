@@ -78,13 +78,13 @@ Deploy last.
 
 Verify the following metrics.
 
-| Metric | Target |
-|----------|---------|
-| LCP | ≤ 2.0 s |
-| INP | ≤ 150 ms |
-| CLS | ≤ 0.05 |
-| FCP | ≤ 1.5 s |
-| TTFB | ≤ 800 ms |
+| Metric | Target   |
+| ------ | -------- |
+| LCP    | ≤ 2.0 s  |
+| INP    | ≤ 150 ms |
+| CLS    | ≤ 0.05   |
+| FCP    | ≤ 1.5 s  |
+| TTFB   | ≤ 800 ms |
 
 All targets should meet or exceed project standards.
 
@@ -96,12 +96,12 @@ Run Lighthouse on the production build.
 
 Minimum scores
 
-| Category | Target |
-|----------|---------|
-| Performance | 95+ |
-| Accessibility | 100 |
-| Best Practices | 100 |
-| SEO | 100 |
+| Category       | Target |
+| -------------- | ------ |
+| Performance    | 95+    |
+| Accessibility  | 100    |
+| Best Practices | 100    |
+| SEO            | 100    |
 
 Development builds should not be used for performance measurements.
 

@@ -11,19 +11,20 @@ Define how a wedding/event gallery moves from creation to availability, closure,
 
 These concepts must remain separate:
 
-| Concept | Current/selected state | Meaning |
-| --- | --- | --- |
-| Gallery availability | `opensAt` / `closesAt` fields exist | Whether the gallery is currently available |
-| Gallery-link token expiry | Implemented: 30 days | Lifetime of a signed link token |
-| Visitor access cookie | Implemented: 12 hours | Lifetime of a visitor's gallery-scoped grant |
-| Gallery retention | Not defined | How long photos and related records remain stored |
-| Permanent deletion | Not defined | When data is removed from primary storage, derivatives, and backups |
+| Concept                   | Current/selected state              | Meaning                                                             |
+| ------------------------- | ----------------------------------- | ------------------------------------------------------------------- |
+| Gallery availability      | `opensAt` / `closesAt` fields exist | Whether the gallery is currently available                          |
+| Gallery-link token expiry | Implemented: 30 days                | Lifetime of a signed link token                                     |
+| Visitor access cookie     | Implemented: 12 hours               | Lifetime of a visitor's gallery-scoped grant                        |
+| Gallery retention         | Not defined                         | How long photos and related records remain stored                   |
+| Permanent deletion        | Not defined                         | When data is removed from primary storage, derivatives, and backups |
 
 Extending gallery availability must not silently extend existing link tokens or visitor cookies unless an explicit policy says so. A new link or fresh visitor authorization may be required.
 
 ## 3. Current lifecycle controls
 
 The current `Gallery` model includes:
+
 - `isActive`
 - `tokenVersion`
 - `opensAt`
@@ -51,6 +52,7 @@ Final states, transitions, and labels require owner approval.
 ## 5. Intended lifecycle workflow
 
 ### Create and publish
+
 - Photographer creates the gallery in the future admin platform.
 - Gallery remains unavailable until intentionally activated/published.
 - Availability dates and shared password are configured.
@@ -58,28 +60,33 @@ Final states, transitions, and labels require owner approval.
 - Link/QR is generated and shared.
 
 ### Extend
+
 - Photographer chooses a new end date within the approved maximum.
 - System confirms the new availability.
 - System determines whether existing links remain valid or must be reissued.
 - Visitor cookies remain governed by their own expiry unless policy explicitly changes it.
 
 ### Close
+
 - Gallery becomes unavailable to guests at the configured end or through admin action.
 - New page and media requests are denied.
 - Existing links must not bypass the closed state.
 - The system communicates a safe unavailable/expired state.
 
 ### Reopen
+
 - Only an authorized admin may reopen a gallery.
 - Reopening must follow the approved policy for links, passwords, and visitor grants.
 - The system must not accidentally reactivate a revoked credential.
 
 ### Revoke
+
 - Photographer can invalidate a compromised/shared link or access credential.
 - Existing signed gallery-link tokens must fail after token-version revocation.
 - Whether visitor cookies are also invalidated immediately must be explicitly designed and tested.
 
 ### Delete
+
 - Deletion must account for originals, derivatives, metadata, guest records, consent evidence, job state, caches, and backups.
 - The UI must explain what will be deleted and whether a recovery/grace period applies.
 - Deletion completion must be verifiable.
@@ -88,18 +95,18 @@ Final states, transitions, and labels require owner approval.
 
 The final retention policy must specify a duration and deletion trigger for each category:
 
-| Data category | Current existence | Policy |
-| --- | --- | --- |
-| Original photos | Future R2 pipeline | Open |
-| Display derivatives/thumbnails | Future pipeline | Open |
-| Gallery metadata | Current `Gallery` model | Open |
-| Guest name/mobile/email | Current `GalleryVisitor` model | Open |
-| Gallery-entry consent evidence | Current visitor fields | Open |
-| Face-search consent evidence | Not implemented | Separate policy required before face search |
-| Selfies/crops/embeddings/match results | Not implemented | No collection until approved |
-| Upload/processing records | Future | Open |
-| Security/admin audit events | Future | Open |
-| Backups | Production policy not established here | Open |
+| Data category                          | Current existence                      | Policy                                      |
+| -------------------------------------- | -------------------------------------- | ------------------------------------------- |
+| Original photos                        | Future R2 pipeline                     | Open                                        |
+| Display derivatives/thumbnails         | Future pipeline                        | Open                                        |
+| Gallery metadata                       | Current `Gallery` model                | Open                                        |
+| Guest name/mobile/email                | Current `GalleryVisitor` model         | Open                                        |
+| Gallery-entry consent evidence         | Current visitor fields                 | Open                                        |
+| Face-search consent evidence           | Not implemented                        | Separate policy required before face search |
+| Selfies/crops/embeddings/match results | Not implemented                        | No collection until approved                |
+| Upload/processing records              | Future                                 | Open                                        |
+| Security/admin audit events            | Future                                 | Open                                        |
+| Backups                                | Production policy not established here | Open                                        |
 
 Do not invent retention durations or imply that closing a gallery automatically deletes these records.
 

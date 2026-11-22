@@ -1,7 +1,6 @@
-
 "use client";
 
-import { ArrowRight,Camera, ShieldCheck } from "lucide-react";
+import { ArrowRight, Camera, ShieldCheck } from "lucide-react";
 import { useActionState } from "react";
 
 import { login } from "@/features/admin/server/actions";
@@ -33,8 +32,8 @@ export function LoginForm() {
               <span>remembered.</span>
             </h1>
             <p>
-              Your creative workspace to manage galleries, photos,
-              clients and everything behind the lens.
+              Your creative workspace to manage galleries, photos, clients and
+              everything behind the lens.
             </p>
           </div>
 
@@ -92,7 +91,9 @@ export function LoginForm() {
                   autoComplete="one-time-code"
                   required
                 />
-                <small>Enter the 6-digit code from your authenticator app.</small>
+                <small>
+                  Enter the 6-digit code from your authenticator app.
+                </small>
               </label>
 
               {state?.error && (
@@ -101,11 +102,7 @@ export function LoginForm() {
                 </p>
               )}
 
-              <button
-                type="submit"
-                className="login-submit"
-                disabled={pending}
-              >
+              <button type="submit" className="login-submit" disabled={pending}>
                 <span>{pending ? "Signing in..." : "Sign in securely"}</span>
                 {!pending && <ArrowRight size={18} />}
               </button>

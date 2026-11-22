@@ -38,6 +38,7 @@ Testimonials are described in design direction material but are not confirmed as
 ## 4. Hero and camera storytelling
 
 The supplied Design Finalization Workflow describes the intended visual concept:
+
 - A realistic DSLR camera enters and settles centrally.
 - The camera LCD displays the opening hero photograph.
 - As the visitor scrolls, photographs appear from behind/through the first image, suggesting memories being released from the camera.
@@ -62,6 +63,7 @@ Current repository implementation has a persistent camera experience using React
 ## 6. Services
 
 Current content model includes:
+
 - Wedding Photography
 - Portrait Photography
 - Event Photography
@@ -74,6 +76,7 @@ These labels and descriptions are temporary content and must be confirmed by the
 About content should build trust through the photographer's real biography, experience, philosophy, and approach. Current copy explicitly identifies itself as temporary. Final biography and claims require owner approval.
 
 Brand voice:
+
 - Calm, professional, friendly, honest, respectful, creative.
 - Avoid salesy, exaggerated, generic, or overly corporate copy.
 - Short headlines and paragraphs; one idea per paragraph.

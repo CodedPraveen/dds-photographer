@@ -1,4 +1,3 @@
-
 import "@/styles/admin.css";
 
 import { AdminShell } from "@/features/admin/components/AdminShell";

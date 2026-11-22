@@ -161,19 +161,19 @@ Check that names are:
 Good
 
 ```javascript
-loadPortfolioImages()
+loadPortfolioImages();
 ```
 
 Avoid
 
 ```javascript
-run()
+run();
 
-handle()
+handle();
 
-data()
+data();
 
-temp()
+temp();
 ```
 
 ---

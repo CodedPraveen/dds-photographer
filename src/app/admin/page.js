@@ -1,4 +1,3 @@
-
 import {
   ArrowUpRight,
   Camera,
@@ -18,18 +17,17 @@ import { prisma } from "@/features/admin/server/prisma";
 export default async function AdminPage() {
   await requireAdmin();
 
-  const [galleries, active, photos, visitors, recent] =
-    await Promise.all([
-      prisma.gallery.count(),
-      prisma.gallery.count({ where: { isActive: true } }),
-      prisma.galleryMedia.count(),
-      prisma.galleryVisitor.count(),
-      prisma.gallery.findMany({
-        orderBy: { createdAt: "desc" },
-        take: 5,
-        include: { _count: { select: { media: true } } },
-      }),
-    ]);
+  const [galleries, active, photos, visitors, recent] = await Promise.all([
+    prisma.gallery.count(),
+    prisma.gallery.count({ where: { isActive: true } }),
+    prisma.galleryMedia.count(),
+    prisma.galleryVisitor.count(),
+    prisma.gallery.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 5,
+      include: { _count: { select: { media: true } } },
+    }),
+  ]);
 
   const metrics = [
     {
@@ -60,7 +58,6 @@ export default async function AdminPage() {
 
   return (
     <div className="admin-dashboard space-y-8">
-
       {/* Welcome header */}
       <section className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
         <div>
@@ -107,9 +104,7 @@ export default async function AdminPage() {
                 {metric.value.toLocaleString("en-IN")}
               </p>
 
-              <p className="mt-1 text-xs text-gray-400">
-                {metric.description}
-              </p>
+              <p className="mt-1 text-xs text-gray-400">{metric.description}</p>
             </article>
           );
         })}
@@ -117,7 +112,6 @@ export default async function AdminPage() {
 
       {/* Main dashboard content */}
       <section className="grid grid-cols-1 gap-5 xl:grid-cols-3">
-
         {/* Recent galleries */}
         <article className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm xl:col-span-2">
           <div className="flex items-center justify-between gap-3">
@@ -157,16 +151,19 @@ export default async function AdminPage() {
                       </p>
                       <p className="mt-1 text-xs text-gray-500">
                         {gallery._count.media} photos · Created{" "}
-                        {new Date(gallery.createdAt).toLocaleDateString("en-IN")}
+                        {new Date(gallery.createdAt).toLocaleDateString(
+                          "en-IN",
+                        )}
                       </p>
                     </div>
                   </div>
 
                   <span
-                    className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium ${gallery.isActive
-                      ? "bg-emerald-50 text-emerald-700"
-                      : "bg-gray-100 text-gray-600"
-                      }`}
+                    className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium ${
+                      gallery.isActive
+                        ? "bg-emerald-50 text-emerald-700"
+                        : "bg-gray-100 text-gray-600"
+                    }`}
                   >
                     {gallery.isActive ? "Active" : "Inactive"}
                   </span>

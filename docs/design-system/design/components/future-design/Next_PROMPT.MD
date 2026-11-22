@@ -537,13 +537,13 @@ When finished, provide:
 
 Use this status table:
 
-| Step | Status | Evidence |
-|---|---|---|
-| 1. Camera entrance | | |
-| 2. LCD → first photo | | |
-| 3. Photos emerge | | |
-| 4. Curved ✓ path | | |
-| 5. Camera fade | | |
+| Step                 | Status | Evidence |
+| -------------------- | ------ | -------- |
+| 1. Camera entrance   |        |          |
+| 2. LCD → first photo |        |          |
+| 3. Photos emerge     |        |          |
+| 4. Curved ✓ path     |        |          |
+| 5. Camera fade       |        |          |
 
 Final rule:
 

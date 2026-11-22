@@ -170,7 +170,7 @@ and `build`. Run them locally or add a CI workflow to obtain explicit results.
   `DIRECT_URL`, and production gallery tokens require `GALLERY_TOKEN_SECRET`.
   The Compose file supplies neither secrets nor a host database port.
 - **Verified:** Docker Engine 29.6.1 was available and `docker compose config
-  --quiet` passed using only a temporary copy of the placeholder example file.
+--quiet` passed using only a temporary copy of the placeholder example file.
 - **Not verified:** the image build, startup, database connectivity, and HTTP
   smoke test. Repeated `docker build` attempts stopped during `npm ci` after an
   invalid/damaged-lockfile warning and produced no image. No migrations were run.

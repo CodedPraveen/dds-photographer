@@ -43,11 +43,11 @@ The project aims to:
 
 Google currently evaluates three primary metrics.
 
-| Metric | Measures |
-|---------|-----------|
-| LCP | Loading Performance |
-| INP | Interaction Responsiveness |
-| CLS | Visual Stability |
+| Metric | Measures                   |
+| ------ | -------------------------- |
+| LCP    | Loading Performance        |
+| INP    | Interaction Responsiveness |
+| CLS    | Visual Stability           |
 
 Additional supporting metrics are also monitored.
 
@@ -255,17 +255,17 @@ The page should progressively reveal itself rather than remaining blank.
 
 # Project Performance Targets
 
-| Metric | Target |
-|----------|---------|
-| LCP | ≤ 2.0 s |
-| INP | ≤ 150 ms |
-| CLS | ≤ 0.05 |
-| FCP | ≤ 1.5 s |
-| TTFB | ≤ 800 ms |
-| Lighthouse Performance | 95+ |
-| Accessibility | 100 |
-| Best Practices | 100 |
-| SEO | 100 |
+| Metric                 | Target   |
+| ---------------------- | -------- |
+| LCP                    | ≤ 2.0 s  |
+| INP                    | ≤ 150 ms |
+| CLS                    | ≤ 0.05   |
+| FCP                    | ≤ 1.5 s  |
+| TTFB                   | ≤ 800 ms |
+| Lighthouse Performance | 95+      |
+| Accessibility          | 100      |
+| Best Practices         | 100      |
+| SEO                    | 100      |
 
 ---
 

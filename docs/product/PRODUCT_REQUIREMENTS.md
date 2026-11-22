@@ -22,18 +22,19 @@ This is not an approved multi-studio, multi-tenant SaaS product.
 
 ## 3. Users and actors
 
-| Actor | Need | Current product boundary |
-| --- | --- | --- |
-| Public visitor / prospective client | Explore work, learn about services, contact photographer | Public website implemented |
-| Gallery guest | Open an invited event gallery and view its photos | Private-gallery foundation implemented |
-| Photographer / administrator | Create and manage event galleries and photos | Admin platform planned, not implemented |
-| Face-search participant | Optionally use a future face-search feature | Evaluation only; no production feature |
+| Actor                               | Need                                                     | Current product boundary                |
+| ----------------------------------- | -------------------------------------------------------- | --------------------------------------- |
+| Public visitor / prospective client | Explore work, learn about services, contact photographer | Public website implemented              |
+| Gallery guest                       | Open an invited event gallery and view its photos        | Private-gallery foundation implemented  |
+| Photographer / administrator        | Create and manage event galleries and photos             | Admin platform planned, not implemented |
+| Face-search participant             | Optionally use a future face-search feature              | Evaluation only; no production feature  |
 
 There is one photographer/business owner in the current product model. A guest is not an admin account. A shared wedding password, once implemented, is a gallery-level gate and not unique guest identity.
 
 ## 4. Product scope
 
 ### In scope
+
 - Public homepage and contact experience.
 - Public portfolio, about, services, and photographer contact information.
 - Camera-led cinematic storytelling and responsive motion.
@@ -44,6 +45,7 @@ There is one photographer/business owner in the current product model. A guest i
 - A separate optional face-search consent and deletion design before any face-search processing.
 
 ### Explicitly not in current scope
+
 - Multi-studio or multi-tenant SaaS.
 - Video upload/playback; Cloudflare Stream is on hold and current scope is photos only.
 - Payments, favorites, mobile applications.
@@ -53,24 +55,25 @@ There is one photographer/business owner in the current product model. A guest i
 
 ## 5. Product status model
 
-| Capability | Status | Meaning |
-| --- | --- | --- |
-| Public website | Implemented | Homepage, contact, public sections and content components exist |
-| Camera-led motion | Implemented | R3F/Three.js camera and GSAP/ScrollTrigger choreography exist |
-| Private gallery | Foundation implemented | Signed link, entry form, visitor cookie and scoped media route exist |
-| Admin platform | Planned | Not implemented |
-| R2 photo storage | Selected, not integrated | Future private photo storage direction |
-| Redis + BullMQ | Selected, not integrated | Future background processing direction |
-| Shared wedding password | Selected, not implemented | One shared password per wedding |
-| Extendable gallery expiry | Selected, policy pending | Exact policy is an open decision |
-| Face pipeline | Selected; not implemented | YuNet + SFace ONNX + OpenCV + FastAPI + PostgreSQL/pgvector |
-| Video | On hold | Do not implement |
+| Capability                | Status                    | Meaning                                                              |
+| ------------------------- | ------------------------- | -------------------------------------------------------------------- |
+| Public website            | Implemented               | Homepage, contact, public sections and content components exist      |
+| Camera-led motion         | Implemented               | R3F/Three.js camera and GSAP/ScrollTrigger choreography exist        |
+| Private gallery           | Foundation implemented    | Signed link, entry form, visitor cookie and scoped media route exist |
+| Admin platform            | Planned                   | Not implemented                                                      |
+| R2 photo storage          | Selected, not integrated  | Future private photo storage direction                               |
+| Redis + BullMQ            | Selected, not integrated  | Future background processing direction                               |
+| Shared wedding password   | Selected, not implemented | One shared password per wedding                                      |
+| Extendable gallery expiry | Selected, policy pending  | Exact policy is an open decision                                     |
+| Face pipeline             | Selected; not implemented | YuNet + SFace ONNX + OpenCV + FastAPI + PostgreSQL/pgvector          |
+| Video                     | On hold                   | Do not implement                                                     |
 
 Installed packages, conceptual diagrams, or selected vendors do not establish implementation.
 
 ## 6. Primary journeys
 
 ### 6.1 Prospective client
+
 1. Arrives at the public website.
 2. Encounters the camera-led hero and image-focused storytelling.
 3. Explores portfolio work and the photographer's approach.
@@ -80,6 +83,7 @@ Installed packages, conceptual diagrams, or selected vendors do not establish im
 The current contact details and photography are placeholder content and must be replaced with verified business content before public launch.
 
 ### 6.2 Gallery guest
+
 1. Receives a private gallery link or QR code in a future delivery workflow.
 2. Opens `/gallery/[token]`.
 3. The server validates the signed link and gallery availability.
@@ -90,6 +94,7 @@ The current contact details and photography are placeholder content and must be 
 A shared wedding password is selected but not yet implemented. The final guest flow must include it when the approved design is implemented. Do not describe the current form as password-protected.
 
 ### 6.3 Photographer/admin
+
 1. Authenticates to a future admin area.
 2. Creates or edits a wedding/event gallery.
 3. Configures its availability and shared password.
@@ -113,6 +118,7 @@ The admin journey is planned and must not be represented as currently usable.
 ## 8. Success measures
 
 No numeric targets have been approved. Product review should assess:
+
 - Visitors can identify the photographer's work and services.
 - Visitors can reach the contact route without confusion.
 - Gallery guests can enter and view only their intended gallery.
@@ -130,15 +136,15 @@ No numeric targets have been approved. Product review should assess:
 
 ## 10. Open product decisions
 
-| Question | Current state |
-| --- | --- |
-| Default and maximum gallery availability | Open |
-| Whether shared password is required for every gallery or configurable | Selected as one shared password per wedding; enforcement details open |
-| Password rotation cadence and failed-attempt policy | Open |
-| Whether QR codes encode the signed link directly or use a redirect | Open |
-| Exact gallery close/reopen behavior | Open |
-| Retention period for photos, guest details, consent records, logs, backups | Open |
-| Face-search launch decision, notice, eligible users, and data lifecycle | Not approved |
-| Final public business copy, portfolio images, testimonials, contact details | Placeholder content remains |
+| Question                                                                    | Current state                                                         |
+| --------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| Default and maximum gallery availability                                    | Open                                                                  |
+| Whether shared password is required for every gallery or configurable       | Selected as one shared password per wedding; enforcement details open |
+| Password rotation cadence and failed-attempt policy                         | Open                                                                  |
+| Whether QR codes encode the signed link directly or use a redirect          | Open                                                                  |
+| Exact gallery close/reopen behavior                                         | Open                                                                  |
+| Retention period for photos, guest details, consent records, logs, backups  | Open                                                                  |
+| Face-search launch decision, notice, eligible users, and data lifecycle     | Not approved                                                          |
+| Final public business copy, portfolio images, testimonials, contact details | Placeholder content remains                                           |
 
 Do not resolve these questions by inventing defaults. Record owner decisions and update this document plus the affected specifications.

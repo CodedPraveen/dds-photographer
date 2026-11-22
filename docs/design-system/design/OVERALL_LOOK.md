@@ -26,7 +26,6 @@ The page breathes.
 
 [Read the guide](components/HERO_SECTION.md)
 
-
 ## Portfolio
 
 The gallery now becomes the primary focus.
@@ -64,4 +63,3 @@ The photographs tell the story.
 The photographer becomes the focus.
 
 The interaction feels premium, immersive, and memorable.
-

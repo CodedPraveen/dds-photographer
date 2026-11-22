@@ -84,7 +84,7 @@ export async function changePassword(_previous, formData) {
   return { success: "Password changed. Sign in again." };
 }
 
-export async function createGallery( formData) {
+export async function createGallery(formData) {
   const admin = await getCurrentAdmin();
   if (!admin) return { error: "Unauthorized." };
   const title = String(formData.get("title") || "").trim();

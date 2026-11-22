@@ -30,6 +30,7 @@ Ordinary gallery access must work without face search.
 ## 3. Distinguish current consent from future consent
 
 Current `GalleryVisitor.consent` and `consentedAt` represent gallery-entry consent only. They must never be reused or interpreted as permission for:
+
 - Selfie/image capture for face search.
 - Face crop extraction.
 - Face embedding generation or storage.
@@ -55,6 +56,7 @@ The exact screen, copy, supported input, and result experience are not approved.
 ## 5. Notice requirements
 
 Before asking for consent, explain in plain language:
+
 - What image or face-related data will be collected or used.
 - The specific purpose of matching within the selected event gallery.
 - Whether the source selfie is transient or retained.
@@ -69,6 +71,7 @@ The notice must be visible at the point of choice. A general privacy-policy link
 ## 6. Consent evidence
 
 The future system should retain evidence sufficient to establish:
+
 - Gallery and visitor scope.
 - Specific purpose and categories of data.
 - Exact notice text or immutable notice version.
@@ -82,6 +85,7 @@ The consent model must be separate from the existing gallery-entry fields. A con
 ## 7. Model evaluation requirements
 
 Before selecting a production model, evaluate:
+
 - SFace provenance, license, and permitted commercial use.
 - Accuracy on the intended image types and event conditions.
 - False-positive and false-negative behavior.
@@ -95,6 +99,7 @@ No threshold, accuracy claim, or production suitability has been established. Do
 ## 8. Data lifecycle requirements
 
 A production proposal must define lifecycle behavior for:
+
 - Guest-provided selfie/source image.
 - Face crops.
 - Face embeddings.
@@ -110,6 +115,7 @@ Do not retain biometric/face-derived data indefinitely by default. Do not use fa
 ## 9. Withdrawal and deletion
 
 The product must provide a clear withdrawal path. On withdrawal:
+
 - Stop future face-search processing for that consent scope.
 - Prevent new searches using the withdrawn consent.
 - Delete or de-identify the source and derived face-search data according to the approved policy.
@@ -131,6 +137,7 @@ Exact deletion timing and legal retention exceptions are open and require owner/
 ## 11. Launch gate
 
 Face search must remain disabled until all are approved:
+
 - [ ] Product owner explicitly approves production launch.
 - [ ] Model provenance/license and evaluation reviewed.
 - [ ] Notice and separate optional opt-in approved.

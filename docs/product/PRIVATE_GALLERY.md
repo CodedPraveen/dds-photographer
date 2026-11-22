@@ -18,6 +18,7 @@ The current implementation is a foundation, not a complete production gallery pl
 ## 3. Access model and current behavior
 
 ### Implemented
+
 - Route: `/gallery/[token]`.
 - Signed gallery-link token includes gallery ID, random nonce, token version, issue time, and expiry.
 - Link token duration is currently 30 days.
@@ -31,6 +32,7 @@ The current implementation is a foundation, not a complete production gallery pl
 - Media is resolved inside the validated gallery; IDs from another gallery must not be accepted.
 
 ### Selected but not implemented
+
 - One shared password per wedding.
 - Extendable gallery expiry.
 - Photographer/admin controls for gallery creation and lifecycle.
@@ -66,6 +68,7 @@ The exact ordering of password and visitor-details collection is a product decis
 ## 6. Visitor information and consent
 
 Current required entry fields:
+
 - Name
 - Mobile number
 - Email address
@@ -80,6 +83,7 @@ Face-search consent is a separate optional affirmative choice and must not be re
 ## 7. Access failure states
 
 The product must handle:
+
 - Invalid or malformed link.
 - Expired link.
 - Revoked link / token-version mismatch.

@@ -3,6 +3,7 @@
 > Updated 2026-10-26. Repository architecture records are the authority. This file separates verified current code from owner-selected future direction.
 
 ## 1. Product boundary
+
 DDS Photographer is a single-photographer business website with a public portfolio, private wedding/event galleries, and a future photographer/admin platform. A photo upload pipeline is planned. Face search has a selected YuNet + SFace ONNX + OpenCV architecture with a separate FastAPI service and PostgreSQL + pgvector storage, but remains unimplemented and requires separate privacy approval. This is not currently a multi-studio SaaS product.
 
 ## 2. Current implemented architecture
@@ -36,9 +37,11 @@ flowchart TD
 ```
 
 ### Public website
+
 Next.js renders Navbar, Hero, About, Portfolio, Services, Contact, and Footer. GSAP/ScrollTrigger orchestrates scroll motion; a lazy React Three Fiber canvas renders the camera. Static fallback and reduced-motion behavior preserve usability if WebGL/motion is unavailable.
 
 ### Private gallery
+
 - `GET /gallery/[token]` validates a signed token on the server.
 - Visitors without a valid gallery-scoped cookie see the entry form.
 - The form collects name, mobile, email, and current gallery-entry consent.
@@ -51,17 +54,17 @@ Current gallery-entry consent is not face-search consent. No face-search process
 
 ## 3. Current code boundaries
 
-| Responsibility | Location |
-| --- | --- |
-| App routes/pages | `src/app/` |
-| Public-site feature | `src/features/public-site/` |
-| Motion feature | `src/features/motion/` |
-| Private-gallery feature | `src/features/private-gallery/` |
-| Generic UI | `src/components/ui/` |
-| Shared libraries | `src/lib/` |
-| Site configuration | `src/config/` |
-| Design tokens | `src/styles/tokens.css` |
-| Prisma schema/migrations | `prisma/` |
+| Responsibility           | Location                        |
+| ------------------------ | ------------------------------- |
+| App routes/pages         | `src/app/`                      |
+| Public-site feature      | `src/features/public-site/`     |
+| Motion feature           | `src/features/motion/`          |
+| Private-gallery feature  | `src/features/private-gallery/` |
+| Generic UI               | `src/components/ui/`            |
+| Shared libraries         | `src/lib/`                      |
+| Site configuration       | `src/config/`                   |
+| Design tokens            | `src/styles/tokens.css`         |
+| Prisma schema/migrations | `prisma/`                       |
 
 Secrets, signing, persistence, and authorization stay in server-only modules. Never send signing secrets, storage credentials, or private object keys to client components.
 
@@ -95,6 +98,7 @@ flowchart TD
 ```
 
 Selected but not integrated:
+
 - Cloudflare R2 for private photo objects.
 - Redis + BullMQ for asynchronous photo processing.
 - One shared password per wedding.
@@ -103,11 +107,13 @@ Selected but not integrated:
 - Cloudflare Stream on hold; current scope is photos only.
 
 ## 5. Guest access and face-search consent
+
 Intended future guest flow: open wedding gallery, enter that wedding's shared password, complete gallery-entry requirements, receive a gallery-scoped grant, and view only media authorized for that gallery.
 
 The shared password is not an individual identity and does not replace visitor consent or authorization. Store only a modern password hash; support rate limiting, rotation, and revocation.
 
 Face search is a separate optional feature. Before any selfie, face crop, embedding, or matching operation:
+
 - Show a standalone plain-language notice describing data collected, specific purpose, and use.
 - Ask for a separate affirmative opt-in with an unchecked control.
 - Do not bundle it with password entry, general gallery entry, or unrelated terms.
@@ -118,7 +124,9 @@ Face search is a separate optional feature. Before any selfie, face crop, embedd
 A preselected checkbox is not an affirmative opt-in. A hidden or bundled terms link is not a substitute for a clear notice. This is the project's privacy-by-design requirement; consult the DPDP commencement notes in `10-security.md` before asserting a provision is currently in force.
 
 ## 6. Out of current scope
+
 Video (Cloudflare Stream is on hold), admin dashboard/authentication, R2 upload/delivery integration, Redis/BullMQ workers, multi-studio SaaS, mobile app, and payments. Face recognition remains unimplemented pending privacy and production-readiness gates.
 
 ## 7. Change control
+
 Before implementing future components, read the relevant repository architecture document, Mermaid diagram, roadmap, and product specification. If records conflict, stop and report the exact conflict. Never silently promote a planned component to implemented status.

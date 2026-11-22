@@ -23,27 +23,27 @@ photo worker.
 
 ## 2. Status and implementation boundary
 
-| Area | Status | Boundary |
-| --- | --- | --- |
-| Gallery media foundation | **Implemented** | Existing schema and routes remain the current source of truth. |
-| Gallery-scoped private access | **Implemented** | Existing signed token and visitor-cookie behavior remains in force. |
-| Admin authentication foundation | **Partially implemented** | Existing Phase 5 implementation is not the Phase 6 role/invitation workflow. |
-| Cloudflare R2 private photo storage | **Selected / Not Integrated** | Target storage; no production R2 workflow is claimed. |
-| Redis + BullMQ processing | **Selected / Not Integrated** | Target queue and worker; no production worker is claimed. |
-| Upload sessions, multipart upload, derivatives, publishing, Trash | **Planned** | Approved Phase 6 target behavior below. |
-| Face processing and guest photo matching | **Deferred / On Hold** | No face data is processed in Phase 6. |
-| Video / Cloudflare Stream | **On Hold** | Outside current scope. |
+| Area                                                              | Status                        | Boundary                                                                     |
+| ----------------------------------------------------------------- | ----------------------------- | ---------------------------------------------------------------------------- |
+| Gallery media foundation                                          | **Implemented**               | Existing schema and routes remain the current source of truth.               |
+| Gallery-scoped private access                                     | **Implemented**               | Existing signed token and visitor-cookie behavior remains in force.          |
+| Admin authentication foundation                                   | **Partially implemented**     | Existing Phase 5 implementation is not the Phase 6 role/invitation workflow. |
+| Cloudflare R2 private photo storage                               | **Selected / Not Integrated** | Target storage; no production R2 workflow is claimed.                        |
+| Redis + BullMQ processing                                         | **Selected / Not Integrated** | Target queue and worker; no production worker is claimed.                    |
+| Upload sessions, multipart upload, derivatives, publishing, Trash | **Planned**                   | Approved Phase 6 target behavior below.                                      |
+| Face processing and guest photo matching                          | **Deferred / On Hold**        | No face data is processed in Phase 6.                                        |
+| Video / Cloudflare Stream                                         | **On Hold**                   | Outside current scope.                                                       |
 
 Existing routes, models, and behavior must not be described as providing the
 planned workflow until implementation and verification exist.
 
 ## 3. Actors and permissions
 
-| Actor | Permissions |
-| --- | --- |
-| Admin | Upload, resume/cancel own upload sessions, process, publish, replace, reorder, and move photos to Trash. |
+| Actor        | Permissions                                                                                                                          |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Admin        | Upload, resume/cancel own upload sessions, process, publish, replace, reorder, and move photos to Trash.                             |
 | Master Admin | All Admin permissions, plus view Trash, restore, permanently delete, invite Admins, promote Admins, and manage role/account changes. |
-| Guest | Register for a gallery and view authorized published derivatives only. Guests never receive original-file access. |
+| Guest        | Register for a gallery and view authorized published derivatives only. Guests never receive original-file access.                    |
 
 The existing Admin account becomes Master Admin through a one-time migration and
 retains its credentials. New Admin accounts are created through single-use email
@@ -98,12 +98,12 @@ Sharp runs in a separate background worker. Processing uses stream-based handlin
 where practical, dynamically manages concurrency using available CPU and RAM,
 and imposes no fixed megapixel limit.
 
-| Output | Format | Requirements |
-| --- | --- | --- |
-| Original | JPEG | Preserve the uploaded file unchanged, including camera metadata. |
-| Client download | JPEG | Quality 92; this is the only guest download variant. |
-| Gallery image | WebP | Maximum dimension 2,000px; quality 80. |
-| Thumbnail | WebP | Maximum dimension 500px; 4:3 center crop; quality 65. |
+| Output          | Format | Requirements                                                     |
+| --------------- | ------ | ---------------------------------------------------------------- |
+| Original        | JPEG   | Preserve the uploaded file unchanged, including camera metadata. |
+| Client download | JPEG   | Quality 92; this is the only guest download variant.             |
+| Gallery image   | WebP   | Maximum dimension 2,000px; quality 80.                           |
+| Thumbnail       | WebP   | Maximum dimension 500px; 4:3 center crop; quality 65.            |
 
 Generated outputs automatically correct EXIF orientation, use sRGB, and strip
 GPS/location metadata. Original camera metadata remains in the original only.
@@ -257,4 +257,3 @@ changes, exact API contracts, retention-job operations, and production
 infrastructure remain implementation and verification work. They must not be
 reported as implemented until source, migrations, configuration, tests, and
 deployment evidence confirm them.
-

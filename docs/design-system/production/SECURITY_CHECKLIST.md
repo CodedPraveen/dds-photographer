@@ -194,7 +194,7 @@ Check for:
 Avoid:
 
 ```javascript
-dangerouslySetInnerHTML
+dangerouslySetInnerHTML;
 ```
 
 Unless absolutely necessary and properly sanitized.

@@ -28,6 +28,7 @@ existing gallery-entry consent. They are not face-search consent.
 The owner selected one shared password per wedding gallery.
 
 Requirements for implementation:
+
 - Store only a modern password hash; never store or return plaintext.
 - Compare passwords server-side using a suitable password-hashing library.
 - Rate-limit attempts and add temporary abuse controls.
@@ -46,6 +47,7 @@ approved for production.
 
 Before collecting a selfie/face image or creating, storing, comparing, or
 otherwise processing a face embedding or match result:
+
 - Present a clear, standalone notice in plain language.
 - Itemize the personal data to be collected or used.
 - State the specific face-search purpose and how the processing enables it.
@@ -90,6 +92,7 @@ Re-check the latest Gazette notifications, corrigenda, rules, and legal advice
 before launch and before making a legal-compliance claim.
 
 Official sources:
+
 - DPDP Act, 2023, Section 6:
   https://www.indiacode.nic.in/handle/123456789/20062
 - Gazette of India, G.S.R. 843(E), 13 November 2025 (commencement notification):
@@ -100,6 +103,7 @@ Official sources:
 ## 5. Face-search data lifecycle
 
 Before production approval, specify:
+
 - Whether selfies are processed transiently or retained.
 - Whether face crops and embeddings are stored; if so, encryption and
   gallery-level isolation.
@@ -116,6 +120,7 @@ separately approved purpose and consent model.
 ## 6. Future media and platform controls
 
 Before R2/worker/admin implementation, define:
+
 - Private buckets and server-only credentials.
 - Short-lived, scoped upload authorization and completion verification.
 - File type/content validation, size limits, malware considerations, and

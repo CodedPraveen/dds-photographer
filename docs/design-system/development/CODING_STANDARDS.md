@@ -103,11 +103,11 @@ File names should describe their purpose.
 Recommended limits
 
 | File Type | Recommended Size |
-|------------|------------------|
-| Component | ≤ 300 lines |
-| Hook | ≤ 150 lines |
-| Utility | ≤ 150 lines |
-| Service | ≤ 250 lines |
+| --------- | ---------------- |
+| Component | ≤ 300 lines      |
+| Hook      | ≤ 150 lines      |
+| Utility   | ≤ 150 lines      |
+| Service   | ≤ 250 lines      |
 
 If a file becomes difficult to navigate, split it into smaller modules.
 
