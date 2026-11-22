@@ -48,8 +48,8 @@ separate worker process/container from the same repository.
 | Next.js App Router/server | Admin authorization, gallery scoping, signed upload authorization, completion verification, media records, publication controls, guest authorization | **APPROVED / PLANNED** |
 | Supabase PostgreSQL | Existing system database; target media/session/status/version records remain database-backed | **IMPLEMENTED database / target schema changes PLANNED** |
 | Private Cloudflare R2 bucket | Originals and derivatives; no public bucket or public object URLs | **SELECTED_NOT_INTEGRATED** |
-| Upstash Redis | Queue backend selected for BullMQ, subject to compatibility validation | **SELECTED_NOT_INTEGRATED / DECISION_REQUIRED validation** |
-| BullMQ photo jobs | Durable processing queue, retries, and job state coordination | **SELECTED_NOT_INTEGRATED** |
+| Upstash Redis | Private TCP `rediss://` queue backend for BullMQ | **APPROVED / foundation implemented; live connectivity unverified** |
+| BullMQ photo jobs | Durable processing queue, retries, and job state coordination | **FOUNDATION IMPLEMENTED / jobs not implemented** |
 | Separate photo worker | Sharp validation and derivative generation using server-only R2 credentials | **APPROVED / PLANNED** |
 
 No Fastify and no separate backend API application are part of this design.
@@ -152,14 +152,19 @@ The exact session and cleanup models, indexes, idempotency keys, and migration
 are **PLANNED** and must be approved and implemented separately; this document
 does not alter the Prisma schema.
 
-## 8. Queue and worker architecture — SELECTED_NOT_INTEGRATED / PLANNED
+## 8. Queue and worker architecture — APPROVED / FOUNDATION IMPLEMENTED
 
 After successful upload verification and accepted-record creation, Next.js enqueues
-a BullMQ photo-processing job in Upstash Redis. Upstash Redis is the selected
-service, but its BullMQ compatibility, connection mode, TLS behavior, command
-support, persistence, limits, and operational fit must be validated before
-implementation. This is **DECISION_REQUIRED**, not an assumed compatibility
-claim.
+a BullMQ photo-processing job in Upstash Redis. The approved connection uses
+the server-only `UPSTASH_REDIS_URL` TCP URL with `rediss://` TLS, username and
+password authentication, and port 6379. BullMQ 6.7.8 uses ioredis 5.11.1;
+producer connections use bounded request retries while worker connections use
+`maxRetriesPerRequest: null`. No ioredis `keyPrefix` is configured.
+
+Reusable connection, queue, and standalone worker factories are implemented in
+`src/lib/queue`. Queue creation is separate from worker creation, and no worker
+starts inside Next.js request handlers. No photo jobs or processing are
+implemented in this step.
 
 The worker runs as a separate process/container from the same Next.js repository.
 It consumes photo jobs, reads originals from private R2 using server-only
@@ -298,8 +303,8 @@ Recovery rules are:
 | Supabase PostgreSQL database | **IMPLEMENTED** foundation; Phase 6 schema changes are planned |
 | Existing storage abstraction and Supabase/R2 adapters | **IMPLEMENTED** code; provider provisioning/integration remains unverified |
 | Cloudflare R2 private bucket and signing configuration | **SELECTED_NOT_INTEGRATED** |
-| Upstash Redis BullMQ compatibility validation | **DECISION_REQUIRED** |
-| BullMQ and separate worker process/container | **SELECTED_NOT_INTEGRATED / PLANNED** |
+| Upstash Redis BullMQ compatibility validation | **APPROVED / TCP configuration implemented; live connectivity unverified** |
+| BullMQ and separate worker process/container | **FOUNDATION IMPLEMENTED / worker deployment PLANNED** |
 | Sharp derivative worker | **APPROVED / PLANNED** |
 | Prisma migrations for sessions, versions, derivatives, statuses, Trash | **PLANNED** |
 | Video / Cloudflare Stream | **ON_HOLD** |
