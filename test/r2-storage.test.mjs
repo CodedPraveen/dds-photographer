@@ -18,12 +18,19 @@ test("R2 configuration validates required private endpoint settings", () => {
   assert.equal(getR2Config({ ...config, R2_ACCOUNT_ENDPOINT: config.endpoint, R2_ACCESS_KEY_ID: "key", R2_SECRET_ACCESS_KEY: "secret", R2_BUCKET_NAME: "bucket" }).bucket, "bucket");
   assert.throws(() => getR2Config({}), /required/);
   assert.throws(() => getR2Config({ R2_ACCOUNT_ENDPOINT: "http://example.test", R2_ACCESS_KEY_ID: "key", R2_SECRET_ACCESS_KEY: "secret", R2_BUCKET_NAME: "bucket" }), /HTTPS/);
+  for (const endpoint of ["https://example.com", "https://user:pass@account.r2.cloudflarestorage.com", "https://account.r2.cloudflarestorage.com?x=1", "https://account.r2.cloudflarestorage.com/#x"]) {
+    assert.throws(() => getR2Config({ R2_ACCOUNT_ENDPOINT: endpoint, R2_ACCESS_KEY_ID: "key", R2_SECRET_ACCESS_KEY: "secret", R2_BUCKET_NAME: "bucket" }), /Cloudflare R2 endpoint/);
+  }
 });
 
 test("R2 versioned keys are gallery scoped and reject path injection", () => {
   assert.equal(buildVersionedObjectKey({ galleryId: "g1", photoId: "p1", versionId: "v1" }), "galleries/g1/p1/versions/v1/original.jpg");
-  assert.equal(buildVersionedObjectKey({ galleryId: "g1", photoId: "p1", versionId: "v1", derivative: "gallery" }), "galleries/g1/p1/versions/v1/gallery.bin");
+  assert.equal(buildVersionedObjectKey({ galleryId: "g1", photoId: "p1", versionId: "v1", derivative: "download" }), "galleries/g1/p1/versions/v1/download.jpg");
+  assert.equal(buildVersionedObjectKey({ galleryId: "g1", photoId: "p1", versionId: "v1", derivative: "gallery" }), "galleries/g1/p1/versions/v1/gallery.webp");
+  assert.equal(buildVersionedObjectKey({ galleryId: "g1", photoId: "p1", versionId: "v1", derivative: "thumbnail" }), "galleries/g1/p1/versions/v1/thumbnail.webp");
   assert.throws(() => buildVersionedObjectKey({ galleryId: "g1/x", photoId: "p1", versionId: "v1" }), /Invalid galleryId/);
+  assert.throws(() => buildVersionedObjectKey({ galleryId: "g1", photoId: "../p1", versionId: "v1" }), /Invalid photoId/);
+  assert.throws(() => buildVersionedObjectKey({ galleryId: "g1", photoId: "p1", versionId: "v1", derivative: "other" }), /Invalid derivative/);
 });
 
 test("R2 adapter writes, reads metadata, checks existence, and deletes through mocked commands", async () => {

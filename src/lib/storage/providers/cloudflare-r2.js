@@ -1,3 +1,5 @@
+import "server-only";
+
 import { DeleteObjectCommand, GetObjectCommand, HeadObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 
 export function getR2Config(env = process.env) {
@@ -10,7 +12,9 @@ export function getR2Config(env = process.env) {
     }
     let parsedEndpoint;
     try { parsedEndpoint = new URL(endpoint); } catch { throw new Error("R2_ACCOUNT_ENDPOINT must be a valid HTTPS URL."); }
-    if (parsedEndpoint.protocol !== "https:") throw new Error("R2_ACCOUNT_ENDPOINT must use HTTPS.");
+    if (parsedEndpoint.protocol !== "https:" || parsedEndpoint.username || parsedEndpoint.password || parsedEndpoint.search || parsedEndpoint.hash || !/^[a-z0-9]+\.r2\.cloudflarestorage\.com$/i.test(parsedEndpoint.hostname)) {
+        throw new Error("R2_ACCOUNT_ENDPOINT must be an HTTPS Cloudflare R2 endpoint without credentials, query, or fragment.");
+    }
     return { endpoint: parsedEndpoint.toString().replace(/\/$/, ""), accessKeyId, secretAccessKey, bucket };
 }
 
@@ -18,8 +22,9 @@ export function buildVersionedObjectKey({ galleryId, photoId, versionId, derivat
     for (const [name, value] of Object.entries({ galleryId, photoId, versionId })) {
         if (typeof value !== "string" || !value || value.includes("/")) throw new Error(`Invalid ${name} for R2 object key.`);
     }
-    if (derivative !== undefined && (typeof derivative !== "string" || !/^[a-zA-Z0-9_-]+$/.test(derivative))) throw new Error("Invalid derivative for R2 object key.");
-    return `galleries/${galleryId}/${photoId}/versions/${versionId}/${derivative ? `${derivative}.bin` : "original.jpg"}`;
+    const derivativeKeys = { download: "download.jpg", gallery: "gallery.webp", thumbnail: "thumbnail.webp" };
+    if (derivative !== undefined && !(derivative in derivativeKeys)) throw new Error("Invalid derivative for R2 object key.");
+    return `galleries/${galleryId}/${photoId}/versions/${versionId}/${derivative === undefined ? "original.jpg" : derivativeKeys[derivative]}`;
 }
 
 function createDefaultClient(config) {
