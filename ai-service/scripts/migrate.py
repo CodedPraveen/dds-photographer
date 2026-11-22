@@ -53,7 +53,7 @@ def file_checksum(path: Path) -> str:
 
 def verify_migration_permissions(cursor) -> None:
     try:
-        verify_database_isolation(cursor, EXPECTED_ROLE, True)
+        verify_database_isolation(cursor, EXPECTED_ROLE, True, AI_SCHEMA)
     except RuntimeError as error:
         raise RuntimeError(
             f"Database role '{EXPECTED_ROLE}' failed ai_private isolation: {error}"
