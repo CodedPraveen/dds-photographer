@@ -10,6 +10,7 @@ from pathlib import Path
 import psycopg
 
 from app.config import ConfigurationError, validate_database_url
+from app.db.connection import verify_database_isolation
 
 
 AI_SCHEMA = "ai_private"
@@ -51,29 +52,12 @@ def file_checksum(path: Path) -> str:
 
 
 def verify_migration_permissions(cursor) -> None:
-    cursor.execute(
-        "SELECT current_user, rolsuper, rolcreaterole, rolcreatedb, "
-        "rolbypassrls, has_database_privilege(current_user, current_database(), 'CREATE'), "
-        "COUNT(*) FILTER (WHERE n.nspname NOT IN ('ai_private', 'pg_catalog', "
-        "'information_schema') AND has_schema_privilege(current_user, n.oid, 'CREATE')), "
-        "has_schema_privilege(current_user, %s, 'USAGE'), "
-        "has_schema_privilege(current_user, %s, 'CREATE') "
-        "FROM pg_roles r CROSS JOIN pg_namespace n "
-        "WHERE r.rolname = current_user GROUP BY current_user, rolsuper, "
-        "rolcreaterole, rolcreatedb, rolbypassrls",
-        (AI_SCHEMA, AI_SCHEMA),
-    )
-    current_user, is_superuser, can_create_role, can_create_db, bypass_rls, can_create_database, outside_create, has_usage, has_create = cursor.fetchone()
-    if current_user != EXPECTED_ROLE:
+    try:
+        verify_database_isolation(cursor, EXPECTED_ROLE, True)
+    except RuntimeError as error:
         raise RuntimeError(
-            f"Expected database role '{EXPECTED_ROLE}', "
-            f"connected as '{current_user}'."
-        )
-    if any((is_superuser, can_create_role, can_create_db, bypass_rls, can_create_database, outside_create)) or not (has_usage and has_create):
-        raise RuntimeError(
-            f"Database role '{EXPECTED_ROLE}' lacks required privileges "
-            f"on {AI_SCHEMA}."
-        )
+            f"Database role '{EXPECTED_ROLE}' failed ai_private isolation: {error}"
+        ) from error
 
 
 def main() -> int:
