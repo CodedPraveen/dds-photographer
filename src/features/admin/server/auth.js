@@ -6,7 +6,7 @@ import argon2 from "argon2";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { prisma } from "./prisma";
+import { prisma } from "./prisma.js";
 import { decryptTotpSecret } from "./totp-secrets.mjs";
 
 const COOKIE = "dds_admin_session";

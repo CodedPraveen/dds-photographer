@@ -75,3 +75,31 @@ export async function downloadFile(key) {
 
     return data;
 }
+
+export async function objectExists(key) {
+    return (await findObject(key)) !== null;
+}
+
+export async function getMetadata(key) {
+    const object = await findObject(key);
+    if (!object) throw createNotFoundError(key);
+    return { key, sizeBytes: object.metadata?.size ?? null, contentType: object.metadata?.mimetype ?? object.metadata?.contentType ?? null, etag: object.metadata?.etag ?? null, metadata: object.metadata ?? {} };
+}
+
+async function findObject(key) {
+    const separator = key.lastIndexOf("/");
+    const folder = separator === -1 ? "" : key.slice(0, separator);
+    const filename = key.slice(separator + 1);
+    const { data, error } = await getSupabaseClient().storage.from(getBucket()).list(folder, { search: filename, limit: 100 });
+    if (error) {
+        if (error.status === 404 || error.statusCode === 404 || error.code === "NoSuchKey") return null;
+        throw error;
+    }
+    return data?.find((entry) => entry.name === filename) ?? null;
+}
+
+function createNotFoundError(key) {
+    const error = new Error(`Supabase object not found: ${key}`);
+    error.status = 404;
+    return error;
+}

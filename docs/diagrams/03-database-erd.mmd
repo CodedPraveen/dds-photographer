@@ -1,6 +1,189 @@
+%% Current schema is marked IMPLEMENTED; Phase 6 entities are PROPOSED.
 erDiagram
-  Gallery ||--o{ GalleryMedia : contains
-  Gallery ||--o{ GalleryVisitor : records
-  Gallery { string id PK; string title; boolean isActive; int tokenVersion; datetime opensAt; datetime closesAt; datetime createdAt; datetime updatedAt }
-  GalleryMedia { string id PK; string galleryId FK; string storageKey; string altText; int sortOrder; boolean isCover; datetime createdAt; datetime updatedAt }
-  GalleryVisitor { string id PK; string galleryId FK; string name; string mobile; string email; boolean consent; datetime consentedAt; datetime createdAt; datetime updatedAt }
+  Gallery ||--o{ GalleryMedia : "IMPLEMENTED contains"
+  Gallery ||--o{ GalleryVisitor : "IMPLEMENTED records"
+  AdminUser ||--o{ AdminSession : "IMPLEMENTED sessions"
+  AdminUser ||--o{ AdminAuditEvent : "IMPLEMENTED audit events"
+  AdminUser ||--o{ AdminInvitation : "PROPOSED invites"
+  AdminUser ||--o{ UploadSession : "PROPOSED creates"
+  Gallery ||--o{ UploadSession : "PROPOSED receives"
+  UploadSession ||--o{ UploadFile : "PROPOSED contains"
+  GalleryMedia ||--o{ MediaVersion : "PROPOSED versions"
+  MediaVersion ||--o{ MediaDerivative : "PROPOSED outputs"
+  MediaVersion ||--o{ ProcessingJob : "PROPOSED jobs"
+  GalleryMedia ||--o| MediaTrash : "PROPOSED cleanup record"
+
+  Gallery {
+    string id PK
+    string title
+    boolean isActive
+    int tokenVersion
+    datetime opensAt
+    datetime closesAt
+    datetime createdAt
+    datetime updatedAt
+  }
+
+  GalleryMedia {
+    string id PK
+    string galleryId FK
+    enum storageProvider
+    string storageKey
+    string altText
+    string mimeType
+    int sizeBytes
+    int width
+    int height
+    int sortOrder
+    boolean isCover
+    datetime createdAt
+    datetime updatedAt
+  }
+
+  GalleryVisitor {
+    string id PK
+    string galleryId FK
+    string name
+    string mobile
+    string email UK
+    boolean consent
+    datetime consentedAt
+    datetime createdAt
+    datetime updatedAt
+  }
+
+  AdminUser {
+    string id PK
+    string email UK
+    string passwordHash
+    string totpSecret
+    string totpSecretEncrypted
+    datetime createdAt
+    datetime updatedAt
+    enum role "PROPOSED ADMIN|MASTER_ADMIN"
+  }
+
+  AdminSession {
+    string id PK
+    string adminId FK
+    string tokenHash UK
+    datetime lastSeenAt
+    datetime expiresAt
+    datetime revokedAt
+    datetime createdAt
+  }
+
+  AdminAuditEvent {
+    string id PK
+    string adminId FK
+    string action
+    string targetId
+    json metadata
+    datetime createdAt
+  }
+
+  AdminLoginRateLimit {
+    string keyHash PK
+    datetime windowStartedAt
+    int failures
+    datetime cooldownUntil
+    datetime updatedAt
+  }
+
+  AdminInvitation {
+    string id PK "PROPOSED"
+    string inviterAdminId FK
+    string inviteeEmail
+    string tokenHash UK
+    enum role
+    enum status
+    datetime expiresAt
+    datetime acceptedAt
+    datetime createdAt
+  }
+
+  UploadSession {
+    string id PK "PROPOSED"
+    string adminId FK
+    string galleryId FK
+    enum status
+    datetime createdAt
+    datetime lastActivityAt
+    datetime expiresAt
+    datetime cancelledAt
+    datetime completedAt
+    json progressMetadata
+  }
+
+  UploadFile {
+    string id PK "PROPOSED"
+    string uploadSessionId FK
+    string originalFilename
+    int sizeBytes
+    string sha256
+    enum uploadMode
+    string r2ObjectKey
+    string multipartUploadId
+    enum verificationStatus
+    enum status
+    string failureDetails
+    json partMetadata
+    datetime completedAt
+  }
+
+  MediaVersion {
+    string id PK "PROPOSED"
+    string mediaId FK
+    string originalObjectKey
+    string predecessorVersionId FK
+    boolean isActive
+    enum processingSummary
+    enum publicationStatus
+    datetime createdAt
+    datetime replacedAt
+    datetime retentionUntil
+  }
+
+  MediaDerivative {
+    string id PK "PROPOSED"
+    string mediaVersionId FK
+    enum derivativeType
+    string objectKey
+    string format
+    int width
+    int height
+    int sizeBytes
+    string sha256
+    enum processingStatus
+    string failureDetails
+    datetime createdAt
+    datetime updatedAt
+  }
+
+  ProcessingJob {
+    string id PK "PROPOSED"
+    string bullmqJobId
+    string mediaVersionId FK
+    string idempotencyKey UK
+    enum status
+    int attemptCount
+    boolean manualRetry
+    string errorDetails
+    datetime startedAt
+    datetime completedAt
+    datetime createdAt
+    datetime updatedAt
+  }
+
+  MediaTrash {
+    string id PK "PROPOSED"
+    string mediaId FK UK
+    enum status
+    datetime deletedAt
+    datetime retentionUntil
+    datetime restoredAt
+    datetime permanentlyDeletedAt
+    int cleanupAttempts
+    string cleanupLastError
+    datetime cleanupLastAttemptAt
+  }
