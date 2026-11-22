@@ -75,3 +75,13 @@ export async function downloadFile(key) {
 
     return data;
 }
+
+export async function objectExists(key) {
+    try { await downloadFile(key); return true; }
+    catch (error) { if (error?.status === 404 || error?.statusCode === 404) return false; throw error; }
+}
+
+export async function getMetadata(key) {
+    const data = await downloadFile(key);
+    return { key, sizeBytes: typeof data.size === "number" ? data.size : null, contentType: data.type || null, etag: null, metadata: {} };
+}

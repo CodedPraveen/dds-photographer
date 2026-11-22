@@ -30,6 +30,16 @@ export async function deleteFile(key, provider) {
     return storage.deleteFile(key);
 }
 
+export async function objectExists(key, provider) {
+    const storage = await getAdapter(provider || getStorageProvider());
+    return storage.objectExists(key);
+}
+
+export async function getMetadata(key, provider) {
+    const storage = await getAdapter(provider || getStorageProvider());
+    return storage.getMetadata(key);
+}
+
 export async function downloadFile(key, provider) {
     const storage = await getAdapter(provider);
 
