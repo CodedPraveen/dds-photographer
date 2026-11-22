@@ -18,6 +18,80 @@ enum StorageProvider {
   R2
 }
 
+enum AdminRole {
+  ADMIN
+  MASTER_ADMIN
+}
+enum AdminInvitationRole {
+  ADMIN
+  MASTER_ADMIN
+}
+enum AdminInvitationStatus {
+  PENDING
+  ACCEPTED
+  REVOKED
+  EXPIRED
+}
+enum UploadSessionStatus {
+  ACTIVE
+  COMPLETED
+  CANCELLED
+  EXPIRED
+}
+enum UploadMode {
+  SINGLE
+  MULTIPART
+}
+enum UploadVerificationStatus {
+  PENDING
+  VERIFIED
+  FAILED
+}
+enum UploadFileStatus {
+  PENDING
+  UPLOADING
+  UPLOADED
+  VERIFIED
+  FAILED
+  CANCELLED
+}
+enum ProcessingSummary {
+  QUEUED
+  PROCESSING
+  READY
+  FAILED
+}
+enum PublicationStatus {
+  UNPUBLISHED
+  PUBLISHED
+}
+enum DerivativeType {
+  ORIGINAL
+  DOWNLOAD
+  GALLERY
+  THUMBNAIL
+}
+enum DerivativeProcessingStatus {
+  QUEUED
+  PROCESSING
+  READY
+  FAILED
+  RETRYING
+}
+enum ProcessingJobStatus {
+  QUEUED
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+enum TrashStatus {
+  ACTIVE
+  RESTORED
+  DELETING
+  CLEANUP_FAILED
+  PERMANENTLY_DELETED
+}
+
 model Gallery {
   id           String           @id @default(cuid())
   title        String
@@ -29,6 +103,7 @@ model Gallery {
   updatedAt    DateTime         @updatedAt
   media        GalleryMedia[]
   visitors     GalleryVisitor[]
+  uploadSessions UploadSession[]
 }
 
 model GalleryMedia {
@@ -45,6 +120,8 @@ model GalleryMedia {
   isCover         Boolean         @default(false)
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
+  versions        MediaVersion[]
+  trash           MediaTrash?
 
   gallery Gallery @relation(fields: [galleryId], references: [id], onDelete: Cascade)
 
@@ -75,8 +152,13 @@ model AdminUser {
   totpSecretEncrypted String?
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
+  role         AdminRole      @default(ADMIN)
+  isActive     Boolean        @default(true)
   sessions     AdminSession[]
   auditEvents  AdminAuditEvent[]
+  invitationsSent AdminInvitation[] @relation("Inviter")
+  acceptedInvitations AdminInvitation[] @relation("AcceptedAdmin")
+  uploadSessions UploadSession[]
 }
 
 model AdminLoginRateLimit {
@@ -112,4 +194,136 @@ model AdminAuditEvent {
 
   @@index([createdAt])
   @@index([adminId, createdAt])
+}
+
+model AdminInvitation {
+  id String @id @default(cuid())
+  inviterAdminId String
+  acceptedAdminId String?
+  inviteeEmail String
+  role AdminInvitationRole
+  tokenHash String @unique
+  status AdminInvitationStatus @default(PENDING)
+  expiresAt DateTime
+  acceptedAt DateTime?
+  revokedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  inviter AdminUser @relation("Inviter", fields: [inviterAdminId], references: [id], onDelete: Restrict)
+  acceptedAdmin AdminUser? @relation("AcceptedAdmin", fields: [acceptedAdminId], references: [id], onDelete: SetNull)
+  @@index([inviteeEmail, status])
+  @@index([expiresAt, status])
+}
+
+model UploadSession {
+  id String @id @default(cuid())
+  adminId String
+  galleryId String
+  status UploadSessionStatus @default(ACTIVE)
+  createdAt DateTime @default(now())
+  lastActivityAt DateTime @default(now())
+  expiresAt DateTime
+  cancelledAt DateTime?
+  completedAt DateTime?
+  progressMetadata Json?
+  admin AdminUser @relation(fields: [adminId], references: [id], onDelete: Restrict)
+  gallery Gallery @relation(fields: [galleryId], references: [id], onDelete: Cascade)
+  files UploadFile[]
+  @@index([adminId, status])
+  @@index([galleryId, status])
+  @@index([expiresAt, status])
+}
+
+model UploadFile {
+  id String @id @default(cuid())
+  uploadSessionId String
+  originalFilename String
+  sizeBytes Int
+  sha256 String
+  uploadMode UploadMode
+  r2ObjectKey String
+  multipartUploadId String?
+  verificationStatus UploadVerificationStatus @default(PENDING)
+  status UploadFileStatus @default(PENDING)
+  failureDetails String?
+  partMetadata Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  completedAt DateTime?
+  uploadSession UploadSession @relation(fields: [uploadSessionId], references: [id], onDelete: Cascade)
+  @@index([uploadSessionId, status])
+  @@index([sha256])
+}
+
+model MediaVersion {
+  id String @id @default(cuid())
+  mediaId String
+  predecessorVersionId String?
+  originalObjectKey String
+  versionNumber Int
+  isActive Boolean @default(false)
+  processingSummary ProcessingSummary @default(QUEUED)
+  publicationStatus PublicationStatus @default(UNPUBLISHED)
+  createdAt DateTime @default(now())
+  replacedAt DateTime?
+  retentionUntil DateTime?
+  media GalleryMedia @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  predecessor MediaVersion? @relation("VersionPredecessor", fields: [predecessorVersionId], references: [id], onDelete: SetNull)
+  replacements MediaVersion[] @relation("VersionPredecessor")
+  derivatives MediaDerivative[]
+  processingJobs ProcessingJob[]
+  @@unique([mediaId, versionNumber])
+  @@index([mediaId, isActive])
+  @@index([retentionUntil])
+}
+
+model MediaDerivative {
+  id String @id @default(cuid())
+  mediaVersionId String
+  derivativeType DerivativeType
+  objectKey String
+  format String
+  width Int?
+  height Int?
+  sizeBytes Int?
+  sha256 String?
+  processingStatus DerivativeProcessingStatus @default(QUEUED)
+  failureDetails String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  mediaVersion MediaVersion @relation(fields: [mediaVersionId], references: [id], onDelete: Cascade)
+  @@unique([mediaVersionId, derivativeType])
+  @@index([processingStatus])
+}
+
+model ProcessingJob {
+  id String @id @default(cuid())
+  bullmqJobId String @unique
+  mediaVersionId String
+  idempotencyKey String @unique
+  status ProcessingJobStatus @default(QUEUED)
+  attemptCount Int @default(0)
+  manualRetry Boolean @default(false)
+  errorDetails String?
+  startedAt DateTime?
+  completedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  mediaVersion MediaVersion @relation(fields: [mediaVersionId], references: [id], onDelete: Cascade)
+  @@index([mediaVersionId, status])
+}
+
+model MediaTrash {
+  id String @id @default(cuid())
+  mediaId String @unique
+  status TrashStatus @default(ACTIVE)
+  deletedAt DateTime @default(now())
+  retentionUntil DateTime
+  restoredAt DateTime?
+  permanentlyDeletedAt DateTime?
+  cleanupAttempts Int @default(0)
+  cleanupLastError String?
+  cleanupLastAttemptAt DateTime?
+  media GalleryMedia @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  @@index([status, retentionUntil])
 }
