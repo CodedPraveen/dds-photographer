@@ -16,7 +16,14 @@ multi-tenant SaaS product. The current product scope is photos only.
 - `IMPLEMENTED` Prisma models `Gallery`, `GalleryMedia`, `GalleryVisitor`,
   `AdminUser`, `AdminSession`, and `AdminAuditEvent`.
 - `IMPLEMENTED` Local development adapter and Prisma/PostgreSQL adapter.
-- `SELECTED_NOT_INTEGRATED` Cloudflare R2 and Redis + BullMQ.
+- `IMPLEMENTED` Supabase PostgreSQL remains the database foundation; Phase 6
+  schema additions are proposed only.
+- `APPROVED / PLANNED` Phase 6 Photo Upload & Processing Pipeline. The current
+  Next.js application remains both frontend and backend; a separate photo
+  worker process/container from the same repository is planned.
+- `SELECTED_NOT_INTEGRATED` Cloudflare R2 private photo storage.
+- `SELECTED_NOT_INTEGRATED` BullMQ with Upstash Redis as the selected queue
+  backend; Upstash/BullMQ compatibility must be verified before implementation.
 - `APPROVED_NOT_IMPLEMENTED` Admin authentication architecture in
   [ADR-001](../development/decisions/ADR-001-admin-authentication.md); the admin
   dashboard and implementation remain Phase 5 work. Upload/processing pipeline,
@@ -27,7 +34,14 @@ multi-tenant SaaS product. The current product scope is photos only.
   is implemented.
 - `ON_HOLD` Video/Cloudflare Stream.
 
-See [system context](../diagrams/01-system-context.mmd), [application architecture](../diagrams/02-application-architecture.mmd), and the [database record](database.md).
+No Fastify or separate backend API application is part of the approved Phase 6
+architecture. Face matching is deferred from Phase 6 and remains a separate
+future architecture. See the [Phase 6 product specification](../product/MEDIA_PIPELINE.md),
+[storage and processing architecture](storage-and-processing.md),
+[database proposal](database.md), [security architecture](security.md),
+[upload workflow](../diagrams/06-photo-upload-storage-flow.mmd),
+[system context](../diagrams/01-system-context.mmd), and
+[application architecture](../diagrams/02-application-architecture.mmd).
 
 ## Change control
 

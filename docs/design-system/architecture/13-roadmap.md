@@ -14,8 +14,31 @@
 | 3     | Camera-led motion experience             | Complete    |
 | 4     | First private-gallery foundation         | Complete    |
 | 5     | Admin dashboard and production readiness | Partially implemented |
+| 6     | Photo Upload & Processing Pipeline       | Approved / Planned |
 
 See `../production/IMPLEMENTATION_STATUS.md` and `../production/IMPLEMENTED_FEATURES.md` for verified details.
+
+## Phase 6 — Photo Upload & Processing Pipeline — Approved / Planned
+
+Phase 6 is approved for planning and documentation, but is not implemented.
+The scope is JPEG/JPG-only private photo upload and processing: direct
+browser-to-private-R2 upload with 15-minute signed authorization, 10 MB single
+uploads or multipart uploads above 10 MB using 8 MB parts, server-side object,
+size, SHA-256, and JPEG verification, resumable seven-day Admin-owned sessions,
+controlled batch uploads, Sharp derivatives, BullMQ processing with three
+automatic attempts, independent derivative status, publishing, versioned
+replacement, 30-day replacement retention, 30-day Trash, and private
+15-minute guest delivery of optimized derivatives.
+
+The Next.js application remains frontend and backend; a separate worker from the
+same repository is planned. R2 and Redis/BullMQ are selected but not integrated,
+and Upstash/BullMQ compatibility must be verified before implementation. Video
+and face matching remain outside Phase 6.
+
+See the [product specification](../../product/MEDIA_PIPELINE.md), [storage and
+processing architecture](../../architecture/storage-and-processing.md),
+[database proposal](../../architecture/database.md), [security architecture](../../architecture/security.md),
+and [photo upload workflow](../../diagrams/06-photo-upload-storage-flow.mmd).
 
 ## Phase 5 — Admin dashboard and production readiness
 

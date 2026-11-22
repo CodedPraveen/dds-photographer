@@ -14,6 +14,27 @@ Secrets are supplied externally and must not be baked into images or committed.
 See [deployment diagram](../diagrams/07-deployment-docker-architecture.mmd) and
 the existing [deployment specification](../design-system/architecture/12-deployment.md).
 
+## Approved Phase 6 target — APPROVED / PLANNED
+
+The target deployment is an AWS Lightsail VPS with a 4 GB RAM target, Nginx as
+the reverse proxy, and Docker Compose managing the existing Next.js application
+plus a separate photo-worker process/container from the same repository. The
+Next.js application remains both frontend and backend. Supabase PostgreSQL
+remains the database; Cloudflare R2 stores private originals and derivatives;
+Upstash Redis is intended for BullMQ, subject to compatibility and connectivity
+validation.
+
+Planned subdomains are `www.yourdomain.com`, `admin.yourdomain.com`, and
+`api.yourdomain.com`. Nginx will route all three to the same Next.js application.
+This target is not evidence that Lightsail, Nginx, DNS, R2, Upstash, BullMQ, or
+the worker has been provisioned or deployed.
+
+Production rollout requires environment and secret configuration, private R2
+bucket/access-policy verification, Upstash/BullMQ compatibility validation,
+worker health checks and graceful shutdown, approved database migrations,
+backups and restore verification, retention/deletion jobs, logging, monitoring,
+alerting, and deployment/rollback checks.
+
 ## Testing and recovery
 
 Run `npm run lint`, `npm test`, `npm run format:check`, and `npm run build` before
