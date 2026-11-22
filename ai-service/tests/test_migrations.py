@@ -82,3 +82,30 @@ def test_checksum_is_stable_for_unchanged_file(tmp_path):
     )
 
     assert first_checksum == second_checksum
+
+
+class FakeCursor:
+    def __init__(self, role, privileges):
+        self.role = role
+        self.privileges = privileges
+        self.calls = 0
+
+    def execute(self, *_args):
+        self.calls += 1
+
+    def fetchone(self):
+        return (self.role,) if self.calls == 1 else self.privileges
+
+
+def test_migration_role_is_required():
+    with pytest.raises(RuntimeError, match="Expected database role"):
+        migration_runner.verify_migration_permissions(
+            FakeCursor("postgres", (True, True))
+        )
+
+
+def test_migration_schema_privileges_are_required():
+    with pytest.raises(RuntimeError, match="lacks required privileges"):
+        migration_runner.verify_migration_permissions(
+            FakeCursor("dds_ai_migrator", (True, False))
+        )

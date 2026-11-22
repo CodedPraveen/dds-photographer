@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 @router.get("/health")
-async def health_check():
+def health_check():
     return {
         "status": "ok",
         "service": "dds-ai-service",
@@ -29,7 +29,7 @@ def readiness_check():
         }
 
     except (psycopg.Error, RuntimeError):
-        logger.exception("Database readiness check failed")
+        logger.warning("Database readiness check failed")
 
         raise HTTPException(
             status_code=503,
