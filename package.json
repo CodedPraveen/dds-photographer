@@ -11,7 +11,7 @@
     "start": "next start",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "test": "node --test",
+    "test": "node --conditions=react-server --test",
     "prisma:generate": "prisma generate",
     "postinstall": "prisma generate",
     "format": "prettier --write .",

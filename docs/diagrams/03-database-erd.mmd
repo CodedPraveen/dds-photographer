@@ -11,6 +11,7 @@ erDiagram
   GalleryMedia ||--o{ MediaVersion : "PROPOSED versions"
   MediaVersion ||--o{ MediaDerivative : "PROPOSED outputs"
   MediaVersion ||--o{ ProcessingJob : "PROPOSED jobs"
+  GalleryMedia ||--o| MediaTrash : "PROPOSED cleanup record"
 
   Gallery {
     string id PK
@@ -172,4 +173,17 @@ erDiagram
     datetime completedAt
     datetime createdAt
     datetime updatedAt
+  }
+
+  MediaTrash {
+    string id PK "PROPOSED"
+    string mediaId FK UK
+    enum status
+    datetime deletedAt
+    datetime retentionUntil
+    datetime restoredAt
+    datetime permanentlyDeletedAt
+    int cleanupAttempts
+    string cleanupLastError
+    datetime cleanupLastAttemptAt
   }

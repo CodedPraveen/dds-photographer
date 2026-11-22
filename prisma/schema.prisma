@@ -267,7 +267,7 @@ model MediaVersion {
   createdAt DateTime @default(now())
   replacedAt DateTime?
   retentionUntil DateTime?
-  media GalleryMedia @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  media GalleryMedia @relation(fields: [mediaId], references: [id], onDelete: Restrict)
   predecessor MediaVersion? @relation("VersionPredecessor", fields: [predecessorVersionId], references: [id], onDelete: SetNull)
   replacements MediaVersion[] @relation("VersionPredecessor")
   derivatives MediaDerivative[]
