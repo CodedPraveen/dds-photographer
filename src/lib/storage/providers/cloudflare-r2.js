@@ -1,6 +1,6 @@
 import "server-only";
 
-import { DeleteObjectCommand, GetObjectCommand, HeadObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { AbortMultipartUploadCommand, CompleteMultipartUploadCommand, CreateMultipartUploadCommand, DeleteObjectCommand, GetObjectCommand, HeadObjectCommand, ListPartsCommand, PutObjectCommand, S3Client, UploadPartCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 export function getR2Config(env = process.env) {
@@ -35,6 +35,40 @@ function createDefaultClient(config) {
 export function createR2Storage({ client, config = getR2Config() } = {}) {
     const r2Client = client || createDefaultClient(config);
     return {
+        async startMultipart(key) {
+            const { UploadId } = await r2Client.send(new CreateMultipartUploadCommand({ Bucket: config.bucket, Key: key, ContentType: "image/jpeg" }));
+            if (!UploadId) throw new Error("R2 did not return an upload ID.");
+            return UploadId;
+        },
+        signPart({ key, uploadId, partNumber, size, expiresIn }) {
+            return getSignedUrl(r2Client, new UploadPartCommand({
+                Bucket: config.bucket, Key: key, UploadId: uploadId, PartNumber: partNumber, ContentLength: size,
+            }), { expiresIn, signableHeaders: new Set(["content-length"]) });
+        },
+        async listParts(key, uploadId) {
+            const parts = [];
+            let marker;
+            do {
+                const result = await r2Client.send(new ListPartsCommand({ Bucket: config.bucket, Key: key, UploadId: uploadId, PartNumberMarker: marker }));
+                parts.push(...(result.Parts ?? []));
+                marker = result.IsTruncated ? result.NextPartNumberMarker : undefined;
+                if (result.IsTruncated && !marker) throw new Error("Invalid R2 part pagination.");
+            } while (marker);
+            return parts;
+        },
+        finishMultipart(key, uploadId, parts) {
+            return r2Client.send(new CompleteMultipartUploadCommand({
+                Bucket: config.bucket, Key: key, UploadId: uploadId,
+                MultipartUpload: { Parts: parts },
+            }));
+        },
+        async abortMultipart(key, uploadId) {
+            try {
+                await r2Client.send(new AbortMultipartUploadCommand({ Bucket: config.bucket, Key: key, UploadId: uploadId }));
+            } catch (error) {
+                if (error.name !== "NoSuchUpload") throw error;
+            }
+        },
         async uploadFile({ key, body, contentType, metadata }) {
             await r2Client.send(new PutObjectCommand({ Bucket: config.bucket, Key: key, Body: body, ContentType: contentType, Metadata: metadata }));
             return { key, provider: "R2" };
@@ -65,6 +99,7 @@ export function createR2Storage({ client, config = getR2Config() } = {}) {
 
 let storage;
 function getStorage() { return (storage ||= createR2Storage()); }
+export const multipartStorage = () => getStorage();
 export const uploadFile = (options) => getStorage().uploadFile(options);
 export const objectExists = (key) => getStorage().objectExists(key);
 export const getMetadata = (key) => getStorage().getMetadata(key);

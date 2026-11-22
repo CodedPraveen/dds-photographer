@@ -8,6 +8,7 @@
     "build": "next build",
     "admin:provision": "node scripts/provision-admin.mjs",
     "admin:cleanup-sessions": "node scripts/cleanup-admin-sessions.mjs",
+    "uploads:cleanup-multipart": "node --conditions=react-server scripts/cleanup-expired-multipart.mjs",
     "start": "next start",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

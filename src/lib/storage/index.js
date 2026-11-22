@@ -3,6 +3,10 @@ import "server-only";
 
 import { getStorageProvider } from "./storage-config.js";
 
+export async function getMultipartStorage() {
+    return (await getAdapter("r2")).multipartStorage();
+}
+
 async function getAdapter(provider) {
     const selectedProvider = (provider || getStorageProvider()).toLowerCase();
 

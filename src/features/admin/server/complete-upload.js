@@ -5,13 +5,18 @@ import { verifyUploadedObject } from "./upload-verification.js";
 
 const MAX_ORIGINAL_SIZE = 50 * 1024 * 1024;
 
-async function readWebStream(stream) {
+async function readWebStream(stream, expectedSize) {
     const chunks = [];
-    for await (const chunk of stream) chunks.push(Buffer.from(chunk));
+    let length = 0;
+    for await (const chunk of stream) {
+        length += chunk.byteLength;
+        if (length > expectedSize) throw new Error("Uploaded object exceeds its declared size.");
+        chunks.push(Buffer.from(chunk));
+    }
     return Buffer.concat(chunks);
 }
 
-export async function completeUpload({ sessionId, fileId, dependencies = {} }) {
+export async function completeUpload({ sessionId, fileId, multipart = false, dependencies = {} }) {
     const auth = dependencies.getCurrentAdmin && dependencies.audit ? null : await import("./auth.js");
     const database = dependencies.prisma ? null : await import("./prisma.js");
     const storage = dependencies.objectExists && dependencies.getMetadata && dependencies.downloadFile ? null : await import("../../../lib/storage/index.js");
@@ -31,7 +36,9 @@ export async function completeUpload({ sessionId, fileId, dependencies = {} }) {
     if (session.status !== "ACTIVE" || session.expiresAt <= new Date()) return { error: "Upload session is expired or inactive.", status: 409 };
 
     const file = await db.uploadFile.findUnique({ where: { id: fileId }, select: { id: true, uploadSessionId: true, originalFilename: true, sizeBytes: true, sha256: true, uploadMode: true, r2ObjectKey: true, status: true, verificationStatus: true } });
-    if (!file || file.uploadSessionId !== session.id || file.uploadMode !== "SINGLE") return { error: "Upload file not found.", status: 404 };
+    if (!file || file.uploadSessionId !== session.id ||
+        file.uploadMode !== (multipart ? "MULTIPART" : "SINGLE") ||
+        (multipart && !["UPLOADED", "VERIFIED"].includes(file.status))) return { error: "Upload file not found.", status: 404 };
 
     if (file.status === "VERIFIED" && file.verificationStatus === "VERIFIED") {
         const existing = await db.galleryMedia.findFirst({ where: { galleryId: session.galleryId, storageKey: file.r2ObjectKey }, select: { id: true, storageKey: true, sizeBytes: true, width: true, height: true } });
@@ -43,7 +50,7 @@ export async function completeUpload({ sessionId, fileId, dependencies = {} }) {
     if (!head || !Number.isInteger(head.sizeBytes) || head.sizeBytes !== file.sizeBytes || head.sizeBytes > MAX_ORIGINAL_SIZE) return { error: "Uploaded object size is invalid.", status: 400 };
 
     let bytes;
-    try { bytes = await readWebStream(await download(file.r2ObjectKey)); } catch { return { error: "Uploaded object could not be read.", status: 400 }; }
+    try { bytes = await readWebStream(await download(file.r2ObjectKey), file.sizeBytes); } catch { return { error: "Uploaded object could not be read.", status: 400 }; }
     let verified;
     try { verified = await verifyUploadedObject({ bytes, expectedSize: file.sizeBytes, expectedSha256: file.sha256 }); } catch (error) {
         return { error: error.message, status: 400 };
@@ -51,6 +58,13 @@ export async function completeUpload({ sessionId, fileId, dependencies = {} }) {
 
     const result = await db.$transaction(async (tx) => {
         await lock(tx, file.id);
+        if (multipart) {
+            const active = await tx.uploadSession.findFirst({
+                where: { id: sessionId, adminId: admin.id, status: "ACTIVE", expiresAt: { gt: new Date() } },
+                select: { id: true },
+            });
+            if (!active) return null;
+        }
         const current = await tx.uploadFile.findUnique({ where: { id: file.id }, select: { status: true, verificationStatus: true } });
         const isVerified = current?.status === "VERIFIED" && current?.verificationStatus === "VERIFIED";
         if (isVerified) {
@@ -67,6 +81,7 @@ export async function completeUpload({ sessionId, fileId, dependencies = {} }) {
         await tx.uploadFile.update({ where: { id: file.id }, data: { status: "VERIFIED", verificationStatus: "VERIFIED", completedAt: new Date() } });
         return media;
     });
+    if (!result) return { error: "Upload session is expired or inactive.", status: 409 };
     await writeAudit(admin.id, "upload.file.verify", file.id, { sessionId, galleryId: session.galleryId, sizeBytes: verified.sizeBytes, sha256: verified.sha256 });
     return { success: true, idempotent: false, media: result };
 }

@@ -246,8 +246,13 @@ processing-job, Trash, and lifecycle concepts described in section 2.
 not integrated.
 
 **DECISION_REQUIRED:** Final table/field names, enum strategy, upload-session
-metadata shape, multipart-part persistence boundary, exact publication versus
+metadata shape, exact publication versus
 delivery-eligibility representation, Trash/version foreign-key behavior,
-retention cleanup scheduling, and Upstash/BullMQ compatibility.
+other retention cleanup scheduling, and Upstash/BullMQ compatibility.
 
-No proposed entity or field in this document is present in the current database.
+Step 5 uses the existing `UploadFile.multipartUploadId` and `partMetadata`
+fields for multipart identity and lifecycle/recovery state. R2 owns part state.
+Expired multipart cleanup is a retryable operator command. Scheduling is deferred.
+
+The Phase 6 foundation fields are present in the repository schema. Deployment
+of the existing migrations must be verified separately.

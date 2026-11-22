@@ -13,8 +13,9 @@ test("upload session policy accepts JPEGs through 50 MB and rejects other types"
   assert.match(validateUploadFileInput({ ...valid, sizeBytes: MAX_ORIGINAL_SIZE + 1 }), /50 MB/);
 });
 
-test("upload session policy does not silently enable multipart uploads", () => {
-  assert.match(validateUploadFileInput({ ...valid, uploadMode: "MULTIPART" }), /Multipart/);
+test("upload session policy enforces the size-based upload mode", () => {
+  assert.match(validateUploadFileInput({ ...valid, uploadMode: "MULTIPART" }), /mode/);
+  assert.equal(validateUploadFileInput({ ...valid, sizeBytes: MAX_ORIGINAL_SIZE, uploadMode: "MULTIPART" }), null);
 });
 
 test("upload authorizations and sessions use the approved lifetimes", () => {

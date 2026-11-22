@@ -4,7 +4,7 @@ import { randomUUID } from "node:crypto";
 
 import { createUploadUrl } from "../../../lib/storage/index.js";
 import { buildVersionedObjectKey } from "../../../lib/storage/providers/cloudflare-r2.js";
-import { MAX_ORIGINAL_SIZE, SESSION_TTL_MS, UPLOAD_URL_TTL_SECONDS, validateUploadFileInput } from "./upload-policy.js";
+import { SESSION_TTL_MS, SINGLE_UPLOAD_LIMIT, UPLOAD_URL_TTL_SECONDS, validateUploadFileInput } from "./upload-policy.js";
 
 export { MAX_ORIGINAL_SIZE, SESSION_TTL_MS, UPLOAD_URL_TTL_SECONDS, validateUploadFileInput } from "./upload-policy.js";
 
@@ -43,6 +43,7 @@ export async function createUploadSession({ galleryId, files, dependencies = {} 
         for (const file of files) {
             const fileId = randomUUID();
             const key = buildVersionedObjectKey({ galleryId, photoId: fileId, versionId: session.id });
+            const uploadMode = file.sizeBytes > SINGLE_UPLOAD_LIMIT ? "MULTIPART" : "SINGLE";
             const uploadFile = await tx.uploadFile.create({
                 data: {
                     id: fileId,
@@ -50,11 +51,13 @@ export async function createUploadSession({ galleryId, files, dependencies = {} 
                     originalFilename: file.filename,
                     sizeBytes: file.sizeBytes,
                     sha256: typeof file.sha256 === "string" ? file.sha256 : "",
-                    uploadMode: "SINGLE",
+                    uploadMode,
                     r2ObjectKey: key,
                 },
             });
-            signedFiles.push({ id: uploadFile.id, filename: file.filename, sizeBytes: file.sizeBytes, objectKey: key, uploadUrl: await signUpload({ key, contentType: "image/jpeg", expiresIn: UPLOAD_URL_TTL_SECONDS }) });
+            signedFiles.push({ id: uploadFile.id, filename: file.filename, sizeBytes: file.sizeBytes, uploadMode,
+                ...(uploadMode === "SINGLE" && { objectKey: key, uploadUrl: await signUpload({ key, contentType: "image/jpeg", expiresIn: UPLOAD_URL_TTL_SECONDS }) }),
+            });
         }
         return { sessionId: session.id, expiresAt: session.expiresAt, uploadUrlExpiresIn: UPLOAD_URL_TTL_SECONDS, files: signedFiles };
     });

@@ -114,9 +114,14 @@ object before accepting a media record.
 - Multipart completion must be explicitly finalized server-side after the
   browser reports part completion. Stale multipart uploads must be aborted and
   their temporary objects cleaned up without touching completed photos.
-- R2 lifecycle rules or an equivalent cleanup job should remove abandoned
-  multipart state; the exact R2 lifecycle configuration remains an operational
-  implementation detail to verify before deployment.
+- R2 ListParts is authoritative for part numbers, sizes, and ETags.
+- Create sessions at `POST /admin/galleries/[id]/upload-sessions`. Send
+  `start`, `part` (with `partNumber`), `complete`, or `abort` to
+  `POST /admin/upload-sessions/[sessionId]/files/[fileId]/multipart`.
+  Retry a failed part by requesting a fresh URL for its part number.
+- Run `npm run uploads:cleanup-multipart` to retry cleanup of expired incomplete
+  multipart uploads. Scheduling is deferred. Cleanup never deletes finalized
+  objects, accepted photos, or active versions.
 
 ## 6. Server-side completion verification — APPROVED / PLANNED
 
