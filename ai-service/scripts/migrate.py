@@ -9,6 +9,9 @@ from pathlib import Path
 
 import psycopg
 
+from app.config import ConfigurationError, validate_database_url
+from app.db.connection import verify_database_isolation
+
 
 AI_SCHEMA = "ai_private"
 EXPECTED_ROLE = "dds_ai_migrator"
@@ -48,11 +51,24 @@ def file_checksum(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def main() -> int:
-    database_url = os.getenv("AI_MIGRATOR_DATABASE_URL")
+def verify_migration_permissions(cursor) -> None:
+    try:
+        verify_database_isolation(cursor, EXPECTED_ROLE, True, AI_SCHEMA)
+    except RuntimeError as error:
+        raise RuntimeError(
+            f"Database role '{EXPECTED_ROLE}' failed ai_private isolation: {error}"
+        ) from error
 
-    if not database_url:
-        print("ERROR: AI_MIGRATOR_DATABASE_URL is not configured.")
+
+def main() -> int:
+    try:
+        database_url = validate_database_url(
+            os.getenv("AI_MIGRATOR_DATABASE_URL"),
+            "AI_MIGRATOR_DATABASE_URL",
+            os.getenv("APP_ENV", "development").lower() == "production",
+        )
+    except ConfigurationError as error:
+        print(f"ERROR: {error}")
         return 1
 
     if not MIGRATIONS_DIR.is_dir():
@@ -69,14 +85,7 @@ def main() -> int:
         ) as connection:
 
             with connection.cursor() as cursor:
-                cursor.execute("SELECT current_user")
-                current_user = cursor.fetchone()[0]
-
-                if current_user != EXPECTED_ROLE:
-                    raise RuntimeError(
-                        f"Expected database role '{EXPECTED_ROLE}', "
-                        f"connected as '{current_user}'."
-                    )
+                verify_migration_permissions(cursor)
 
                 cursor.execute(
                     "SELECT pg_advisory_lock(%s, %s)",

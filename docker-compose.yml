@@ -42,6 +42,21 @@ services:
     networks:
       - dds_internal
 
+  ai-migrate:
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+    command: ["python", "-m", "scripts.migrate"]
+    env_file:
+      - .env.ai
+    profiles:
+      - ai-migrations
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - dds_internal
+
   db:
     image: postgres:16-bookworm
     env_file:

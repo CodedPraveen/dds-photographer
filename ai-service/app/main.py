@@ -19,8 +19,7 @@ app.include_router(
 
 
 @app.get("/")
-async def root():
+def root():
     return {
         "message": "DDS AI Service is running",
     }
-    
