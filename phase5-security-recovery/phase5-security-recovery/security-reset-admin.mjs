@@ -2,6 +2,7 @@ import "dotenv/config";
 
 import { createHash } from "node:crypto";
 import { createInterface } from "node:readline";
+
 import { PrismaPg } from "@prisma/adapter-pg";
 import argon2 from "argon2";
 
