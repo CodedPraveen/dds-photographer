@@ -127,14 +127,14 @@ Avoid sounding:
 
 The tone should adapt depending on the section.
 
-| Section | Tone |
-|----------|------|
-| Hero | Inspiring |
-| About | Personal |
-| Services | Informative |
-| Portfolio | Minimal |
-| Testimonials | Authentic |
-| Contact | Friendly |
+| Section      | Tone        |
+| ------------ | ----------- |
+| Hero         | Inspiring   |
+| About        | Personal    |
+| Services     | Informative |
+| Portfolio    | Minimal     |
+| Testimonials | Authentic   |
+| Contact      | Friendly    |
 
 ---
 

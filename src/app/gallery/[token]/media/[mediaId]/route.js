@@ -106,10 +106,7 @@ export async function GET(_request, { params }) {
   }
 
   try {
-    const body = await downloadFile(
-      media.storageKey,
-      media.storageProvider,
-    );
+    const body = await downloadFile(media.storageKey, media.storageProvider);
 
     const allowedTypes = [
       "image/jpeg",

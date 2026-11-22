@@ -76,6 +76,7 @@ experience.
 ## 5. Persistence graph
 
 Current Prisma schema:
+
 - `Gallery` has many `GalleryMedia`.
 - `Gallery` has many `GalleryVisitor`.
 - `GalleryMedia.galleryId` and `GalleryVisitor.galleryId` reference `Gallery`.
@@ -110,13 +111,13 @@ not a deployed or implemented integration. Cloudflare Stream is on hold.
 
 ## 8. Change-impact guide
 
-| Change | Inspect first |
-| --- | --- |
-| Public copy / links | `site-content.js`, consuming components |
-| Hero / scroll motion | `MotionExperience`, `MotionOrchestrator`, Hero markup/styles |
-| Camera model / scene | `PersistentCamera.jsx`, GLB asset, camera styles |
+| Change               | Inspect first                                                              |
+| -------------------- | -------------------------------------------------------------------------- |
+| Public copy / links  | `site-content.js`, consuming components                                    |
+| Hero / scroll motion | `MotionExperience`, `MotionOrchestrator`, Hero markup/styles               |
+| Camera model / scene | `PersistentCamera.jsx`, GLB asset, camera styles                           |
 | Gallery entry fields | Form, `validation.mjs`, Server Action, Prisma repository, schema/migration |
-| Gallery token policy | `gallery-access.js`, `secure-token.mjs`, tests/docs |
-| Media delivery | Media Route Handler, gallery access and repository |
-| Database field | Prisma schema, migration, repository, ERD |
-| New infrastructure | Roadmap, tech stack, security, deployment docs, Eraser approval |
+| Gallery token policy | `gallery-access.js`, `secure-token.mjs`, tests/docs                        |
+| Media delivery       | Media Route Handler, gallery access and repository                         |
+| Database field       | Prisma schema, migration, repository, ERD                                  |
+| New infrastructure   | Roadmap, tech stack, security, deployment docs, Eraser approval            |

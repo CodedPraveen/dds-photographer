@@ -3,6 +3,7 @@
 > Updated 2026-10-26. Implemented models below are taken from `prisma/schema.prisma`. Proposed models are conceptual only and must not be added to Prisma without an approved implementation task.
 
 ## 1. Implemented Prisma models
+
 The current schema contains `Gallery`, `GalleryMedia`, and `GalleryVisitor`.
 
 ```mermaid
@@ -43,6 +44,7 @@ erDiagram
 ```
 
 ### Gallery
+
 - CUID primary key.
 - `isActive` controls availability.
 - `tokenVersion` supports revoking previously issued gallery-link tokens.
@@ -50,12 +52,14 @@ erDiagram
 - Has many media and visitor records.
 
 ### GalleryMedia
+
 - Belongs to one gallery; gallery deletion cascades.
 - `storageKey` is an internal storage identifier, not a guest URL.
 - `sortOrder` controls ordering; `isCover` identifies the cover.
 - Index: `[galleryId, sortOrder]`.
 
 ### GalleryVisitor
+
 - Belongs to one gallery; gallery deletion cascades.
 - Stores visitor name, mobile, normalized email, and current gallery-entry consent evidence.
 - Unique constraint: `[galleryId, email]`; index: `[galleryId]`.
@@ -66,10 +70,13 @@ The existing `consent` and `consentedAt` fields represent gallery-entry consent 
 ## 2. Proposed future data requirements — not implemented
 
 ### Wedding password
+
 A future gallery credential field/entity must store only a modern password hash, never plaintext. It should support rotation, revocation, failed-attempt controls, and audit metadata. Final schema belongs in the admin/security design.
 
 ### Extendable expiry
+
 Keep these concepts separate:
+
 - Gallery availability window (`opensAt`, `closesAt`).
 - Gallery-link token expiry (currently 30 days).
 - Visitor access-cookie expiry (currently 12 hours).
@@ -78,7 +85,9 @@ Keep these concepts separate:
 Extending gallery availability must not silently extend existing signed tokens or visitor cookies unless that behavior is explicitly designed. Issue fresh credentials where required.
 
 ### Face-search consent
+
 Design a separate gallery-scoped consent record before face-search data is collected or processed. The model should evidence:
+
 - Visitor and gallery to which the choice applies.
 - Specific purpose and personal-data categories in the notice.
 - Exact notice text or immutable notice version.
@@ -95,7 +104,9 @@ need an approved implementation design and migration. No face-related model
 exists in the current Prisma schema.
 
 ## 3. Future media-processing concepts — not implemented
+
 Upload batches, processing jobs, media variants, and audit events may be needed for R2 and Redis/BullMQ. Design them after the storage and processing workflows are approved. Do not revive the old generic User/Album/Photo/Face/Download ERD as if it described the current database.
 
 ## 4. Schema authority
+
 The current schema is `prisma/schema.prisma`; migrations are under `prisma/migrations/`. Update this document when a migration changes schema. Keep implemented models separate from proposed product concepts.

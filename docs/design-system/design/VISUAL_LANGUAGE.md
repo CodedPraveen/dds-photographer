@@ -11,7 +11,7 @@
 
 This document defines the visual language of the Photographer Business Website.
 
-While **Design Principles** explain *why* we design a certain way, this document explains *how the interface should look.*
+While **Design Principles** explain _why_ we design a certain way, this document explains _how the interface should look._
 
 Every page, section, and component must follow these visual rules to maintain a consistent identity across the entire website.
 

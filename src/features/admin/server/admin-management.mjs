@@ -18,7 +18,10 @@ export function assertInvitationAcceptable(invitation, now = new Date()) {
   }
 }
 
-export async function createAdminInvitation(tx, { inviterAdminId, email, role, tokenHash, now = new Date() }) {
+export async function createAdminInvitation(
+  tx,
+  { inviterAdminId, email, role, tokenHash, now = new Date() },
+) {
   const createdAt = new Date(now);
   return tx.adminInvitation.create({
     data: {
@@ -33,16 +36,23 @@ export async function createAdminInvitation(tx, { inviterAdminId, email, role, t
   });
 }
 
-export async function acceptAdminInvitation(tx, { tokenHash, acceptedAdminId, now = new Date() }) {
+export async function acceptAdminInvitation(
+  tx,
+  { tokenHash, acceptedAdminId, now = new Date() },
+) {
   const result = await tx.adminInvitation.updateMany({
     where: { tokenHash, status: "PENDING", expiresAt: { gt: now } },
     data: { status: "ACCEPTED", acceptedAdminId, acceptedAt: now },
   });
-  if (result.count !== 1) throw new Error("Invitation is unavailable, expired, or already used.");
+  if (result.count !== 1)
+    throw new Error("Invitation is unavailable, expired, or already used.");
   return tx.adminInvitation.findUnique({ where: { tokenHash } });
 }
 
-export async function changeAdminRoleOrActiveState(tx, { adminId, role, isActive }) {
+export async function changeAdminRoleOrActiveState(
+  tx,
+  { adminId, role, isActive },
+) {
   await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext('dds.admin-master-state'))`;
   const current = await tx.adminUser.findUnique({ where: { id: adminId } });
   if (!current) throw new Error("Admin account not found.");
@@ -56,11 +66,17 @@ export async function changeAdminRoleOrActiveState(tx, { adminId, role, isActive
     const otherActiveMasters = await tx.adminUser.count({
       where: { role: "MASTER_ADMIN", isActive: true, id: { not: adminId } },
     });
-    if (otherActiveMasters === 0) throw new Error("The last active Master Admin cannot be deactivated or demoted.");
+    if (otherActiveMasters === 0)
+      throw new Error(
+        "The last active Master Admin cannot be deactivated or demoted.",
+      );
   }
 
   return tx.adminUser.update({
     where: { id: adminId },
-    data: { ...(role === undefined ? {} : { role }), ...(isActive === undefined ? {} : { isActive }) },
+    data: {
+      ...(role === undefined ? {} : { role }),
+      ...(isActive === undefined ? {} : { isActive }),
+    },
   });
 }

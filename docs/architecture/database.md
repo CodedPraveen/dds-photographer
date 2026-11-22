@@ -96,7 +96,7 @@ require schema review before implementation.
 
 ### Admin roles and invitations
 
-Add a role field to `AdminUser) with exactly `ADMIN` and `MASTER_ADMIN`.
+Add a role field to `AdminUser) with exactly `ADMIN`and`MASTER_ADMIN`.
 A proposed nullable/unique invitation relation may be represented by an
 `AdminInvitation` entity because invitations have their own expiry, single-use,
 and audit lifecycle.
@@ -184,12 +184,12 @@ status.
 
 Target outputs:
 
-| Type | Output | Requirements |
-| --- | --- | --- |
-| ORIGINAL | JPEG | Unchanged bytes and camera metadata. |
-| DOWNLOAD | JPEG | Quality 92. |
-| GALLERY | WebP | Maximum dimension 2,000px, quality 80. |
-| THUMBNAIL | WebP | Maximum dimension 500px, 4:3 center crop, quality 65. |
+| Type      | Output | Requirements                                          |
+| --------- | ------ | ----------------------------------------------------- |
+| ORIGINAL  | JPEG   | Unchanged bytes and camera metadata.                  |
+| DOWNLOAD  | JPEG   | Quality 92.                                           |
+| GALLERY   | WebP   | Maximum dimension 2,000px, quality 80.                |
+| THUMBNAIL | WebP   | Maximum dimension 500px, 4:3 center crop, quality 65. |
 
 Derivative processing statuses should cover `QUEUED), `PROCESSING),
 `READY), `FAILED), and `RETRYING). Publication belongs to the photo/version

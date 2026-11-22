@@ -1,4 +1,3 @@
-
 # AI Service Database Migrations
 
 This directory contains SQL migrations for the `ai_private` PostgreSQL schema.

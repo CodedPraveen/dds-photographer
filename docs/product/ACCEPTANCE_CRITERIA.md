@@ -8,6 +8,7 @@
 This document defines observable product outcomes for the public website, private-gallery foundation, planned admin/media capabilities, privacy requirements, and lifecycle. It is a product acceptance checklist, not a substitute for engineering test plans.
 
 Status labels:
+
 - **Implemented baseline:** behavior exists in the current repository and should be regression-tested.
 - **Planned acceptance:** required before the corresponding future feature is considered complete.
 - **Open:** depends on an owner decision or policy not yet supplied.
@@ -44,6 +45,7 @@ The detailed storyboard beats in the supplied Design Finalization Workflow shoul
 ## 4. Private gallery — implemented baseline
 
 ### Link and gallery validation
+
 - [ ] A valid signed link for an active gallery opens the correct gallery.
 - [ ] Invalid signature is rejected.
 - [ ] Expired link is rejected.
@@ -54,6 +56,7 @@ The detailed storyboard beats in the supplied Design Finalization Workflow shoul
 - [ ] One gallery's token cannot access another gallery.
 
 ### Guest entry
+
 - [ ] Entry requires name, mobile, email, and gallery-entry consent.
 - [ ] Missing/invalid fields produce clear field-level feedback.
 - [ ] Email normalization is consistent.
@@ -65,6 +68,7 @@ The detailed storyboard beats in the supplied Design Finalization Workflow shoul
 - [ ] Existing gallery-entry consent is never treated as face-search consent.
 
 ### Media access
+
 - [ ] Media ID is resolved only within the token's gallery.
 - [ ] Non-cover media requires a valid visitor grant.
 - [ ] Unauthorized requests do not reveal whether a media ID exists in another gallery.
@@ -141,6 +145,7 @@ The detailed storyboard beats in the supplied Design Finalization Workflow shoul
 ## 10. Release readiness
 
 A feature is not accepted merely because its UI exists. Before release:
+
 - [ ] Product behavior matches the approved Eraser architecture and product specification.
 - [ ] Current implementation status is accurately documented.
 - [ ] Security/privacy review is complete for affected data and access paths.

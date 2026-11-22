@@ -157,21 +157,21 @@ cleanup.
 
 ## 11. Threats and failure handling
 
-| Threat | Required control |
-| --- | --- |
-| Unauthorized Admin access | Existing authentication/MFA/session controls; server-side role checks; revocation and rate limits. |
-| Admin role escalation | Explicit role authorization, confirmation, audit logging, and last-Master-Admin protection. |
-| Cross-gallery object access | Gallery-scoped records, keys, authorization, and delivery checks. |
-| Forged upload completion | Server-side R2 existence, size, SHA-256, and JPEG validation. |
-| Malicious or corrupt JPEG | Actual content decoding/validation before acceptance or processing; preserve original on failure. |
-| Replayed/expired signed URL | 15-minute expiry plus gallery/session/object state validation. |
-| Upload-session takeover | Bind session actions to the creating Admin and revalidate each action. |
-| Duplicate/replayed processing jobs | Version/derivative idempotency keys and independent status reconciliation. |
-| Missing derivative delivery | Check derivative readiness before issuing a URL; fail closed. |
-| Public cache or R2 exposure | Private bucket, server-only credentials, no-store/private delivery, no public URLs. |
-| Unauthorized restore/permanent deletion | Master Admin authorization, confirmation, audit, and version-aware cleanup. |
-| Cleanup deletes active version | Check current active version before every deletion; retry safely. |
-| Sensitive log leakage | Redaction and structured logging that excludes credentials, URLs, passwords, selfies, and unnecessary metadata. |
+| Threat                                  | Required control                                                                                                |
+| --------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Unauthorized Admin access               | Existing authentication/MFA/session controls; server-side role checks; revocation and rate limits.              |
+| Admin role escalation                   | Explicit role authorization, confirmation, audit logging, and last-Master-Admin protection.                     |
+| Cross-gallery object access             | Gallery-scoped records, keys, authorization, and delivery checks.                                               |
+| Forged upload completion                | Server-side R2 existence, size, SHA-256, and JPEG validation.                                                   |
+| Malicious or corrupt JPEG               | Actual content decoding/validation before acceptance or processing; preserve original on failure.               |
+| Replayed/expired signed URL             | 15-minute expiry plus gallery/session/object state validation.                                                  |
+| Upload-session takeover                 | Bind session actions to the creating Admin and revalidate each action.                                          |
+| Duplicate/replayed processing jobs      | Version/derivative idempotency keys and independent status reconciliation.                                      |
+| Missing derivative delivery             | Check derivative readiness before issuing a URL; fail closed.                                                   |
+| Public cache or R2 exposure             | Private bucket, server-only credentials, no-store/private delivery, no public URLs.                             |
+| Unauthorized restore/permanent deletion | Master Admin authorization, confirmation, audit, and version-aware cleanup.                                     |
+| Cleanup deletes active version          | Check current active version before every deletion; retry safely.                                               |
+| Sensitive log leakage                   | Redaction and structured logging that excludes credentials, URLs, passwords, selfies, and unnecessary metadata. |
 
 Storage outages, worker crashes, failed derivatives, replacement failures, and
 cleanup failures must preserve successful work, keep the previous published

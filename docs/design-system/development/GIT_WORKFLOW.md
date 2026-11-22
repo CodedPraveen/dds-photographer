@@ -292,16 +292,16 @@ chore: update project dependencies
 
 # Commit Types
 
-| Type | Purpose |
-|--------|----------|
-| feat | New feature |
-| fix | Bug fix |
-| refactor | Internal improvements |
-| docs | Documentation |
-| perf | Performance improvements |
-| style | Formatting or styling |
-| test | Testing |
-| chore | Maintenance |
+| Type     | Purpose                  |
+| -------- | ------------------------ |
+| feat     | New feature              |
+| fix      | Bug fix                  |
+| refactor | Internal improvements    |
+| docs     | Documentation            |
+| perf     | Performance improvements |
+| style    | Formatting or styling    |
+| test     | Testing                  |
+| chore    | Maintenance              |
 
 ---
 
@@ -660,4 +660,7 @@ If not, consider splitting the work into smaller commits or improving the commit
 - SYSTEM_ARCHITECTURE.md
 - PERFORMANCE_BUDGET.md
 - RELEASE_PROCESS.md
+
+```
+
 ```

@@ -5,17 +5,32 @@ export const UPLOAD_URL_TTL_SECONDS = 15 * 60;
 export const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
 function validFilename(filename) {
-    return typeof filename === "string" && filename.trim().length > 0 && filename.length <= 255;
+  return (
+    typeof filename === "string" &&
+    filename.trim().length > 0 &&
+    filename.length <= 255
+  );
 }
 
 export function validateUploadFileInput(file) {
-    if (!validFilename(file?.filename) || file?.mimeType !== "image/jpeg" || !Number.isInteger(file?.sizeBytes) || file.sizeBytes < 1 || file.sizeBytes > MAX_ORIGINAL_SIZE) {
-        return "Only JPEG files from 1 byte through 50 MB are accepted.";
-    }
-    if (typeof file.sha256 !== "string" || file.sha256.length !== 64 || !/^[0-9a-f]+$/i.test(file.sha256)) {
-        return "A valid SHA-256 checksum is required.";
-    }
-    const mode = file.sizeBytes > SINGLE_UPLOAD_LIMIT ? "MULTIPART" : "SINGLE";
-    if (file.uploadMode && file.uploadMode !== mode) return "Upload mode does not match file size.";
-    return null;
+  if (
+    !validFilename(file?.filename) ||
+    file?.mimeType !== "image/jpeg" ||
+    !Number.isInteger(file?.sizeBytes) ||
+    file.sizeBytes < 1 ||
+    file.sizeBytes > MAX_ORIGINAL_SIZE
+  ) {
+    return "Only JPEG files from 1 byte through 50 MB are accepted.";
+  }
+  if (
+    typeof file.sha256 !== "string" ||
+    file.sha256.length !== 64 ||
+    !/^[0-9a-f]+$/i.test(file.sha256)
+  ) {
+    return "A valid SHA-256 checksum is required.";
+  }
+  const mode = file.sizeBytes > SINGLE_UPLOAD_LIMIT ? "MULTIPART" : "SINGLE";
+  if (file.uploadMode && file.uploadMode !== mode)
+    return "Upload mode does not match file size.";
+  return null;
 }

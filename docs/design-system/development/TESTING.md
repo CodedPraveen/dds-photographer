@@ -71,12 +71,12 @@ Lower levels should contain more tests than higher levels.
 
 The project uses four levels of testing.
 
-| Level | Purpose |
-|--------|----------|
-| Unit | Individual functions and utilities |
-| Component | React components |
-| Integration | Features working together |
-| End-to-End | Complete user journeys |
+| Level       | Purpose                            |
+| ----------- | ---------------------------------- |
+| Unit        | Individual functions and utilities |
+| Component   | React components                   |
+| Integration | Features working together          |
+| End-to-End  | Complete user journeys             |
 
 ---
 

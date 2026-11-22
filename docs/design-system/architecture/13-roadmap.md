@@ -5,16 +5,16 @@
 
 ## Phase status
 
-| Phase | Scope                                    | Status      |
-| ----- | ---------------------------------------- | ----------- |
-| 0     | Architecture and baseline audit          | Complete    |
-| 1A    | Application foundation, Part 1           | Complete    |
-| 1B    | Application foundation, Part 2           | Complete    |
-| 2     | Public marketing website                 | Complete    |
-| 3     | Camera-led motion experience             | Complete    |
-| 4     | First private-gallery foundation         | Complete    |
+| Phase | Scope                                    | Status                |
+| ----- | ---------------------------------------- | --------------------- |
+| 0     | Architecture and baseline audit          | Complete              |
+| 1A    | Application foundation, Part 1           | Complete              |
+| 1B    | Application foundation, Part 2           | Complete              |
+| 2     | Public marketing website                 | Complete              |
+| 3     | Camera-led motion experience             | Complete              |
+| 4     | First private-gallery foundation         | Complete              |
 | 5     | Admin dashboard and production readiness | Partially implemented |
-| 6     | Photo Upload & Processing Pipeline       | Approved / Planned |
+| 6     | Photo Upload & Processing Pipeline       | Approved / Planned    |
 
 See `../production/IMPLEMENTATION_STATUS.md` and `../production/IMPLEMENTED_FEATURES.md` for verified details.
 
@@ -110,15 +110,15 @@ Mobile apps, multi-studio support, payments, and SaaS/multi-tenant features are 
 
 ## Owner decisions recorded 2026-10-26
 
-| Decision            | Direction                           | Boundary                         |
-| ------------------- | ----------------------------------- | -------------------------------- |
-| Guest password      | One shared password per wedding     | Selected; implementation pending |
-| Gallery expiry      | Extendable                          | Selected; policy details pending |
-| Photo storage       | Cloudflare R2                       | Selected; integration pending    |
-| Video               | Cloudflare Stream                   | On hold; photo-only              |
-| Background jobs     | Redis + BullMQ                      | Selected; integration pending    |
-| Face pipeline       | YuNet + SFace ONNX + OpenCV + FastAPI + PostgreSQL/pgvector | Selected; integration pending |
-| Face-search consent | Separate, explicit, optional opt-in | Required before processing       |
+| Decision            | Direction                                                   | Boundary                         |
+| ------------------- | ----------------------------------------------------------- | -------------------------------- |
+| Guest password      | One shared password per wedding                             | Selected; implementation pending |
+| Gallery expiry      | Extendable                                                  | Selected; policy details pending |
+| Photo storage       | Cloudflare R2                                               | Selected; integration pending    |
+| Video               | Cloudflare Stream                                           | On hold; photo-only              |
+| Background jobs     | Redis + BullMQ                                              | Selected; integration pending    |
+| Face pipeline       | YuNet + SFace ONNX + OpenCV + FastAPI + PostgreSQL/pgvector | Selected; integration pending    |
+| Face-search consent | Separate, explicit, optional opt-in                         | Required before processing       |
 
 ## Change control
 

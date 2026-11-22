@@ -43,14 +43,14 @@ pipeline.
 The approved target keeps Next.js as both frontend and backend and adds a
 separate worker process/container from the same repository.
 
-| Boundary | Responsibility | Status |
-| --- | --- | --- |
-| Next.js App Router/server | Admin authorization, gallery scoping, signed upload authorization, completion verification, media records, publication controls, guest authorization | **APPROVED / PLANNED** |
-| Supabase PostgreSQL | Existing system database; target media/session/status/version records remain database-backed | **IMPLEMENTED database / target schema changes PLANNED** |
-| Private Cloudflare R2 bucket | Originals and derivatives; no public bucket or public object URLs | **SELECTED_NOT_INTEGRATED** |
-| Upstash Redis | Private TCP `rediss://` queue backend for BullMQ | **APPROVED / foundation implemented; live connectivity unverified** |
-| BullMQ photo jobs | Durable processing queue, retries, and job state coordination | **FOUNDATION IMPLEMENTED / jobs not implemented** |
-| Separate photo worker | Sharp validation and derivative generation using server-only R2 credentials | **APPROVED / PLANNED** |
+| Boundary                     | Responsibility                                                                                                                                       | Status                                                              |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| Next.js App Router/server    | Admin authorization, gallery scoping, signed upload authorization, completion verification, media records, publication controls, guest authorization | **APPROVED / PLANNED**                                              |
+| Supabase PostgreSQL          | Existing system database; target media/session/status/version records remain database-backed                                                         | **IMPLEMENTED database / target schema changes PLANNED**            |
+| Private Cloudflare R2 bucket | Originals and derivatives; no public bucket or public object URLs                                                                                    | **SELECTED_NOT_INTEGRATED**                                         |
+| Upstash Redis                | Private TCP `rediss://` queue backend for BullMQ                                                                                                     | **APPROVED / foundation implemented; live connectivity unverified** |
+| BullMQ photo jobs            | Durable processing queue, retries, and job state coordination                                                                                        | **FOUNDATION IMPLEMENTED / jobs not implemented**                   |
+| Separate photo worker        | Sharp validation and derivative generation using server-only R2 credentials                                                                          | **APPROVED / PLANNED**                                              |
 
 No Fastify and no separate backend API application are part of this design.
 Next.js remains the backend boundary for HTTP actions. The worker is a separate
@@ -193,12 +193,12 @@ Worker deployment topology, resource limits, autoscaling, and health checks are
 Sharp is the approved library. The worker preserves the original bytes and
 camera metadata, and writes these outputs:
 
-| Output | Format | Specification |
-| --- | --- | --- |
-| Original | JPEG | Unchanged. |
-| Download | JPEG | Quality 92. |
-| Gallery | WebP | Maximum dimension 2,000px, quality 80. |
-| Thumbnail | WebP | Maximum dimension 500px, 4:3 center crop, quality 65. |
+| Output    | Format | Specification                                         |
+| --------- | ------ | ----------------------------------------------------- |
+| Original  | JPEG   | Unchanged.                                            |
+| Download  | JPEG   | Quality 92.                                           |
+| Gallery   | WebP   | Maximum dimension 2,000px, quality 80.                |
+| Thumbnail | WebP   | Maximum dimension 500px, 4:3 center crop, quality 65. |
 
 Generated derivatives automatically correct EXIF orientation, use sRGB, and
 strip GPS/location metadata. Stream-based processing is preferred where
@@ -303,17 +303,17 @@ Recovery rules are:
 
 ### Dependencies and status
 
-| Dependency / requirement | Status |
-| --- | --- |
-| Supabase PostgreSQL database | **IMPLEMENTED** foundation; Phase 6 schema changes are planned |
-| Existing storage abstraction and Supabase/R2 adapters | **IMPLEMENTED** code; provider provisioning/integration remains unverified |
-| Cloudflare R2 private bucket and signing configuration | **SELECTED_NOT_INTEGRATED** |
-| Upstash Redis BullMQ compatibility validation | **APPROVED / TCP configuration implemented; live connectivity unverified** |
-| BullMQ and separate worker process/container | **FOUNDATION IMPLEMENTED / worker deployment PLANNED** |
-| Sharp derivative worker | **APPROVED / PLANNED** |
-| Prisma migrations for sessions, versions, derivatives, statuses, Trash | **PLANNED** |
-| Video / Cloudflare Stream | **ON_HOLD** |
-| Face detection, embeddings, matching | **ON_HOLD / deferred from Phase 6** |
+| Dependency / requirement                                               | Status                                                                     |
+| ---------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| Supabase PostgreSQL database                                           | **IMPLEMENTED** foundation; Phase 6 schema changes are planned             |
+| Existing storage abstraction and Supabase/R2 adapters                  | **IMPLEMENTED** code; provider provisioning/integration remains unverified |
+| Cloudflare R2 private bucket and signing configuration                 | **SELECTED_NOT_INTEGRATED**                                                |
+| Upstash Redis BullMQ compatibility validation                          | **APPROVED / TCP configuration implemented; live connectivity unverified** |
+| BullMQ and separate worker process/container                           | **FOUNDATION IMPLEMENTED / worker deployment PLANNED**                     |
+| Sharp derivative worker                                                | **APPROVED / PLANNED**                                                     |
+| Prisma migrations for sessions, versions, derivatives, statuses, Trash | **PLANNED**                                                                |
+| Video / Cloudflare Stream                                              | **ON_HOLD**                                                                |
+| Face detection, embeddings, matching                                   | **ON_HOLD / deferred from Phase 6**                                        |
 
 Before deployment, verify the selected R2 and Upstash services, credentials,
 private access policies, queue connectivity/TLS, worker resource limits,
@@ -347,4 +347,3 @@ The architecture is ready for implementation when:
 
 No Prisma schema, migration, source code, dependency, deployment, or diagram
 change is authorized by this documentation-only step.
-

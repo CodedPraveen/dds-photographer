@@ -48,14 +48,14 @@ Animations should provide:
 
 # Performance Targets
 
-| Metric | Target |
-|----------|---------|
-| Animation FPS | 60 FPS |
-| Minimum FPS (Mobile) | 50 FPS |
-| Animation Delay | < 16 ms/frame |
-| Input Response | < 100 ms |
-| Scroll Jank | None |
-| Dropped Frames | Minimal |
+| Metric               | Target        |
+| -------------------- | ------------- |
+| Animation FPS        | 60 FPS        |
+| Minimum FPS (Mobile) | 50 FPS        |
+| Animation Delay      | < 16 ms/frame |
+| Input Response       | < 100 ms      |
+| Scroll Jank          | None          |
+| Dropped Frames       | Minimal       |
 
 These targets should be verified during development.
 
@@ -317,14 +317,14 @@ Avoid:
 
 Recommended durations
 
-| Animation | Duration |
-|-----------|----------|
-| Hover | 150–250 ms |
-| Button | 150–200 ms |
-| Card | 250–400 ms |
-| Section | 500–900 ms |
-| Hero | 800–1500 ms |
-| Camera | 1000–3000 ms |
+| Animation | Duration     |
+| --------- | ------------ |
+| Hover     | 150–250 ms   |
+| Button    | 150–200 ms   |
+| Card      | 250–400 ms   |
+| Section   | 500–900 ms   |
+| Hero      | 800–1500 ms  |
+| Camera    | 1000–3000 ms |
 
 Timing should support the narrative without feeling slow.
 

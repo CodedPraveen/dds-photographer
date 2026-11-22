@@ -45,23 +45,24 @@ silently select one or rewrite the approved architecture.
 
 ## 4. Product decisions
 
-| Area | Decision | Status |
-| --- | --- | --- |
-| Guest password | One shared password per wedding | Selected; not implemented |
-| Gallery expiry | Extendable | Selected; policy details pending |
-| Photo storage | Cloudflare R2 | Selected; integration pending |
-| Background processing | Redis + BullMQ | Selected; integration pending |
-| Video | Cloudflare Stream | On hold; photo-only scope |
-| Face detection | YuNet | Selected; not integrated |
-| Face embeddings | SFace ONNX + OpenCV | Selected; not integrated |
-| Face-search backend | FastAPI/Uvicorn | Selected; not integrated |
-| Embedding search | PostgreSQL + pgvector | Selected; not integrated |
-| Face-search consent | Separate, explicit, optional opt-in | Required before face-search processing |
+| Area                  | Decision                            | Status                                 |
+| --------------------- | ----------------------------------- | -------------------------------------- |
+| Guest password        | One shared password per wedding     | Selected; not implemented              |
+| Gallery expiry        | Extendable                          | Selected; policy details pending       |
+| Photo storage         | Cloudflare R2                       | Selected; integration pending          |
+| Background processing | Redis + BullMQ                      | Selected; integration pending          |
+| Video                 | Cloudflare Stream                   | On hold; photo-only scope              |
+| Face detection        | YuNet                               | Selected; not integrated               |
+| Face embeddings       | SFace ONNX + OpenCV                 | Selected; not integrated               |
+| Face-search backend   | FastAPI/Uvicorn                     | Selected; not integrated               |
+| Embedding search      | PostgreSQL + pgvector               | Selected; not integrated               |
+| Face-search consent   | Separate, explicit, optional opt-in | Required before face-search processing |
 
 A shared wedding password is a gallery-level gate, not unique guest authentication.
 Never store plaintext passwords.
 
 The following time windows are different and must remain distinct:
+
 - Gallery availability (`opensAt`, `closesAt`).
 - Gallery-link token expiry (currently 30 days).
 - Visitor access cookie expiry (currently 12 hours).
@@ -89,6 +90,7 @@ The roadmap in `docs/design-system/architecture/13-roadmap.md` is the current
 repository roadmap, while repository architecture records remain the approved authority.
 
 Repository implementation status:
+
 - Foundation and public website: implemented.
 - Camera-led motion experience: implemented.
 - Private-gallery foundation: implemented, not a complete production delivery platform.
@@ -102,6 +104,7 @@ Repository implementation status:
 Phase 3 motion refinement remains partially implemented: the public motion code
 has a curved reversible photo path, persistent camera return states, and a static
 reduced-motion camera path. Runtime visual verification remains outstanding.
+
 - R2, Redis/BullMQ, shared password, QR generation, SFace face search: future work.
 - Video: on hold.
 
@@ -126,6 +129,7 @@ gallery-link token lifetimes.
 ## 8. Validation
 
 Use the repository scripts:
+
 ```bash
 npm run lint
 npm test

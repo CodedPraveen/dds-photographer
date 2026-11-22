@@ -12,6 +12,7 @@ This is an internal tool for one photographer/business, not a multi-tenant SaaS 
 ## 2. Primary actor
 
 **Photographer / administrator**
+
 - Needs to create and manage event galleries.
 - Needs to upload, order, publish, and remove photos.
 - Needs to configure guest access, shared password, availability, and QR delivery.
@@ -22,6 +23,7 @@ No separate editor, staff role, client account, or multi-studio role hierarchy i
 ## 3. Planned navigation areas
 
 The precise information architecture is not yet approved. The following are product capability groups, not confirmed screen names:
+
 - Dashboard / gallery overview.
 - Gallery list and gallery details.
 - Create/edit gallery.
@@ -35,6 +37,7 @@ Do not build unapproved screens or role structures based solely on this outline.
 ## 4. Core workflows
 
 ### 4.1 Admin access
+
 1. Photographer opens the admin area.
 2. System authenticates the photographer.
 3. System authorizes access to admin actions.
@@ -43,6 +46,7 @@ Do not build unapproved screens or role structures based solely on this outline.
 Admin authentication method, MFA, recovery, session duration, and account provisioning are open decisions. Admin access must be implemented before exposing management operations.
 
 ### 4.2 Create a gallery
+
 1. Photographer starts a new wedding/event gallery.
 2. Enters a title and any approved display metadata.
 3. Configures availability dates if required.
@@ -54,6 +58,7 @@ Admin authentication method, MFA, recovery, session duration, and account provis
 Draft/publish states and exact metadata fields require confirmation. Current `Gallery` model has title, isActive, tokenVersion, opensAt, and closesAt; do not imply it already supports all future workflow states.
 
 ### 4.3 Manage photos
+
 1. Photographer selects a gallery.
 2. Adds photos through the future upload workflow.
 3. Reviews validation/processing results.
@@ -64,6 +69,7 @@ Draft/publish states and exact metadata fields require confirmation. Current `Ga
 Upload and processing implementation is not present. See `MEDIA_PIPELINE.md`.
 
 ### 4.4 Manage guest access
+
 - Set/change the one shared password for the wedding.
 - Rotate or revoke a compromised password.
 - View/copy the gallery link.
@@ -74,7 +80,9 @@ Upload and processing implementation is not present. See `MEDIA_PIPELINE.md`.
 The exact relationship between closing a gallery, invalidating links, and invalidating visitor cookies must be defined. Existing `tokenVersion` supports gallery-link revocation; do not assume it alone revokes every already-issued visitor cookie unless verified and designed.
 
 ### 4.5 Review gallery status
+
 The admin should be able to distinguish at minimum:
+
 - Draft/not published (if approved).
 - Active and available.
 - Scheduled/not yet open.

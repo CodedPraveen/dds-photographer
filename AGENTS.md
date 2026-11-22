@@ -3,7 +3,9 @@
 # AGENTS.md
 
 ## Architecture Reference
+
 Before implementing any feature:
+
 1. Read the relevant owner-approved repository documentation.
 2. Review the associated Mermaid diagrams and decision records.
 3. Follow the Development Roadmap.
@@ -16,16 +18,20 @@ ADR documents. Historical external references may be retained for provenance,
 but no external system is required to understand or implement the project.
 
 ## DDS Photographer Website
+
 You are an implementation agent. Implement approved decisions exactly as documented. You are not the product designer, UX designer, or architect. Never redesign, simplify, or replace decisions without approval.
 
 ## Project Root
+
 - The currently opened folder is the project root.
 - Never create another project/workspace, isolated worktree, or duplicate repository.
 - Never clone the repository.
 - Keep project changes inside the current project root.
 
 ## Source of Truth
+
 Use this order to understand project intent:
+
 1. Explicit owner-approved decisions in repository documentation.
 2. Approved architecture documents and Mermaid diagrams.
 3. Development roadmap.
@@ -36,6 +42,7 @@ If sources conflict, identify the exact documents and code involved, report the
 conflict, and stop. Do not silently choose a design or modify approved architecture.
 
 ## Current Project Direction
+
 - Premium single-photographer website with public marketing portfolio and private wedding/event galleries.
 - Not a multi-tenant SaaS product.
 - Stack: Next.js App Router, React, JavaScript, Tailwind CSS v4, PostgreSQL + Prisma, Three.js/React Three Fiber, GSAP/ScrollTrigger. Framer Motion is installed but is not the primary motion engine.
@@ -54,6 +61,7 @@ conflict, and stop. Do not silently choose a design or modify approved architect
 These are status guardrails, not permission to implement planned features.
 
 ## Priority 4 — Engineering Detail
+
 Priority 4 is specification and engineering planning. Do not implement planned infrastructure or features merely because they are described here. Work only on the specific task the user approved.
 
 Prepare implementation-ready specifications for:
@@ -92,6 +100,7 @@ Prepare implementation-ready specifications for:
    - Include acceptance criteria and unresolved decisions.
 
 ### Priority 4 Documentation Rules
+
 - Keep the high-level architecture readable; use separate detailed workflows for storage, processing, security, deployment, and recovery.
 - Use explicit status labels: **Implemented**, **Selected / Not Integrated**, **Planned**, **Evaluation Only**, **On Hold**, and **Decision Needed**.
 - Separate current behavior from target design.
@@ -102,6 +111,7 @@ Prepare implementation-ready specifications for:
 - Update architecture documentation only when explicitly requested. If a request conflicts with approved architecture, explain the conflict before making changes.
 
 ## Development Rules
+
 - Keep code modular, readable, and aligned with existing naming conventions.
 - Prefer reusable components and small focused functions.
 - Remove unused imports/code within requested scope.
@@ -110,7 +120,9 @@ Prepare implementation-ready specifications for:
 - Never rewrite large sections, refactor unrelated files, change architecture, rename files, add dependencies, or introduce breaking changes without approval.
 
 ## Documentation First
+
 Before implementing:
+
 1. Read relevant repository documentation and Mermaid diagrams.
 2. Check existing code and current implementation status.
 3. Plan the work.
@@ -119,29 +131,36 @@ Before implementing:
 6. Update documentation if needed without silently changing architecture.
 
 ## Scope and UI
+
 - Only work on the requested task; never implement future phases without approval.
 - Do not change approved layout, spacing, typography, animation, visual hierarchy, or interactions unless requested.
 - Do not create unnecessary folders, placeholders, demo components, or duplicate documentation.
 
 ## Dependencies and Error Handling
+
 Before installing a package, verify it is required, maintained, and not already covered by an existing dependency.
 Never ignore errors or bypass validation just to make the project compile.
 
 ## Self Review
+
 Before finishing coding tasks, check as applicable:
+
 - Build, lint, and tests pass.
 - No broken imports or obvious duplication.
 - No unrelated files changed.
 - Documentation matches implementation and repository architecture records.
-If a check cannot be run, say so explicitly.
+  If a check cannot be run, say so explicitly.
 
 ## Git
+
 Never create repositories, worktrees, or branches; commit, push, or rewrite Git history unless the user explicitly asks.
 
 ## Communication
+
 If a requirement is unclear or conflicts with approved decisions, stop and ask one concise question. Never guess.
 
 ## Success Criteria
+
 A task is complete only when requested scope is implemented, existing functionality is preserved, relevant checks are reported accurately, and documentation remains valid. Do not continue to another phase unless explicitly instructed.
 
 <!-- END:nextjs-agent-rules -->

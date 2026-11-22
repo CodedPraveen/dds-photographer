@@ -58,16 +58,16 @@ The 3D experience should be:
 
 The project uses:
 
-| Technology | Purpose |
-|------------|----------|
-| Three.js | Rendering Engine |
-| React Three Fiber | React Renderer |
-| Drei | Utilities |
-| GSAP | Animation Timeline |
-| ScrollTrigger | Scroll Control |
-| GLTF/GLB | Camera Model |
-| Draco | Model Compression |
-| KTX2 | Texture Compression |
+| Technology        | Purpose             |
+| ----------------- | ------------------- |
+| Three.js          | Rendering Engine    |
+| React Three Fiber | React Renderer      |
+| Drei              | Utilities           |
+| GSAP              | Animation Timeline  |
+| ScrollTrigger     | Scroll Control      |
+| GLTF/GLB          | Camera Model        |
+| Draco             | Model Compression   |
+| KTX2              | Texture Compression |
 
 ---
 
@@ -349,13 +349,13 @@ Large assets should never block rendering.
 
 Target
 
-| Metric | Target |
-|----------|---------|
-| FPS | 60 |
-| Draw Calls | <100 |
-| Triangles | <100k |
-| Textures | Compressed |
-| Memory | Stable |
+| Metric     | Target     |
+| ---------- | ---------- |
+| FPS        | 60         |
+| Draw Calls | <100       |
+| Triangles  | <100k      |
+| Textures   | Compressed |
+| Memory     | Stable     |
 
 ---
 

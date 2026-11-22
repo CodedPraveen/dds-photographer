@@ -3,6 +3,7 @@
 ## 1. Start with the project context
 
 For every task, read:
+
 1. `AGENTS.md`
 2. `PROJECT_CONTEXT.md`
 3. `CURRENT_STATE.md`
@@ -15,6 +16,7 @@ Do not scan unrelated folders.
 ## 2. State the task boundary
 
 Before editing, identify:
+
 - Requested outcome.
 - Current phase and whether the work is approved for it.
 - Exact files likely to change.

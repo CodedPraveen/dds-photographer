@@ -1,4 +1,3 @@
-
 import Link from "next/link";
 
 import GalleryList from "@/features/admin/components/GalleryList";

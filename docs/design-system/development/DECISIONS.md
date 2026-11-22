@@ -8,13 +8,13 @@ Reason
 
 Need original quality.
 
---------------------------------
+---
 
 Decision
 
 Store originals locally.
 
---------------------------------
+---
 
 Decision
 

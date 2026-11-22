@@ -30,9 +30,7 @@ export default async function GalleryAdminPage({ params }) {
 
   if (!gallery) notFound();
 
-  const token = gallery.isActive
-    ? await createGalleryLinkToken(gallery)
-    : null;
+  const token = gallery.isActive ? await createGalleryLinkToken(gallery) : null;
 
   const galleryUrl = token
     ? `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/gallery/${encodeURIComponent(token)}`
@@ -51,8 +49,9 @@ export default async function GalleryAdminPage({ params }) {
         </div>
 
         <span
-          className={`admin-status ${gallery.isActive ? "is-active" : "is-inactive"
-            }`}
+          className={`admin-status ${
+            gallery.isActive ? "is-active" : "is-inactive"
+          }`}
         >
           {gallery.isActive ? "Active" : "Inactive"}
         </span>
@@ -85,7 +84,10 @@ export default async function GalleryAdminPage({ params }) {
           </div>
         </div>
 
-        <form action={updateGallery.bind(null, id)} className="gallery-edit-form">
+        <form
+          action={updateGallery.bind(null, id)}
+          className="gallery-edit-form"
+        >
           <label className="gallery-field">
             <span>Gallery title</span>
             <input
@@ -107,9 +109,7 @@ export default async function GalleryAdminPage({ params }) {
           </label>
 
           <div className="gallery-detail-meta">
-            <span>
-              Created: {gallery.createdAt.toLocaleString("en-IN")}
-            </span>
+            <span>Created: {gallery.createdAt.toLocaleString("en-IN")}</span>
             <span>
               Last updated: {gallery.updatedAt.toLocaleString("en-IN")}
             </span>

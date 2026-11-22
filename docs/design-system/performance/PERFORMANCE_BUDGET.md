@@ -62,13 +62,13 @@ The project follows these principles:
 
 Target values for production.
 
-| Metric | Target |
-|---------|---------|
-| Largest Contentful Paint (LCP) | ≤ 2.5 s |
+| Metric                          | Target   |
+| ------------------------------- | -------- |
+| Largest Contentful Paint (LCP)  | ≤ 2.5 s  |
 | Interaction to Next Paint (INP) | ≤ 200 ms |
-| Cumulative Layout Shift (CLS) | ≤ 0.1 |
-| First Contentful Paint (FCP) | ≤ 1.8 s |
-| Time to First Byte (TTFB) | ≤ 800 ms |
+| Cumulative Layout Shift (CLS)   | ≤ 0.1    |
+| First Contentful Paint (FCP)    | ≤ 1.8 s  |
+| Time to First Byte (TTFB)       | ≤ 800 ms |
 
 These metrics should be monitored continuously.
 
@@ -78,12 +78,12 @@ These metrics should be monitored continuously.
 
 Minimum production targets.
 
-| Category | Target |
-|----------|---------|
-| Performance | 95+ |
-| Accessibility | 100 |
-| Best Practices | 100 |
-| SEO | 100 |
+| Category       | Target |
+| -------------- | ------ |
+| Performance    | 95+    |
+| Accessibility  | 100    |
+| Best Practices | 100    |
+| SEO            | 100    |
 
 Development builds are not used for performance evaluation.
 
@@ -93,12 +93,12 @@ Development builds are not used for performance evaluation.
 
 Target values.
 
-| Resource | Target |
-|-----------|---------|
-| Initial JavaScript | ≤ 180 KB (gzipped) |
-| Route-specific JavaScript | ≤ 100 KB |
-| Third-party JavaScript | Keep minimal |
-| Unused JavaScript | 0 KB whenever practical |
+| Resource                  | Target                  |
+| ------------------------- | ----------------------- |
+| Initial JavaScript        | ≤ 180 KB (gzipped)      |
+| Route-specific JavaScript | ≤ 100 KB                |
+| Third-party JavaScript    | Keep minimal            |
+| Unused JavaScript         | 0 KB whenever practical |
 
 Every dependency should justify its cost.
 
@@ -108,11 +108,11 @@ Every dependency should justify its cost.
 
 Target values.
 
-| Resource | Target |
-|-----------|---------|
-| Initial CSS | ≤ 60 KB (gzipped) |
-| Unused CSS | Minimal |
-| Global CSS | Keep small and reusable |
+| Resource    | Target                  |
+| ----------- | ----------------------- |
+| Initial CSS | ≤ 60 KB (gzipped)       |
+| Unused CSS  | Minimal                 |
+| Global CSS  | Keep small and reusable |
 
 Avoid unnecessary utility duplication.
 

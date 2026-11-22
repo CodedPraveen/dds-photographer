@@ -92,12 +92,27 @@
     gap: var(--dds-space-6);
   }
 
-  .item:nth-child(6n + 1) { grid-column: span 5; }
-  .item:nth-child(6n + 2) { grid-column: span 7; margin-top: var(--dds-space-12); }
-  .item:nth-child(6n + 3) { grid-column: span 4; }
-  .item:nth-child(6n + 4) { grid-column: span 4; margin-top: var(--dds-space-8); }
-  .item:nth-child(6n + 5) { grid-column: span 4; }
-  .item:nth-child(6n + 6) { grid-column: 3 / span 7; margin-top: var(--dds-space-8); }
+  .item:nth-child(6n + 1) {
+    grid-column: span 5;
+  }
+  .item:nth-child(6n + 2) {
+    grid-column: span 7;
+    margin-top: var(--dds-space-12);
+  }
+  .item:nth-child(6n + 3) {
+    grid-column: span 4;
+  }
+  .item:nth-child(6n + 4) {
+    grid-column: span 4;
+    margin-top: var(--dds-space-8);
+  }
+  .item:nth-child(6n + 5) {
+    grid-column: span 4;
+  }
+  .item:nth-child(6n + 6) {
+    grid-column: 3 / span 7;
+    margin-top: var(--dds-space-8);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
