@@ -150,9 +150,10 @@ def test_restricted_roles_have_effective_ai_private_boundary():
                 cursor.execute(sql.SQL("GRANT USAGE ON SCHEMA {} TO {}").format(sql.Identifier(ai_schema), sql.Identifier(runtime)))
                 cursor.execute(sql.SQL("GRANT USAGE, CREATE ON SCHEMA {} TO {}").format(sql.Identifier(ai_schema), sql.Identifier(migrator)))
                 cursor.execute(sql.SQL("GRANT CREATE ON SCHEMA {} TO {}").format(sql.Identifier(outside_schema), sql.Identifier(outside_writer)))
+                cursor.execute(sql.SQL("GRANT USAGE ON SCHEMA {} TO {}").format(sql.Identifier(outside_schema), sql.Identifier(view_writer)))
                 cursor.execute(sql.SQL("CREATE TABLE {}.view_base (id integer, value integer)").format(sql.Identifier(outside_schema)))
                 cursor.execute(sql.SQL("CREATE VIEW {}.updatable_view AS SELECT id, value FROM {}.view_base").format(sql.Identifier(outside_schema), sql.Identifier(outside_schema)))
-                cursor.execute(sql.SQL("GRANT UPDATE ON TABLE {}.updatable_view TO {}").format(sql.Identifier(outside_schema), sql.Identifier(view_writer)))
+                cursor.execute(sql.SQL("GRANT SELECT, UPDATE ON TABLE {}.updatable_view TO {}").format(sql.Identifier(outside_schema), sql.Identifier(view_writer)))
 
                 cursor.execute(sql.SQL("SET ROLE {}").format(sql.Identifier(runtime)))
                 verify_database_isolation(cursor, runtime, False, ai_schema)
@@ -193,17 +194,25 @@ def test_restricted_roles_have_effective_ai_private_boundary():
                 with pytest.raises(RuntimeError):
                     verify_database_isolation(cursor, migrator, True, ai_schema)
                 cursor.execute("RESET ROLE")
+                cursor.execute(sql.SQL("REVOKE {} FROM {}").format(sql.Identifier(outside_writer), sql.Identifier(runtime)))
+                cursor.execute(sql.SQL("REVOKE {} FROM {}").format(sql.Identifier(outside_writer), sql.Identifier(migrator)))
                 cursor.execute(sql.SQL("GRANT {} TO {}").format(sql.Identifier(view_writer), sql.Identifier(runtime)))
                 cursor.execute(sql.SQL("SET ROLE {}").format(sql.Identifier(runtime)))
+                cursor.execute(sql.SQL("SELECT id, value FROM {}.updatable_view").format(sql.Identifier(outside_schema)))
+                with pytest.raises(psycopg.errors.InsufficientPrivilege):
+                    cursor.execute(sql.SQL("CREATE TABLE {}.view_blocked (id integer)").format(sql.Identifier(outside_schema)))
                 with pytest.raises(RuntimeError):
                     verify_database_isolation(cursor, runtime, False, ai_schema)
                 cursor.execute("RESET ROLE")
                 cursor.execute(sql.SQL("GRANT {} TO {}").format(sql.Identifier(view_writer), sql.Identifier(migrator)))
                 cursor.execute(sql.SQL("SET ROLE {}").format(sql.Identifier(migrator)))
+                cursor.execute(sql.SQL("SELECT id, value FROM {}.updatable_view").format(sql.Identifier(outside_schema)))
+                with pytest.raises(psycopg.errors.InsufficientPrivilege):
+                    cursor.execute(sql.SQL("CREATE TABLE {}.view_blocked (id integer)").format(sql.Identifier(outside_schema)))
                 with pytest.raises(RuntimeError):
                     verify_database_isolation(cursor, migrator, True, ai_schema)
                 cursor.execute("RESET ROLE")
-        except Exception as error:
+        except BaseException as error:
             original_error = error
         finally:
             cleanup_failures = []
