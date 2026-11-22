@@ -18,7 +18,32 @@ export function assertInvitationAcceptable(invitation, now = new Date()) {
   }
 }
 
+export async function createAdminInvitation(tx, { inviterAdminId, email, role, tokenHash, now = new Date() }) {
+  const createdAt = new Date(now);
+  return tx.adminInvitation.create({
+    data: {
+      inviterAdminId,
+      inviteeEmail: normalizeAdminEmail(email),
+      role,
+      tokenHash,
+      status: "PENDING",
+      createdAt,
+      expiresAt: new Date(createdAt.getTime() + 24 * 60 * 60 * 1000),
+    },
+  });
+}
+
+export async function acceptAdminInvitation(tx, { tokenHash, acceptedAdminId, now = new Date() }) {
+  const result = await tx.adminInvitation.updateMany({
+    where: { tokenHash, status: "PENDING", expiresAt: { gt: now } },
+    data: { status: "ACCEPTED", acceptedAdminId, acceptedAt: now },
+  });
+  if (result.count !== 1) throw new Error("Invitation is unavailable, expired, or already used.");
+  return tx.adminInvitation.findUnique({ where: { tokenHash } });
+}
+
 export async function changeAdminRoleOrActiveState(tx, { adminId, role, isActive }) {
+  await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext('dds.admin-master-state'))`;
   const current = await tx.adminUser.findUnique({ where: { id: adminId } });
   if (!current) throw new Error("Admin account not found.");
 
@@ -28,7 +53,6 @@ export async function changeAdminRoleOrActiveState(tx, { adminId, role, isActive
     ((role !== undefined && role !== "MASTER_ADMIN") || isActive === false);
 
   if (becomesLastActiveMaster) {
-    await tx.$queryRaw`SELECT "id" FROM "AdminUser" WHERE "role" = 'MASTER_ADMIN' AND "isActive" = true FOR UPDATE`;
     const otherActiveMasters = await tx.adminUser.count({
       where: { role: "MASTER_ADMIN", isActive: true, id: { not: adminId } },
     });
