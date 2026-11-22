@@ -43,7 +43,7 @@ face-processing path is part of Phase 6.
 
 ## 3. Admin authentication and role authorization — APPROVED / PLANNED
 
-The target roles are `ADMIN` and `MASTER_ADMIN). Authorization is checked
+The target roles are `ADMIN` and `MASTER_ADMIN`. Authorization is checked
 server-side on every operation, not inferred from UI visibility.
 
 - Admin may upload, process, publish, replace, and move photos to Trash.

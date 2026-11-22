@@ -10,7 +10,6 @@ External design tools are not required.
 - [Roadmap](design-system/architecture/13-roadmap.md)
 - [Security and privacy](architecture/security.md)
 - [Technology decisions](architecture/technology.md)
-- [Database](architecture/database.md)
 - [Operations and deployment](operations/README.md)
 - [Phase 6 product specification](product/MEDIA_PIPELINE.md)
 - [Storage and processing architecture](architecture/storage-and-processing.md)

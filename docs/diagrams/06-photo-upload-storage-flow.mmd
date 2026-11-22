@@ -9,6 +9,10 @@ flowchart LR
   Session --> Owner{Creating Admin owns session?}
   Owner -- No --> SessionDeny[Reject resume/cancel]
   Owner -- Yes --> Sign[Generate 15-minute signed R2 authorization]
+  Session --> SessionExpiry[Expires 7 days after last activity]
+  SessionExpiry --> SessionCleanup[Abort incomplete multipart uploads<br/>and remove temporary session records]
+  SessionCleanup --> PreserveCompleted[Completed photos are never deleted]
+  SessionCleanup --> SessionCleanupRetry[Retry and audit cleanup failures]
   Sign --> Browser[Browser uploads directly]
   Browser --> Mode{File size}
   Mode -- Up to 10 MB --> Single[Single upload]
@@ -46,6 +50,12 @@ flowchart LR
   ReplaceProcess -- Success --> NewActive[New version becomes active/published]
   ReplaceProcess -- Failure --> OldActive[Keep old published version active]
   OldActive --> Retry
+  NewActive --> PreviousRetention[Retain replaced previous version for 30 days]
+  PreviousRetention --> VersionCleanup[Version cleanup checks active-version state]
+  VersionCleanup --> ActiveGuard{Currently active version?}
+  ActiveGuard -- Yes --> PreserveActive[Never delete current active version]
+  ActiveGuard -- No --> DeletePrevious[Delete expired previous version]
+  DeletePrevious --> VersionCleanupRetry[Retry and audit cleanup failures]
 
   Review --> Trash[Admin soft-deletes photo]
   Trash --> RemoveAccess[Remove guest access immediately]
