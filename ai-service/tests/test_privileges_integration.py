@@ -23,16 +23,31 @@ def test_restricted_roles_have_effective_ai_private_boundary():
     outside_writer = f"ai_writer_test_{suffix}"
     ai_schema = f"ai_private_test_{suffix}"
     outside_schema = f"app_private_test_{suffix}"
+    created_roles = []
+    created_schemas = []
 
     with psycopg.connect(TEST_DATABASE_URL, autocommit=True) as connection:
         try:
             with connection.cursor() as cursor:
-                cursor.execute(sql.SQL("CREATE ROLE {} NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT").format(sql.Identifier(runtime)))
-                cursor.execute(sql.SQL("CREATE ROLE {} NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT").format(sql.Identifier(migrator)))
-                cursor.execute(sql.SQL("CREATE ROLE {} NOLOGIN NOSUPERUSER CREATEDB NOCREATEROLE INHERIT").format(sql.Identifier(elevated)))
-                cursor.execute(sql.SQL("CREATE ROLE {} NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT").format(sql.Identifier(outside_writer)))
-                cursor.execute(sql.SQL("CREATE SCHEMA {} AUTHORIZATION CURRENT_USER").format(sql.Identifier(ai_schema)))
-                cursor.execute(sql.SQL("CREATE SCHEMA {} AUTHORIZATION CURRENT_USER").format(sql.Identifier(outside_schema)))
+                for role, definition in (
+                    (runtime, "NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT"),
+                    (migrator, "NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT"),
+                    (elevated, "NOLOGIN NOSUPERUSER CREATEDB NOCREATEROLE INHERIT"),
+                    (outside_writer, "NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT"),
+                ):
+                    cursor.execute(
+                        sql.SQL("CREATE ROLE {} " + definition).format(
+                            sql.Identifier(role)
+                        )
+                    )
+                    created_roles.append(role)
+                for schema in (ai_schema, outside_schema):
+                    cursor.execute(
+                        sql.SQL("CREATE SCHEMA {} AUTHORIZATION CURRENT_USER").format(
+                            sql.Identifier(schema)
+                        )
+                    )
+                    created_schemas.append(schema)
                 cursor.execute(sql.SQL("GRANT USAGE ON SCHEMA {} TO {}").format(sql.Identifier(ai_schema), sql.Identifier(runtime)))
                 cursor.execute(sql.SQL("GRANT USAGE, CREATE ON SCHEMA {} TO {}").format(sql.Identifier(ai_schema), sql.Identifier(migrator)))
                 cursor.execute(sql.SQL("GRANT CREATE ON SCHEMA {} TO {}").format(sql.Identifier(outside_schema), sql.Identifier(outside_writer)))
@@ -78,10 +93,34 @@ def test_restricted_roles_have_effective_ai_private_boundary():
                 cursor.execute("RESET ROLE")
         finally:
             with connection.cursor() as cursor:
-                cursor.execute("RESET ROLE")
-                cursor.execute(sql.SQL("DROP SCHEMA {} CASCADE").format(sql.Identifier(ai_schema)))
-                cursor.execute(sql.SQL("DROP SCHEMA {} CASCADE").format(sql.Identifier(outside_schema)))
-                cursor.execute(sql.SQL("DROP ROLE IF EXISTS {}").format(sql.Identifier(runtime)))
-                cursor.execute(sql.SQL("DROP ROLE IF EXISTS {}").format(sql.Identifier(migrator)))
-                cursor.execute(sql.SQL("DROP ROLE IF EXISTS {}").format(sql.Identifier(elevated)))
-                cursor.execute(sql.SQL("DROP ROLE IF EXISTS {}").format(sql.Identifier(outside_writer)))
+                def cleanup(statement):
+                    try:
+                        cursor.execute(statement)
+                    except psycopg.Error:
+                        pass
+
+                cleanup("RESET ROLE")
+                memberships = (
+                    (elevated, runtime),
+                    (outside_writer, runtime),
+                    (outside_writer, migrator),
+                )
+                for member, recipient in memberships:
+                    if member in created_roles and recipient in created_roles:
+                        cleanup(
+                            sql.SQL("REVOKE {} FROM {}").format(
+                                sql.Identifier(member), sql.Identifier(recipient)
+                            )
+                        )
+                for schema in reversed(created_schemas):
+                    cleanup(
+                        sql.SQL("DROP SCHEMA {} CASCADE").format(
+                            sql.Identifier(schema)
+                        )
+                    )
+                for role in reversed(created_roles):
+                    cleanup(
+                        sql.SQL("DROP ROLE IF EXISTS {}").format(
+                            sql.Identifier(role)
+                        )
+                    )
