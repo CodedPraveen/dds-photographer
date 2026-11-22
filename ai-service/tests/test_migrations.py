@@ -94,18 +94,33 @@ class FakeCursor:
         self.calls += 1
 
     def fetchone(self):
-        return (self.role,) if self.calls == 1 else self.privileges
+        return self.privileges
 
 
 def test_migration_role_is_required():
     with pytest.raises(RuntimeError, match="Expected database role"):
         migration_runner.verify_migration_permissions(
-            FakeCursor("postgres", (True, True))
+            FakeCursor("postgres", ("postgres", False, False, False, False, False, 0, True, True))
         )
 
 
 def test_migration_schema_privileges_are_required():
     with pytest.raises(RuntimeError, match="lacks required privileges"):
         migration_runner.verify_migration_permissions(
-            FakeCursor("dds_ai_migrator", (True, False))
+            FakeCursor("dds_ai_migrator", ("dds_ai_migrator", False, False, False, False, False, 0, True, False))
+        )
+
+
+def test_runtime_role_and_create_privileges_are_rejected(monkeypatch):
+    from app import config
+    from app.db.connection import verify_runtime_database
+
+    monkeypatch.setattr(config.settings, "AI_RUNTIME_DATABASE_ROLE", "dds_ai_runtime")
+    with pytest.raises(RuntimeError, match="Unexpected runtime"):
+        verify_runtime_database(
+            FakeCursor("postgres", ("postgres", False, False, False, False, False, 0, True, False))
+        )
+    with pytest.raises(RuntimeError, match="invalid ai_private"):
+        verify_runtime_database(
+            FakeCursor("dds_ai_runtime", ("dds_ai_runtime", False, False, False, False, False, 0, True, True))
         )

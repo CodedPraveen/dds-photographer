@@ -51,20 +51,25 @@ def file_checksum(path: Path) -> str:
 
 
 def verify_migration_permissions(cursor) -> None:
-    cursor.execute("SELECT current_user")
-    current_user = cursor.fetchone()[0]
+    cursor.execute(
+        "SELECT current_user, rolsuper, rolcreaterole, rolcreatedb, "
+        "rolbypassrls, has_database_privilege(current_user, current_database(), 'CREATE'), "
+        "COUNT(*) FILTER (WHERE n.nspname NOT IN ('ai_private', 'pg_catalog', "
+        "'information_schema') AND has_schema_privilege(current_user, n.oid, 'CREATE')), "
+        "has_schema_privilege(current_user, %s, 'USAGE'), "
+        "has_schema_privilege(current_user, %s, 'CREATE') "
+        "FROM pg_roles r CROSS JOIN pg_namespace n "
+        "WHERE r.rolname = current_user GROUP BY current_user, rolsuper, "
+        "rolcreaterole, rolcreatedb, rolbypassrls",
+        (AI_SCHEMA, AI_SCHEMA),
+    )
+    current_user, is_superuser, can_create_role, can_create_db, bypass_rls, can_create_database, outside_create, has_usage, has_create = cursor.fetchone()
     if current_user != EXPECTED_ROLE:
         raise RuntimeError(
             f"Expected database role '{EXPECTED_ROLE}', "
             f"connected as '{current_user}'."
         )
-    cursor.execute(
-        "SELECT has_schema_privilege(current_user, %s, 'USAGE'), "
-        "has_schema_privilege(current_user, %s, 'CREATE')",
-        (AI_SCHEMA, AI_SCHEMA),
-    )
-    has_usage, has_create = cursor.fetchone()
-    if not (has_usage and has_create):
+    if any((is_superuser, can_create_role, can_create_db, bypass_rls, can_create_database, outside_create)) or not (has_usage and has_create):
         raise RuntimeError(
             f"Database role '{EXPECTED_ROLE}' lacks required privileges "
             f"on {AI_SCHEMA}."

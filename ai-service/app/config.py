@@ -1,5 +1,5 @@
 import os
-from urllib.parse import parse_qs, urlsplit
+from urllib.parse import parse_qsl, urlsplit
 
 
 class ConfigurationError(ValueError):
@@ -10,13 +10,24 @@ def validate_database_url(value: str | None, name: str, production: bool) -> str
     if not value or not value.strip():
         raise ConfigurationError(f"{name} is not configured")
 
-    parsed = urlsplit(value)
+    try:
+        parsed = urlsplit(value)
+        _ = parsed.port
+    except ValueError as error:
+        raise ConfigurationError(f"{name} is malformed") from error
     if parsed.scheme not in {"postgres", "postgresql"}:
         raise ConfigurationError(f"{name} must use a PostgreSQL URL")
     if not parsed.hostname or not parsed.path.strip("/"):
         raise ConfigurationError(f"{name} must include a host and database")
+    try:
+        query_pairs = parse_qsl(parsed.query, keep_blank_values=True, strict_parsing=True)
+    except ValueError as error:
+        raise ConfigurationError(f"{name} has a malformed query") from error
+    sslmodes = [value for key, value in query_pairs if key == "sslmode"]
+    if len(sslmodes) > 1 or any(key == "ssl" for key, _ in query_pairs):
+        raise ConfigurationError(f"{name} has ambiguous SSL configuration")
     if production:
-        sslmode = parse_qs(parsed.query).get("sslmode", [""])[0]
+        sslmode = sslmodes[0] if sslmodes else ""
         if sslmode not in {"require", "verify-ca", "verify-full"}:
             raise ConfigurationError(
                 f"{name} must require TLS in production"
