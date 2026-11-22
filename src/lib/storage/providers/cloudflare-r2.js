@@ -1,6 +1,7 @@
 import "server-only";
 
 import { DeleteObjectCommand, GetObjectCommand, HeadObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 export function getR2Config(env = process.env) {
     const endpoint = env.R2_ACCOUNT_ENDPOINT;
@@ -37,6 +38,13 @@ export function createR2Storage({ client, config = getR2Config() } = {}) {
         async uploadFile({ key, body, contentType, metadata }) {
             await r2Client.send(new PutObjectCommand({ Bucket: config.bucket, Key: key, Body: body, ContentType: contentType, Metadata: metadata }));
             return { key, provider: "R2" };
+        },
+        async createUploadUrl({ key, contentType, expiresIn = 900 }) {
+            if (!Number.isInteger(expiresIn) || expiresIn < 1 || expiresIn > 900) {
+                throw new Error("R2 upload URL expiry must be between 1 and 900 seconds.");
+            }
+            const command = new PutObjectCommand({ Bucket: config.bucket, Key: key, ContentType: contentType });
+            return getSignedUrl(r2Client, command, { expiresIn });
         },
         async objectExists(key) {
             try { await r2Client.send(new HeadObjectCommand({ Bucket: config.bucket, Key: key })); return true; }

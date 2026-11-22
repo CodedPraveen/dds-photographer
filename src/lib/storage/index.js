@@ -45,3 +45,11 @@ export async function downloadFile(key, provider) {
 
     return storage.downloadFile(key);
 }
+
+export async function createUploadUrl(options) {
+    const storage = await getAdapter("r2");
+    if (typeof storage.createUploadUrl !== "function") {
+        throw new Error("The selected R2 adapter cannot create upload URLs.");
+    }
+    return storage.createUploadUrl(options);
+}

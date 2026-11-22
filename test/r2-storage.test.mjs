@@ -49,3 +49,10 @@ test("R2 existence check preserves non-not-found errors", async () => {
   const storage = createR2Storage({ client: { send: async () => { const error = new Error("denied"); error.$metadata = { httpStatusCode: 403 }; throw error; } }, config });
   await assert.rejects(storage.objectExists("private/key"), /denied/);
 });
+
+test("R2 signed upload URL is generated server-side with a bounded expiry", async () => {
+  const storage = createR2Storage({ client: new (await import("@aws-sdk/client-s3")).S3Client({ region: "auto", endpoint: config.endpoint, credentials: { accessKeyId: "key", secretAccessKey: "secret" } }), config });
+  const url = await storage.createUploadUrl({ key: "galleries/g1/p1/versions/v1/original.jpg", contentType: "image/jpeg", expiresIn: 900 });
+  assert.match(url, /X-Amz-Expires=900/);
+  await assert.rejects(storage.createUploadUrl({ key: "k", contentType: "image/jpeg", expiresIn: 901 }), /between 1 and 900/);
+});
