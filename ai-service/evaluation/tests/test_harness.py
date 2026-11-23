@@ -9,6 +9,7 @@ from evaluation.cleanup import cleanup_run, cleanup_stale, create_run_dir
 from evaluation.dataset import DatasetError, load_dataset
 from evaluation.metrics import classification_metrics, latency_summary
 from evaluation.sface import SFaceAdapter, SFaceBlocked, SFaceError, evaluate_pairs, load_pairs, require_sface_approval
+from evaluation.yunet import YuNetAdapter, YuNetError
 
 
 def digest(path):
@@ -85,6 +86,27 @@ class FakeCv2:
     dnn = FakeDnn()
 
 
+class FailingRecognizer:
+    def alignCrop(self, _image, _detection):
+        import cv2
+        raise cv2.error("mock align failure")
+
+    def feature(self, _aligned):
+        return [[1.0]]
+
+
+class FailingFaceRecognizerSF:
+    @staticmethod
+    def create(*_args):
+        import cv2
+        raise cv2.error("mock init failure")
+
+
+class FailingSFaceCv2:
+    FaceRecognizerSF = FailingFaceRecognizerSF
+    dnn = FakeDnn()
+
+
 def approved_sface(tmp_path):
     model = tmp_path / "sface.onnx"; model.write_bytes(b"sface")
     return Artifact("sface", Path("sface.onnx"), "v", "repo@0123456789abcdef0123456789abcdef01234567", "Apache-2.0", digest(model), "APPROVED")
@@ -103,6 +125,65 @@ def test_sface_adapter_aligns_and_extracts_mocked_embedding(tmp_path):
 def test_sface_adapter_rejects_invalid_inputs(tmp_path, image, detection):
     adapter = SFaceAdapter(approved_sface(tmp_path), tmp_path, FakeCv2)
     with pytest.raises(SFaceError): adapter.extract_embedding(image, detection)
+
+
+def test_sface_normalizes_opencv_initialization_and_alignment_errors(tmp_path):
+    import numpy as np
+    with pytest.raises(SFaceError, match="initialize"):
+        SFaceAdapter(approved_sface(tmp_path), tmp_path, FailingSFaceCv2)
+    adapter = SFaceAdapter(approved_sface(tmp_path), tmp_path, FakeCv2)
+    adapter.recognizer = FailingRecognizer()
+    with pytest.raises(SFaceError, match="inference"):
+        adapter.extract_embedding(np.zeros((4, 4, 3), dtype=np.uint8), [1, 1, 2, 2, *([0.0] * 11)])
+
+
+class FakeYuNetDetector:
+    def setInputSize(self, _size):
+        import cv2
+        raise cv2.error("mock inference failure")
+
+    def detect(self, _image):
+        return None, None
+
+
+class FakeYuNetFactory:
+    fail_init = False
+
+    @staticmethod
+    def create(*_args):
+        import cv2
+        if FakeYuNetFactory.fail_init:
+            raise cv2.error("mock init failure")
+        return FakeYuNetDetector()
+
+
+class FakeYuNetCv2:
+    FaceDetectorYN = FakeYuNetFactory
+    IMREAD_COLOR = 1
+    dnn = FakeDnn()
+
+    @staticmethod
+    def imread(_path, _mode):
+        import cv2
+        raise cv2.error("mock read failure")
+
+
+def approved_yunet(tmp_path):
+    model = tmp_path / "yunet.onnx"; model.write_bytes(b"yunet")
+    return Artifact("yunet", Path("yunet.onnx"), "v", "repo@0123456789abcdef0123456789abcdef01234567", "MIT", digest(model), "APPROVED")
+
+
+def test_yunet_normalizes_opencv_initialization_read_and_inference_errors(tmp_path):
+    FakeYuNetFactory.fail_init = True
+    with pytest.raises(YuNetError, match="initialization"):
+        YuNetAdapter(approved_yunet(tmp_path), tmp_path, cv2_module=FakeYuNetCv2)
+    FakeYuNetFactory.fail_init = False
+    adapter = YuNetAdapter(approved_yunet(tmp_path), tmp_path, cv2_module=FakeYuNetCv2)
+    with pytest.raises(YuNetError, match="reading"):
+        adapter.detect(tmp_path / "image.jpg")
+    import numpy as np
+    with pytest.raises(YuNetError, match="inference"):
+        adapter.detect_image(np.zeros((4, 4, 3), dtype=np.uint8))
 
 
 def test_sface_pair_manifest_and_aggregate_metrics(tmp_path):
@@ -175,6 +256,17 @@ def test_dataset_requires_boolean_and_validates_example_shape(tmp_path):
     assert load_dataset(path, tmp_path)[0]["id"] == "face"
     manifest["cases"][0]["eligible"] = "true"
     path.write_text(json.dumps(manifest))
+    with pytest.raises(DatasetError): load_dataset(path, tmp_path)
+
+
+@pytest.mark.parametrize("field,value", [("dataset_id", "bad id"), ("id", "visitor-123"), ("expected_face_count", True), ("labels", "not-an-object")])
+def test_dataset_rejects_malformed_identifiers_and_metadata(tmp_path, field, value):
+    image = tmp_path / "face.jpg"; image.write_bytes(b"fixture")
+    case = {"id": "face", "path": "face.jpg", "sha256": digest(image), "expected_face_count": 1, "eligible": True}
+    manifest = {"dataset_id": "example", "dataset_type": "synthetic", "authorization": "authorized", "cases": [case]}
+    if field == "dataset_id": manifest[field] = value
+    else: case[field] = value
+    path = tmp_path / "m.json"; path.write_text(json.dumps(manifest))
     with pytest.raises(DatasetError): load_dataset(path, tmp_path)
 
 
@@ -300,4 +392,21 @@ def test_cleanup_success_and_stale(tmp_path):
     import os, time
     old = time.time() - 7200; os.utime(stale, (old, old))
     assert cleanup_stale(tmp_path) >= 1
+
+
+def test_cli_reports_cleanup_failure_without_pending_report(monkeypatch, tmp_path, capsys):
+    from evaluation import cli
+    image = tmp_path / "face.jpg"; image.write_bytes(b"fixture")
+    manifest = tmp_path / "dataset.json"
+    manifest.write_text(json.dumps({"dataset_id": "synthetic", "dataset_type": "synthetic", "authorization": "authorized", "cases": [{"id": "face", "path": "face.jpg", "sha256": digest(image), "expected_face_count": 0, "eligible": True}]}))
+    artifact = approved_yunet(tmp_path)
+    monkeypatch.setattr(cli, "check_environment", lambda **_kwargs: None)
+    monkeypatch.setattr(cli, "load_manifest", lambda _path: {"yunet": artifact})
+    monkeypatch.setattr(cli, "load_dataset", lambda _manifest, _root: [{"id": "face", "eligible": True, "expected_face_count": 0, "_path": image}])
+    monkeypatch.setattr(cli, "YuNetAdapter", lambda *_args: type("Adapter", (), {"model_load_ms": 1.0, "detect": lambda _self, _path: (0, 0.0, 1.0)})())
+    monkeypatch.setattr(cli, "cleanup_run", lambda _path: False)
+    assert cli.main(["run-yunet", "--models", str(tmp_path / "models.json"), "--manifest", str(manifest), "--root", str(tmp_path), "--temp-root", str(tmp_path / "runs")]) == 2
+    output = json.loads(capsys.readouterr().out)
+    assert output["cleanup_status"] == "failed"
+    assert "pending" not in output
 

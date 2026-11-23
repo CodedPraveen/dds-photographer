@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 
 
@@ -11,6 +12,7 @@ class DatasetError(ValueError):
 
 
 _EXCLUSIONS = {"group_photo", "minor", "unclear_consent", "ineligible"}
+_PSEUDONYMOUS_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")
 
 
 def _hash(path: Path) -> str:
@@ -26,7 +28,7 @@ def load_dataset(path: Path, root: Path, max_bytes: int = 25 * 1024 * 1024) -> l
         raw = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
         raise DatasetError("invalid dataset manifest JSON") from exc
-    if not isinstance(raw, dict) or not isinstance(raw.get("dataset_id"), str) or not raw["dataset_id"]:
+    if not isinstance(raw, dict) or not isinstance(raw.get("dataset_id"), str) or not _PSEUDONYMOUS_ID.fullmatch(raw["dataset_id"]):
         raise DatasetError("dataset_id is required")
     if raw.get("authorization") != "authorized" or raw.get("dataset_type") not in {"synthetic", "authorized_non_production"}:
         raise DatasetError("dataset is not explicitly authorized non-production data")
@@ -40,7 +42,7 @@ def load_dataset(path: Path, root: Path, max_bytes: int = 25 * 1024 * 1024) -> l
         if not isinstance(case, dict):
             raise DatasetError("dataset case must be an object")
         cid = case.get("id")
-        if not isinstance(cid, str) or not cid or cid in seen or any(x in cid.lower() for x in ("email", "phone", "visitor", "gallery")):
+        if not isinstance(cid, str) or not _PSEUDONYMOUS_ID.fullmatch(cid) or cid in seen or any(x in cid.lower() for x in ("email", "phone", "visitor", "gallery")):
             raise DatasetError("invalid or identifying case id")
         seen.add(cid)
         if not isinstance(case.get("eligible"), bool):
@@ -50,6 +52,10 @@ def load_dataset(path: Path, root: Path, max_bytes: int = 25 * 1024 * 1024) -> l
             raise DatasetError(f"invalid exclusion for {cid}")
         if not isinstance(case.get("path"), str):
             raise DatasetError(f"path is required for {cid}")
+        if "expected_face_count" in case and (not isinstance(case["expected_face_count"], int) or isinstance(case["expected_face_count"], bool) or case["expected_face_count"] < 0):
+            raise DatasetError(f"expected_face_count must be a non-negative integer: {cid}")
+        if "labels" in case and not isinstance(case["labels"], dict):
+            raise DatasetError(f"labels metadata must be an object: {cid}")
         rel = Path(case["path"])
         if rel.is_absolute() or ".." in rel.parts:
             raise DatasetError(f"unsafe dataset path for {cid}")

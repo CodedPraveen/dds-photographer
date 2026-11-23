@@ -87,7 +87,9 @@ def main(argv=None) -> int:
             return 0
         cases = load_dataset(args.manifest, args.root)
         artifact = models["yunet"]; adapter = YuNetAdapter(artifact, args.model_dir)
-        run_dir = create_run_dir(args.temp_root); cleanup_stale(args.temp_root)
+        cleanup_stale(args.temp_root)
+        run_dir = create_run_dir(args.temp_root)
+        report = None
         try:
             eligible = [case for case in cases if case["eligible"]]
             results = [adapter.detect(case["_path"]) for case in eligible]
@@ -105,13 +107,15 @@ def main(argv=None) -> int:
                 "confidence": {"max": max((result[1] for result in results), default=None)},
                 "latency": latency_summary([result[2] for result in results]),
                 "model_load_ms": adapter.model_load_ms,
-                "cleanup_status": "pending",
             }
-            (run_dir / "report.json").write_text(json.dumps(report), encoding="utf-8")
-            report["cleanup_status"] = "complete" if cleanup_run(run_dir) else "failed"
-            print(json.dumps(report)); return 0 if report["cleanup_status"] == "complete" else 2
+            cleanup_ok = cleanup_run(run_dir)
+            report["cleanup_status"] = "complete" if cleanup_ok else "failed"
+            print(json.dumps(report)); return 0 if cleanup_ok else 2
         finally:
-            if run_dir.exists(): cleanup_run(run_dir)
+            # cleanup_run is idempotent; retry only if processing failed before
+            # the normal cleanup point, never by rewriting a pending report.
+            if run_dir.exists():
+                cleanup_run(run_dir)
     except (IsolationError, ArtifactError, DatasetError, SFaceBlocked, SFaceError, YuNetError, KeyError) as exc:
         print(json.dumps({"status": "blocked", "error": str(exc)}), file=sys.stderr); return 2
 

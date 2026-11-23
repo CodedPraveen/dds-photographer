@@ -54,8 +54,10 @@ class SFaceAdapter:
                 str(self.path), "", self.cv2.dnn.DNN_BACKEND_OPENCV, self.cv2.dnn.DNN_TARGET_CPU
             )
             self.model_load_ms = (time.perf_counter() - started) * 1000
-        except (AttributeError, ImportError, RuntimeError, TypeError, ValueError) as exc:
-            raise SFaceError("unable to initialize OpenCV FaceRecognizerSF") from exc
+        except (AttributeError, ImportError, RuntimeError, TypeError, ValueError):
+            raise SFaceError("unable to initialize OpenCV FaceRecognizerSF") from None
+        except Exception:
+            raise SFaceError("unable to initialize OpenCV FaceRecognizerSF") from None
 
     def extract_embedding(self, image, detection):
         try:
@@ -70,8 +72,10 @@ class SFaceAdapter:
             aligned = self.recognizer.alignCrop(image_array, face)
             embedding = self.recognizer.feature(aligned)
             vector = np.asarray(embedding, dtype=np.float32)
-        except (RuntimeError, TypeError, ValueError) as exc:
-            raise SFaceError("SFace inference failed") from exc
+        except (RuntimeError, TypeError, ValueError):
+            raise SFaceError("SFace inference failed") from None
+        except Exception:
+            raise SFaceError("SFace inference failed") from None
         if vector.ndim == 2 and vector.shape[0] == 1:
             vector = vector[0]
         if vector.ndim != 1 or vector.size == 0 or not np.isfinite(vector).all():
