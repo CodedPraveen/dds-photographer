@@ -144,6 +144,23 @@ def test_isolation_flag_alone_is_not_sufficient(monkeypatch):
         isolation.check_environment()
 
 
+@pytest.mark.parametrize("name", [
+    "DATABASE_URL", "POSTGRES_PASSWORD", "MYSQL_CONNECTION_URL", "MONGODB_URI",
+    "AWS_SECRET_ACCESS_KEY", "AZURE_CLIENT_SECRET", "GOOGLE_APPLICATION_CREDENTIALS",
+    "CLOUDFLARE_API_TOKEN", "S3_SECRET_ACCESS_KEY", "R2_ACCESS_KEY_ID",
+    "REDIS_URL", "SUPABASE_SERVICE_KEY", "PRISMA_DATABASE_URL", "PAYMENTS_SERVICE_TOKEN",
+])
+def test_production_credential_names_are_blocked(name):
+    from evaluation.isolation import forbidden_environment_names
+    assert name in forbidden_environment_names({name: "dummy-value"})
+
+
+@pytest.mark.parametrize("name", ["PATH", "PYTHONPATH", "PYTHONUNBUFFERED", "PYTHON_VERSION", "HOME", "LANG", "DDS_EVALUATION_ISOLATED"])
+def test_harmless_runtime_names_are_not_blocked(name):
+    from evaluation.isolation import forbidden_environment_names
+    assert forbidden_environment_names({name: "dummy-value"}) == []
+
+
 @pytest.mark.parametrize("field", ["CapEff", "CapPrm", "CapInh", "CapBnd", "CapAmb"])
 def test_each_nonzero_capability_field_is_rejected(field):
     from evaluation.isolation import IsolationError, verify_capabilities

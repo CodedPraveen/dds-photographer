@@ -39,3 +39,23 @@ jobs:
           --model-dir /evaluation/models
           --dataset-root /evaluation/dataset
           --temp-root /tmp/evaluation
+      - name: Reject production credential smoke test
+        shell: bash
+        run: |
+          set +e
+          output=$(docker run --rm \
+            --network none \
+            --read-only \
+            --cap-drop=ALL \
+            --security-opt no-new-privileges \
+            --tmpfs /tmp:rw,noexec,nosuid,size=64m \
+            -v "$PWD/ai-service/evaluation/models:/evaluation/models:ro" \
+            -v "$PWD/ai-service/evaluation/dataset:/evaluation/dataset:ro" \
+            -e DATABASE_URL=postgresql://dummy:dummy@db.invalid/test \
+            dds-face-eval:ci \
+            python -m evaluation.cli check-env 2>&1)
+          status=$?
+          set -e
+          printf '%s\n' "$output"
+          test "$status" -ne 0
+          printf '%s\n' "$output" | grep -q 'production/database/storage environment variables are present'

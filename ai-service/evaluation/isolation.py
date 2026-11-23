@@ -11,8 +11,31 @@ class IsolationError(RuntimeError):
     pass
 
 
-_FORBIDDEN = ("DATABASE_URL", "DIRECT_URL", "R2", "REDIS", "BULLMQ", "SUPABASE", "PRISMA")
+_FORBIDDEN_EXACT = {
+    "DATABASE_URL", "DATABASE_URI", "DATABASE_DSN", "DB_URL", "DB_URI", "DB_DSN",
+    "PGHOST", "PGPORT", "PGDATABASE", "PGUSER", "PGPASSWORD", "PGSERVICE",
+    "MYSQL_HOST", "MYSQL_PORT", "MYSQL_DATABASE", "MYSQL_USER", "MYSQL_PASSWORD",
+    "MONGO_URI", "MONGODB_URI", "MONGODB_URL", "REDIS_URL", "REDIS_HOST", "REDIS_PASSWORD",
+    "UPSTASH_REDIS_URL", "UPSTASH_REDIS_REST_URL", "UPSTASH_REDIS_REST_TOKEN",
+    "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY", "AWS_SESSION_TOKEN", "AWS_SECURITY_TOKEN",
+    "AZURE_CLIENT_ID", "AZURE_CLIENT_SECRET", "AZURE_TENANT_ID", "AZURE_SUBSCRIPTION_ID",
+    "GOOGLE_APPLICATION_CREDENTIALS", "GOOGLE_APPLICATION_CREDENTIALS_JSON",
+    "CLOUDFLARE_API_TOKEN", "CLOUDFLARE_API_KEY", "CF_API_TOKEN", "CF_API_KEY",
+    "R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY", "S3_ACCESS_KEY_ID", "S3_SECRET_ACCESS_KEY",
+}
+_FORBIDDEN_PREFIXES = ("POSTGRES_", "MYSQL_", "MONGO_", "MONGODB_", "REDIS_", "UPSTASH_", "BULLMQ_", "SUPABASE_", "PRISMA_", "AWS_", "AZURE_", "GCP_", "GOOGLE_CLOUD_", "CLOUDFLARE_", "CF_", "S3_", "R2_", "SERVICE_ACCOUNT_")
+_FORBIDDEN_SUFFIXES = ("_DATABASE_URL", "_DATABASE_URI", "_DATABASE_DSN", "_CONNECTION_STRING", "_CONNECTION_URL", "_API_KEY", "_API_TOKEN", "_ACCESS_TOKEN", "_CLIENT_SECRET", "_SERVICE_TOKEN", "_SERVICE_KEY", "_PASSWORD", "_CREDENTIALS")
 _CAPABILITY_FIELDS = ("CapEff", "CapPrm", "CapInh", "CapBnd", "CapAmb")
+
+
+def forbidden_environment_names(environment: dict[str, str] | None = None) -> list[str]:
+    values = os.environ if environment is None else environment
+    blocked = []
+    for key in values:
+        upper = key.upper()
+        if upper in _FORBIDDEN_EXACT or upper.startswith(_FORBIDDEN_PREFIXES) or upper.endswith(_FORBIDDEN_SUFFIXES):
+            blocked.append(key)
+    return blocked
 
 
 def _read(proc_root: Path, name: str) -> str:
@@ -102,7 +125,7 @@ def _mount_options(mountinfo: str, mountpoint: str) -> tuple[set[str], set[str]]
 
 
 def check_environment(model_dir: Path | None = None, dataset_root: Path | None = None, temp_root: Path | None = None, proc_root: Path = Path("/proc")) -> None:
-    if any(any(token in key.upper() for token in _FORBIDDEN) for key in os.environ):
+    if forbidden_environment_names():
         raise IsolationError("production/database/storage environment variables are present")
     if os.getenv("DDS_EVALUATION_ISOLATED") != "1":
         raise IsolationError("evaluation must run in the prescribed isolated container")
