@@ -1,0 +1,25 @@
+{
+  "dataset_id": "example-non-production-v1",
+  "dataset_type": "synthetic",
+  "authorization": "authorized",
+  "cases": [
+    {
+      "id": "single-face-example",
+      "path": "images/single-face.jpg",
+      "sha256": "REPLACE_WITH_SHA256",
+      "expected_face_count": 1,
+      "eligible": true,
+      "labels": {"lighting": "daylight", "pose": "frontal", "occlusion": "none", "accessories": "none"}
+    },
+    {
+      "id": "group-exclusion-example",
+      "path": "images/group.jpg",
+      "sha256": "REPLACE_WITH_SHA256",
+      "expected_face_count": 2,
+      "eligible": false,
+      "exclusion": "group_photo",
+      "labels": {}
+    }
+  ]
+}
+
