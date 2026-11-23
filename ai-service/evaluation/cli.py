@@ -5,15 +5,16 @@ import json
 import os
 import platform
 import sys
+import time
 from pathlib import Path
 
-from .artifacts import ArtifactError, load_manifest, verify_status
+from .artifacts import ArtifactError, load_manifest, require_approved, verify_artifact, verify_status
 from .cleanup import cleanup_run, cleanup_stale, create_run_dir
 from .dataset import DatasetError, load_dataset, validate_image
 from .isolation import IsolationError, check_environment
 from .metrics import latency_summary
-from .sface import SFaceAdapter, SFaceBlocked, evaluate_pairs, load_pairs
-from .yunet import YuNetAdapter
+from .sface import SFaceAdapter, SFaceBlocked, SFaceError, evaluate_pairs, load_pairs
+from .yunet import YuNetAdapter, YuNetError
 
 
 def _common(parser):
@@ -69,10 +70,19 @@ def main(argv=None) -> int:
             print(json.dumps({"status": "ok", "models": statuses}))
             return 0 if all(item["status"] != "failed" for item in statuses) else 2
         if args.command == "run-sface":
+            yunet_artifact = models.get("yunet")
+            if yunet_artifact is None:
+                raise YuNetError("YuNet artifact is missing from the model manifest")
+            require_approved(yunet_artifact)
+            verify_artifact(yunet_artifact, args.model_dir)
+            verify_artifact(models["sface"], args.model_dir)
             cases, pairs = load_pairs(args.manifest, args.root)
             adapter = SFaceAdapter(models["sface"], args.model_dir)
             detector = YuNetAdapter(models["yunet"], args.model_dir)
+            started = time.perf_counter()
             report = evaluate_pairs(cases, pairs, adapter, lambda image: detector.detect_faces(image)[0], args.threshold)
+            report["model_load_ms"] = adapter.model_load_ms + detector.model_load_ms
+            report["evaluation_latency_ms"] = (time.perf_counter() - started) * 1000
             print(json.dumps({"status": "ok", **report}))
             return 0
         cases = load_dataset(args.manifest, args.root)
@@ -102,7 +112,7 @@ def main(argv=None) -> int:
             print(json.dumps(report)); return 0 if report["cleanup_status"] == "complete" else 2
         finally:
             if run_dir.exists(): cleanup_run(run_dir)
-    except (IsolationError, ArtifactError, DatasetError, SFaceBlocked, KeyError) as exc:
+    except (IsolationError, ArtifactError, DatasetError, SFaceBlocked, SFaceError, YuNetError, KeyError) as exc:
         print(json.dumps({"status": "blocked", "error": str(exc)}), file=sys.stderr); return 2
 
 

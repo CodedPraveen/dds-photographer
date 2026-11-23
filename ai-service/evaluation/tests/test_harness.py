@@ -128,6 +128,39 @@ def test_pair_manifest_rejects_duplicate_and_ineligible_references(tmp_path):
         with pytest.raises(DatasetError): load_pairs(path, tmp_path)
 
 
+@pytest.mark.parametrize("pairs", [
+    [{"id": "", "left": "a", "right": "b", "same": True}],
+    [{"id": "self", "left": "a", "right": "a", "same": True}],
+    [{"id": "p1", "left": "a", "right": "b", "same": True}, {"id": "p2", "left": "b", "right": "a", "same": True}],
+    [{"id": "not pseudonymous@example", "left": "a", "right": "b", "same": True}],
+])
+def test_pair_manifest_rejects_empty_self_reversed_or_non_pseudonymous_pairs(tmp_path, pairs):
+    first = tmp_path / "a.jpg"; second = tmp_path / "b.jpg"
+    first.write_bytes(b"a"); second.write_bytes(b"b")
+    manifest = {"dataset_id": "synthetic", "dataset_type": "synthetic", "authorization": "authorized", "cases": [
+        {"id": "a", "path": "a.jpg", "sha256": digest(first), "expected_face_count": 1, "eligible": True},
+        {"id": "b", "path": "b.jpg", "sha256": digest(second), "expected_face_count": 1, "eligible": True}], "pairs": pairs}
+    path = tmp_path / "pairs.json"; path.write_text(json.dumps(manifest))
+    with pytest.raises(DatasetError): load_pairs(path, tmp_path)
+
+
+def test_pair_manifest_requires_one_expected_face(tmp_path):
+    image = tmp_path / "a.jpg"; image.write_bytes(b"a")
+    manifest = {"dataset_id": "synthetic", "dataset_type": "synthetic", "authorization": "authorized", "cases": [{"id": "a", "path": "a.jpg", "sha256": digest(image), "expected_face_count": 2, "eligible": True}], "pairs": []}
+    path = tmp_path / "pairs.json"; path.write_text(json.dumps(manifest))
+    with pytest.raises(DatasetError): load_pairs(path, tmp_path)
+
+
+def test_sface_threshold_must_be_cosine_range(tmp_path):
+    import numpy as np
+    adapter = SFaceAdapter(approved_sface(tmp_path), tmp_path, FakeCv2)
+    cases = [{"id": "a", "_path": tmp_path / "a.jpg", "eligible": True, "expected_face_count": 1}, {"id": "b", "_path": tmp_path / "b.jpg", "eligible": True, "expected_face_count": 1}]
+    pairs = [{"id": "p", "left": "a", "right": "b", "same": True}]
+    for threshold in [-1.1, 1.1, float("inf")]:
+        with pytest.raises(SFaceError):
+            evaluate_pairs(cases, pairs, adapter, lambda _image: [[1, 1, 2, 2, *([0.0] * 11)]], threshold, lambda _path: np.zeros((4, 4, 3), dtype=np.uint8))
+
+
 def test_dataset_rejects_traversal_and_unauthorized(tmp_path):
     image = tmp_path / "image.bin"; image.write_bytes(b"x")
     base = {"dataset_id": "x", "dataset_type": "synthetic", "authorization": "authorized", "cases": []}
@@ -181,6 +214,8 @@ def test_ipv6_malformed_route_is_rejected():
 
 def test_default_relative_model_path_is_resolved_before_mount_check(monkeypatch, tmp_path):
     from evaluation import isolation
+    for name in isolation.forbidden_environment_names(dict(__import__("os").environ)):
+        monkeypatch.delenv(name, raising=False)
     seen = []
     monkeypatch.setattr(isolation, "_mount_options", lambda _text, mountpoint: (seen.append(mountpoint) or ({"ro"}, {"size=1M", "noexec", "nosuid"})))
     status = "\n".join([*(f"{field}:\t0000000000000000" for field in ["CapEff", "CapPrm", "CapInh", "CapBnd", "CapAmb"]), "NoNewPrivs:\t1"])

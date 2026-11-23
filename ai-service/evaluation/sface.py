@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 import math
+import re
+import time
 from pathlib import Path
 from typing import Callable
 
@@ -16,6 +18,9 @@ class SFaceBlocked(ArtifactError):
 
 class SFaceError(ValueError):
     pass
+
+
+_PSEUDONYMOUS_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")
 
 
 def require_sface_approval(artifact: Artifact) -> None:
@@ -43,10 +48,12 @@ class SFaceAdapter:
         require_sface_approval(artifact)
         self.path = verify_artifact(artifact, model_dir)
         try:
+            started = time.perf_counter()
             self.cv2 = cv2_module or __import__("cv2")
             self.recognizer = self.cv2.FaceRecognizerSF.create(
                 str(self.path), "", self.cv2.dnn.DNN_BACKEND_OPENCV, self.cv2.dnn.DNN_TARGET_CPU
             )
+            self.model_load_ms = (time.perf_counter() - started) * 1000
         except (AttributeError, ImportError, RuntimeError, TypeError, ValueError) as exc:
             raise SFaceError("unable to initialize OpenCV FaceRecognizerSF") from exc
 
@@ -103,24 +110,34 @@ def load_pairs(manifest_path: Path, dataset_root: Path) -> tuple[list[dict], lis
     seen = set()
     validated = []
     for pair in pairs:
-        if not isinstance(pair, dict) or not isinstance(pair.get("id"), str) or pair["id"] in seen:
+        if not isinstance(pair, dict) or not isinstance(pair.get("id"), str) or not pair["id"] or not _PSEUDONYMOUS_ID.fullmatch(pair["id"]) or pair["id"] in seen:
             raise DatasetError("pair IDs must be unique strings")
         if not isinstance(pair.get("left"), str) or not isinstance(pair.get("right"), str):
             raise DatasetError(f"invalid pair references: {pair.get('id')}")
         if pair["left"] not in by_id or pair["right"] not in by_id:
             raise DatasetError(f"pair references unknown case: {pair['id']}")
+        if pair["left"] == pair["right"]:
+            raise DatasetError(f"self-pair is not allowed: {pair['id']}")
+        pair_key = tuple(sorted((pair["left"], pair["right"])))
+        if any(existing["_key"] == pair_key for existing in validated):
+            raise DatasetError(f"duplicate or reversed pair: {pair['id']}")
         if not by_id[pair["left"]]["eligible"] or not by_id[pair["right"]]["eligible"]:
             raise DatasetError(f"pair references ineligible case: {pair['id']}")
         if not isinstance(pair.get("same"), bool):
             raise DatasetError(f"pair label must be boolean: {pair['id']}")
+        for case_id in (pair["left"], pair["right"]):
+            if by_id[case_id].get("expected_face_count") != 1:
+                raise DatasetError(f"SFace pairs require expected_face_count=1: {pair['id']}")
         seen.add(pair["id"])
-        validated.append({"id": pair["id"], "left": pair["left"], "right": pair["right"], "same": pair["same"]})
+        validated.append({"id": pair["id"], "left": pair["left"], "right": pair["right"], "same": pair["same"], "_key": pair_key})
+    for pair in validated:
+        pair.pop("_key", None)
     return cases, validated
 
 
 def evaluate_pairs(cases: list[dict], pairs: list[dict], adapter: SFaceAdapter, detector: Callable, threshold: float = 0.363, image_loader: Callable | None = None) -> dict:
-    if not math.isfinite(threshold):
-        raise SFaceError("threshold must be finite")
+    if not math.isfinite(threshold) or threshold < -1 or threshold > 1:
+        raise SFaceError("threshold must be finite and within [-1, 1]")
     by_id = {case["id"]: case for case in cases}
     if image_loader is None:
         try:
