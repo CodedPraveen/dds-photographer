@@ -57,19 +57,28 @@ def verify_ipv4_routes(text: str) -> None:
 
 
 def verify_ipv6_routes(text: str) -> None:
+    allowed = {
+        # Docker Desktop's network-none loopback table: local ::/0 kernel route.
+        ("::", 0, "::", 0, "::", 0xFFFFFFFF, 1, 0, 0x00200200, "lo"),
+        # Docker Desktop's local host route.
+        ("::1", 128, "::", 0, "::", 0, 2, 0, 0x80200001, "lo"),
+    }
     for line in text.splitlines():
         fields = line.split()
         if len(fields) < 10:
             raise IsolationError("invalid IPv6 route entry")
-        if fields[-1] != "lo":
-            raise IsolationError("external IPv6 route present")
         try:
             destination = ipaddress.IPv6Address(int(fields[0], 16))
             prefix = int(fields[1], 16)
+            source = ipaddress.IPv6Address(int(fields[2], 16))
+            source_prefix = int(fields[3], 16)
+            next_hop = ipaddress.IPv6Address(int(fields[4], 16))
+            metric, refcount, use, flags = (int(value, 16) for value in fields[5:9])
         except ValueError as exc:
             raise IsolationError("invalid IPv6 route value") from exc
-        if destination != ipaddress.IPv6Address("::1") or prefix != 128:
-            raise IsolationError("non-loopback IPv6 destination present")
+        route = (str(destination), prefix, str(source), source_prefix, str(next_hop), metric, refcount, use, flags, fields[9])
+        if route not in allowed:
+            raise IsolationError("unknown or non-loopback IPv6 route present")
 
 
 def _mount_options(mountinfo: str, mountpoint: str) -> tuple[set[str], set[str]]:

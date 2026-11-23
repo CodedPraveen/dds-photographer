@@ -81,12 +81,29 @@ def test_excluded_cases_never_open_or_stat_files(tmp_path):
 def test_ipv4_and_ipv6_route_fixtures():
     from evaluation.isolation import IsolationError, verify_ipv4_routes, verify_ipv6_routes
     ipv4 = "Iface Destination Gateway Flags RefCnt Use Metric Mask MTU Window IRTT\nlo 0000007F 00000000 0001 0 0 0 000000FF 0 0 0 0"
-    ipv6 = "0" * 31 + "1" + " 80 " + "0" * 32 + " 00 " + "0" * 32 + " 00000000 00000000 00000000 00000000 lo"
+    ipv6 = "0" * 32 + " 00 " + "0" * 32 + " 00 " + "0" * 32 + " ffffffff 00000001 00000000 00200200 lo\n" + "0" * 31 + "1" + " 80 " + "0" * 32 + " 00 " + "0" * 32 + " 00000000 00000002 00000000 80200001 lo"
     verify_ipv4_routes(ipv4); verify_ipv6_routes(ipv6)
     with pytest.raises(IsolationError): verify_ipv4_routes(ipv4.replace("lo ", "eth0 "))
     with pytest.raises(IsolationError): verify_ipv6_routes(ipv6.replace(" lo", " eth0"))
     with pytest.raises(IsolationError): verify_ipv4_routes(ipv4.replace("0000007F", "00000000"))
     with pytest.raises(IsolationError): verify_ipv6_routes(ipv6.replace("0" * 31 + "1", "0" * 32))
+
+
+@pytest.mark.parametrize("mutation", [
+    lambda text: " ".join(text.split()[:4] + ["00000000000000000000000000000001"] + text.split()[5:]),
+    lambda text: " ".join(text.split()[:2] + ["00000000000000000000000000000001"] + text.split()[3:]),
+    lambda text: " ".join(text.split()[:5] + ["00000000"] + text.split()[6:]),
+    lambda text: " ".join(text.split()[:9] + ["eth0"]),
+])
+def test_ipv6_unsafe_route_variants_are_rejected(mutation):
+    from evaluation.isolation import IsolationError, verify_ipv6_routes
+    fixture = "0" * 32 + " 00 " + "0" * 32 + " 00 " + "0" * 32 + " ffffffff 00000001 00000000 00200200 lo"
+    with pytest.raises(IsolationError): verify_ipv6_routes(mutation(fixture))
+
+
+def test_ipv6_malformed_route_is_rejected():
+    from evaluation.isolation import IsolationError, verify_ipv6_routes
+    with pytest.raises(IsolationError): verify_ipv6_routes("0" * 32 + " 00 malformed")
 
 
 def test_default_relative_model_path_is_resolved_before_mount_check(monkeypatch, tmp_path):
