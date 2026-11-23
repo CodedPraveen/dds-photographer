@@ -93,7 +93,8 @@ def test_default_relative_model_path_is_resolved_before_mount_check(monkeypatch,
     from evaluation import isolation
     seen = []
     monkeypatch.setattr(isolation, "_mount_options", lambda _text, mountpoint: (seen.append(mountpoint) or ({"ro"}, {"size=1M", "noexec", "nosuid"})))
-    monkeypatch.setattr(isolation, "_read", lambda _root, name: "Iface Destination Gateway Flags RefCnt Use Metric Mask MTU Window IRTT\nlo 0000007F 00000000 0001 0 0 0 000000FF 0 0 0 0" if name == "net/route" else ("" if name == "net/ipv6_route" else "CapEff:\t0000000000000000\nNoNewPrivs:\t1" if name == "self/status" else ""))
+    status = "\n".join([*(f"{field}:\t0000000000000000" for field in ["CapEff", "CapPrm", "CapInh", "CapBnd", "CapAmb"]), "NoNewPrivs:\t1"])
+    monkeypatch.setattr(isolation, "_read", lambda _root, name: "Iface Destination Gateway Flags RefCnt Use Metric Mask MTU Window IRTT\nlo 0000007F 00000000 0001 0 0 0 000000FF 0 0 0 0" if name == "net/route" else ("" if name == "net/ipv6_route" else (status if name == "self/status" else "")))
     monkeypatch.setattr(isolation.platform, "system", lambda: "Linux")
     monkeypatch.setenv("DDS_EVALUATION_ISOLATED", "1")
     isolation.check_environment(Path("models"), Path("dataset"), Path("/tmp/evaluation"), tmp_path)
@@ -124,6 +125,21 @@ def test_isolation_flag_alone_is_not_sufficient(monkeypatch):
     monkeypatch.setattr(isolation.platform, "system", lambda: "Windows")
     with pytest.raises(isolation.IsolationError):
         isolation.check_environment()
+
+
+@pytest.mark.parametrize("field", ["CapEff", "CapPrm", "CapInh", "CapBnd", "CapAmb"])
+def test_each_nonzero_capability_field_is_rejected(field):
+    from evaluation.isolation import IsolationError, verify_capabilities
+    fields = {name: "0000000000000000" for name in ["CapEff", "CapPrm", "CapInh", "CapBnd", "CapAmb"]}
+    fields[field] = "0000000000000001"
+    status = "\n".join(f"{name}:\t{value}" for name, value in fields.items())
+    with pytest.raises(IsolationError): verify_capabilities(status)
+
+
+def test_missing_capability_field_is_rejected():
+    from evaluation.isolation import IsolationError, verify_capabilities
+    status = "\n".join(f"{name}:\t0000000000000000" for name in ["CapEff", "CapPrm", "CapInh", "CapBnd"])
+    with pytest.raises(IsolationError): verify_capabilities(status)
 
 
 def test_metrics_and_no_biometric_values():

@@ -1,0 +1,41 @@
+name: Phase 8.3 evaluation isolation
+
+on:
+  push:
+    paths:
+      - "ai-service/evaluation/**"
+      - ".github/workflows/phase8-3-evaluation.yml"
+  pull_request:
+    paths:
+      - "ai-service/evaluation/**"
+      - ".github/workflows/phase8-3-evaluation.yml"
+
+jobs:
+  isolated-evaluation-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build evaluation image
+        run: docker build -f ai-service/evaluation/Dockerfile -t dds-face-eval:ci ai-service
+      - name: Prepare empty read-only mounts
+        run: mkdir -p ai-service/evaluation/models ai-service/evaluation/dataset
+      - name: Run isolated runtime smoke test
+        run: >-
+          docker run --rm
+          --network none
+          --read-only
+          --cap-drop=ALL
+          --security-opt no-new-privileges
+          --cpus=2
+          --memory=512m
+          --tmpfs /tmp:rw,noexec,nosuid,size=64m
+          -v "$PWD/ai-service/evaluation/models:/evaluation/models:ro"
+          -v "$PWD/ai-service/evaluation/dataset:/evaluation/dataset:ro"
+          dds-face-eval:ci
+          python -m evaluation.cli check-env
+          --model-dir /evaluation/models
+          --dataset-root /evaluation/dataset
+          --temp-root /tmp/evaluation

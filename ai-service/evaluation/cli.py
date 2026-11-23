@@ -24,7 +24,10 @@ def _common(parser):
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description="DDS isolated CPU-only model evaluation; no downloads, DB, storage, or HTTP server. Windows: $env:DDS_EVALUATION_ISOLATED='1'; python -m evaluation.cli check-env")
     sub = parser.add_subparsers(dest="command", required=True)
-    sub.add_parser("check-env")
+    p = sub.add_parser("check-env")
+    p.add_argument("--model-dir", type=Path)
+    p.add_argument("--dataset-root", type=Path)
+    p.add_argument("--temp-root", type=Path)
     p = sub.add_parser("verify-models"); _common(p)
     p = sub.add_parser("validate-dataset"); p.add_argument("--manifest", type=Path, required=True); p.add_argument("--root", type=Path, required=True)
     p = sub.add_parser("run-yunet"); _common(p); p.add_argument("--manifest", type=Path, required=True); p.add_argument("--root", type=Path, required=True); p.add_argument("--temp-root", type=Path, default=Path("/tmp/evaluation"))
@@ -32,7 +35,8 @@ def main(argv=None) -> int:
     args = parser.parse_args(argv)
     try:
         if args.command == "check-env":
-            check_environment(); print(json.dumps({"status": "ok", "python": platform.python_version()})); return 0
+            check_environment(args.model_dir, args.dataset_root, args.temp_root)
+            print(json.dumps({"status": "ok", "python": platform.python_version()})); return 0
         if args.command == "validate-dataset":
             check_environment(dataset_root=args.root)
             cases = load_dataset(args.manifest, args.root)

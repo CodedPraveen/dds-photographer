@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import platform
 import ipaddress
+import re
 from pathlib import Path
 
 
@@ -11,6 +12,7 @@ class IsolationError(RuntimeError):
 
 
 _FORBIDDEN = ("DATABASE_URL", "DIRECT_URL", "R2", "REDIS", "BULLMQ", "SUPABASE", "PRISMA")
+_CAPABILITY_FIELDS = ("CapEff", "CapPrm", "CapInh", "CapBnd", "CapAmb")
 
 
 def _read(proc_root: Path, name: str) -> str:
@@ -18,6 +20,15 @@ def _read(proc_root: Path, name: str) -> str:
         return (proc_root / name).read_text(encoding="utf-8")
     except OSError as exc:
         raise IsolationError(f"unable to read {name}") from exc
+
+
+def verify_capabilities(status: str) -> None:
+    for field in _CAPABILITY_FIELDS:
+        match = re.search(rf"^{field}:\s+([0-9A-Fa-f]+)\s*$", status, re.MULTILINE)
+        if match is None:
+            raise IsolationError(f"{field} is missing from process status")
+        if int(match.group(1), 16) != 0:
+            raise IsolationError(f"{field} is non-zero")
 
 
 def verify_ipv4_routes(text: str) -> None:
@@ -91,7 +102,8 @@ def check_environment(model_dir: Path | None = None, dataset_root: Path | None =
     verify_ipv4_routes(_read(proc_root, "net/route"))
     verify_ipv6_routes(_read(proc_root, "net/ipv6_route"))
     status = _read(proc_root, "self/status")
-    if getattr(os, "geteuid", lambda: -1)() == 0 or "CapEff:\t0000000000000000" not in status or "NoNewPrivs:\t1" not in status:
+    verify_capabilities(status)
+    if getattr(os, "geteuid", lambda: -1)() == 0 or "NoNewPrivs:\t1" not in status:
         raise IsolationError("process is not non-root with dropped capabilities and no-new-privileges")
     mountinfo = _read(proc_root, "self/mountinfo")
     root_options, _ = _mount_options(mountinfo, "/")
