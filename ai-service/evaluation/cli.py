@@ -12,7 +12,7 @@ from .cleanup import cleanup_run, cleanup_stale, create_run_dir
 from .dataset import DatasetError, load_dataset, validate_image
 from .isolation import IsolationError, check_environment
 from .metrics import latency_summary
-from .sface import SFaceBlocked
+from .sface import SFaceAdapter, SFaceBlocked, evaluate_pairs, load_pairs
 from .yunet import YuNetAdapter
 
 
@@ -31,7 +31,7 @@ def main(argv=None) -> int:
     p = sub.add_parser("verify-models"); _common(p)
     p = sub.add_parser("validate-dataset"); p.add_argument("--manifest", type=Path, required=True); p.add_argument("--root", type=Path, required=True)
     p = sub.add_parser("run-yunet"); _common(p); p.add_argument("--manifest", type=Path, required=True); p.add_argument("--root", type=Path, required=True); p.add_argument("--temp-root", type=Path, default=Path("/tmp/evaluation"))
-    p = sub.add_parser("run-sface"); _common(p); p.add_argument("--manifest", type=Path, required=True); p.add_argument("--root", type=Path, required=True)
+    p = sub.add_parser("run-sface"); _common(p); p.add_argument("--manifest", type=Path, required=True); p.add_argument("--root", type=Path, required=True); p.add_argument("--threshold", type=float, default=0.363)
     args = parser.parse_args(argv)
     try:
         if args.command == "check-env":
@@ -46,7 +46,13 @@ def main(argv=None) -> int:
             print(json.dumps({"status": "ok", "cases": len(cases)}))
             return 0
         if args.command == "run-sface":
-            raise SFaceBlocked("SFace evaluation is blocked until written licensing/provenance approval")
+            check_environment()
+            models = load_manifest(args.models)
+            sface_artifact = models.get("sface")
+            if sface_artifact is None:
+                raise SFaceBlocked("SFace artifact is missing from the model manifest")
+            from .sface import require_sface_approval
+            require_sface_approval(sface_artifact)
         check_environment(
             model_dir=getattr(args, "model_dir", None),
             dataset_root=getattr(args, "root", None),
@@ -62,6 +68,13 @@ def main(argv=None) -> int:
                     statuses.append({"id": artifact.id, "status": "failed", "error": str(exc)})
             print(json.dumps({"status": "ok", "models": statuses}))
             return 0 if all(item["status"] != "failed" for item in statuses) else 2
+        if args.command == "run-sface":
+            cases, pairs = load_pairs(args.manifest, args.root)
+            adapter = SFaceAdapter(models["sface"], args.model_dir)
+            detector = YuNetAdapter(models["yunet"], args.model_dir)
+            report = evaluate_pairs(cases, pairs, adapter, lambda image: detector.detect_faces(image)[0], args.threshold)
+            print(json.dumps({"status": "ok", **report}))
+            return 0
         cases = load_dataset(args.manifest, args.root)
         artifact = models["yunet"]; adapter = YuNetAdapter(artifact, args.model_dir)
         run_dir = create_run_dir(args.temp_root); cleanup_stale(args.temp_root)

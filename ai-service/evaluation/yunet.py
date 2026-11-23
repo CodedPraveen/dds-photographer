@@ -27,12 +27,22 @@ class YuNetAdapter:
         image = self.cv2.imread(str(image_path), self.cv2.IMREAD_COLOR)
         if image is None:
             raise YuNetError("invalid image")
+        return self.detect_image(image)
+
+    def detect_image(self, image):
+        if image is None or getattr(image, "ndim", 0) != 3 or image.shape[2] != 3:
+            raise YuNetError("invalid image")
+        started = time.perf_counter()
+        faces, latency = self.detect_faces(image)
+        count = 0 if faces is None else len(faces)
+        confidence = 0.0 if count == 0 else float(max(face[-1] for face in faces))
+        return count, confidence, latency
+
+    def detect_faces(self, image):
         height, width = image.shape[:2]
         self.detector.setInputSize((width, height))
         started = time.perf_counter()
         _, faces = self.detector.detect(image)
         latency = (time.perf_counter() - started) * 1000
-        count = 0 if faces is None else len(faces)
-        confidence = 0.0 if count == 0 else float(max(face[-1] for face in faces))
-        return count, confidence, latency
+        return faces, latency
 

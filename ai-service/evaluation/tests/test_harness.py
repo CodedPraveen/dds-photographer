@@ -8,7 +8,7 @@ from evaluation.artifacts import Artifact, ArtifactError, load_manifest, verify_
 from evaluation.cleanup import cleanup_run, cleanup_stale, create_run_dir
 from evaluation.dataset import DatasetError, load_dataset
 from evaluation.metrics import classification_metrics, latency_summary
-from evaluation.sface import SFaceBlocked, require_sface_approval
+from evaluation.sface import SFaceAdapter, SFaceBlocked, SFaceError, evaluate_pairs, load_pairs, require_sface_approval
 
 
 def digest(path):
@@ -53,6 +53,79 @@ def test_approved_artifact_requires_full_pinned_commit(tmp_path, source):
 def test_sface_gate_blocks_before_loading(tmp_path):
     artifact = Artifact("sface", Path("missing.onnx"), "v", "commit", "Apache-2.0", "1" * 64, "BLOCKED_LICENSING_PROVENANCE")
     with pytest.raises(SFaceBlocked): require_sface_approval(artifact)
+
+
+class FakeDnn:
+    DNN_BACKEND_OPENCV = 3
+    DNN_TARGET_CPU = 0
+
+
+class FakeRecognizer:
+    def __init__(self):
+        self.aligned = None
+
+    def alignCrop(self, image, detection):
+        self.aligned = (image, detection)
+        return image[:2, :2]
+
+    def feature(self, aligned):
+        return [[3.0, 4.0]]
+
+
+class FakeFaceRecognizerSF:
+    instance = FakeRecognizer()
+
+    @staticmethod
+    def create(*args):
+        return FakeFaceRecognizerSF.instance
+
+
+class FakeCv2:
+    FaceRecognizerSF = FakeFaceRecognizerSF
+    dnn = FakeDnn()
+
+
+def approved_sface(tmp_path):
+    model = tmp_path / "sface.onnx"; model.write_bytes(b"sface")
+    return Artifact("sface", Path("sface.onnx"), "v", "repo@0123456789abcdef0123456789abcdef01234567", "Apache-2.0", digest(model), "APPROVED")
+
+
+def test_sface_adapter_aligns_and_extracts_mocked_embedding(tmp_path):
+    import numpy as np
+    adapter = SFaceAdapter(approved_sface(tmp_path), tmp_path, FakeCv2)
+    embedding = adapter.extract_embedding(np.zeros((4, 4, 3), dtype=np.uint8), [1, 1, 2, 2, *([0.0] * 11)])
+    assert embedding.tolist() == [3.0, 4.0]
+    assert FakeFaceRecognizerSF.instance.aligned is not None
+    assert SFaceAdapter.cosine_similarity([1, 0], [1, 0]) == 1.0
+
+
+@pytest.mark.parametrize("image,detection", [(None, [[1] * 15]), ("bad", [[1] * 15]), (None, None)])
+def test_sface_adapter_rejects_invalid_inputs(tmp_path, image, detection):
+    adapter = SFaceAdapter(approved_sface(tmp_path), tmp_path, FakeCv2)
+    with pytest.raises(SFaceError): adapter.extract_embedding(image, detection)
+
+
+def test_sface_pair_manifest_and_aggregate_metrics(tmp_path):
+    import numpy as np
+    first = tmp_path / "a.jpg"; second = tmp_path / "b.jpg"
+    first.write_bytes(b"a"); second.write_bytes(b"b")
+    manifest = {"dataset_id": "synthetic", "dataset_type": "synthetic", "authorization": "authorized", "cases": [
+        {"id": "a", "path": "a.jpg", "sha256": digest(first), "expected_face_count": 1, "eligible": True},
+        {"id": "b", "path": "b.jpg", "sha256": digest(second), "expected_face_count": 1, "eligible": True}],
+        "pairs": [{"id": "p1", "left": "a", "right": "b", "same": True}]}
+    manifest_path = tmp_path / "pairs.json"; manifest_path.write_text(json.dumps(manifest))
+    cases, pairs = load_pairs(manifest_path, tmp_path)
+    adapter = SFaceAdapter(approved_sface(tmp_path), tmp_path, FakeCv2)
+    report = evaluate_pairs(cases, pairs, adapter, lambda _image: [[1, 1, 2, 2, *([0.0] * 11)]], image_loader=lambda _path: np.zeros((4, 4, 3), dtype=np.uint8))
+    assert report["pair_count"] == 1 and report["tp"] == 1 and report["threshold"] == 0.363
+
+
+def test_pair_manifest_rejects_duplicate_and_ineligible_references(tmp_path):
+    image = tmp_path / "a.jpg"; image.write_bytes(b"a")
+    base = {"dataset_id": "synthetic", "dataset_type": "synthetic", "authorization": "authorized", "cases": [{"id": "a", "path": "a.jpg", "sha256": digest(image), "expected_face_count": 1, "eligible": True}]}
+    for pairs in [[{"id": "p", "left": "a", "right": "a", "same": True}, {"id": "p", "left": "a", "right": "a", "same": True}], [{"id": "p", "left": "missing", "right": "a", "same": True}]]:
+        path = tmp_path / "pairs.json"; path.write_text(json.dumps({**base, "pairs": pairs}))
+        with pytest.raises(DatasetError): load_pairs(path, tmp_path)
 
 
 def test_dataset_rejects_traversal_and_unauthorized(tmp_path):
@@ -124,7 +197,9 @@ def test_cli_subcommands_do_not_require_unrelated_arguments(monkeypatch, tmp_pat
     dataset = {"dataset_id": "x", "dataset_type": "synthetic", "authorization": "authorized", "cases": [{"id": "minor", "path": "missing.jpg", "eligible": False, "exclusion": "minor"}]}
     manifest = tmp_path / "dataset.json"; manifest.write_text(json.dumps(dataset))
     assert cli.main(["validate-dataset", "--manifest", str(manifest), "--root", str(tmp_path)]) == 0
-    assert cli.main(["run-sface", "--manifest", str(manifest), "--root", str(tmp_path)]) == 2
+    models = tmp_path / "models.json"
+    models.write_text(json.dumps({"models": [{"id": "sface", "artifact": "missing.onnx", "version": "v", "source": "repo", "license": "Apache-2.0", "sha256": "", "approval": "BLOCKED_LICENSING_PROVENANCE"}]}))
+    assert cli.main(["run-sface", "--models", str(models), "--manifest", str(manifest), "--root", str(tmp_path)]) == 2
     assert "blocked" in capsys.readouterr().err
 
 
