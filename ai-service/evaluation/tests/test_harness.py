@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from evaluation.artifacts import Artifact, ArtifactError, load_manifest, verify_artifact
+from evaluation.artifacts import Artifact, ArtifactError, load_manifest, verify_artifact, verify_status
 from evaluation.cleanup import cleanup_run, cleanup_stale, create_run_dir
 from evaluation.dataset import DatasetError, load_dataset
 from evaluation.metrics import classification_metrics, latency_summary
@@ -23,6 +23,26 @@ def test_artifact_checksum_and_failure(tmp_path):
     with pytest.raises(ArtifactError): verify_artifact(bad, tmp_path)
 
 
+def test_blocked_manifest_entry_does_not_block_approved_entry(tmp_path):
+    model = tmp_path / "yunet.onnx"; model.write_bytes(b"model")
+    manifest = {
+        "models": [
+            {"id": "yunet", "artifact": "yunet.onnx", "version": "v", "source": "repo@commit", "license": "MIT", "sha256": digest(model), "approval": "APPROVED"},
+            {"id": "sface", "artifact": "sface.onnx", "version": "v", "source": "repo", "license": "Apache-2.0", "sha256": "", "approval": "BLOCKED_LICENSING_PROVENANCE"},
+        ]
+    }
+    path = tmp_path / "models.json"; path.write_text(json.dumps(manifest))
+    loaded = load_manifest(path)
+    assert verify_status(loaded["yunet"], tmp_path)["status"] == "verified"
+    assert verify_status(loaded["sface"], tmp_path)["status"] == "blocked"
+
+
+def test_manifest_fallback_does_not_eagerly_require_artifact_key(tmp_path):
+    path = tmp_path / "models.json"
+    path.write_text(json.dumps({"models": [{"id": "x", "path": "x.onnx", "version": "v", "source": "repo@commit", "license": "MIT", "sha256": "", "approval": "BLOCKED_UNVERIFIED_ARTIFACT"}]}))
+    assert load_manifest(path)["x"].path == Path("x.onnx")
+
+
 def test_sface_gate_blocks_before_loading(tmp_path):
     artifact = Artifact("sface", Path("missing.onnx"), "v", "commit", "Apache-2.0", "1" * 64, "BLOCKED_LICENSING_PROVENANCE")
     with pytest.raises(SFaceBlocked): require_sface_approval(artifact)
@@ -33,6 +53,41 @@ def test_dataset_rejects_traversal_and_unauthorized(tmp_path):
     base = {"dataset_id": "x", "dataset_type": "synthetic", "authorization": "authorized", "cases": []}
     (tmp_path / "m.json").write_text(json.dumps({**base, "cases": [{"id": "x", "path": "../image.bin", "sha256": digest(image), "eligible": True}]}))
     with pytest.raises(DatasetError): load_dataset(tmp_path / "m.json", tmp_path)
+
+
+def test_dataset_requires_boolean_and_validates_example_shape(tmp_path):
+    image = tmp_path / "face.jpg"; image.write_bytes(b"authorized-fixture")
+    manifest = {"dataset_id": "example", "dataset_type": "synthetic", "authorization": "authorized", "cases": [{"id": "face", "path": "face.jpg", "sha256": digest(image), "expected_face_count": 1, "eligible": True}]}
+    path = tmp_path / "m.json"; path.write_text(json.dumps(manifest))
+    assert load_dataset(path, tmp_path)[0]["id"] == "face"
+    manifest["cases"][0]["eligible"] = "true"
+    path.write_text(json.dumps(manifest))
+    with pytest.raises(DatasetError): load_dataset(path, tmp_path)
+
+
+def test_excluded_cases_never_open_or_stat_files(tmp_path):
+    manifest = {"dataset_id": "x", "dataset_type": "synthetic", "authorization": "authorized", "cases": [{"id": "minor", "path": "missing.jpg", "eligible": False, "exclusion": "minor"}]}
+    path = tmp_path / "m.json"; path.write_text(json.dumps(manifest))
+    assert load_dataset(path, tmp_path)[0]["_path"] is None
+
+
+def test_ipv4_and_ipv6_route_fixtures():
+    from evaluation.isolation import IsolationError, verify_ipv4_routes, verify_ipv6_routes
+    ipv4 = "Iface Destination Gateway Flags RefCnt Use Metric Mask MTU Window IRTT\nlo 0000007F 00000000 0001 0 0 0 000000FF 0 0 0 0"
+    ipv6 = "0" * 32 + " 80 " + "0" * 32 + " 00 " + "0" * 32 + " 00000000 00000000 00000000 00000000 lo"
+    verify_ipv4_routes(ipv4); verify_ipv6_routes(ipv6)
+    with pytest.raises(IsolationError): verify_ipv4_routes(ipv4.replace("lo ", "eth0 "))
+    with pytest.raises(IsolationError): verify_ipv6_routes(ipv6.replace(" lo", " eth0"))
+
+
+def test_cli_subcommands_do_not_require_unrelated_arguments(monkeypatch, tmp_path, capsys):
+    from evaluation import cli
+    monkeypatch.setattr(cli, "check_environment", lambda **kwargs: None)
+    dataset = {"dataset_id": "x", "dataset_type": "synthetic", "authorization": "authorized", "cases": [{"id": "minor", "path": "missing.jpg", "eligible": False, "exclusion": "minor"}]}
+    manifest = tmp_path / "dataset.json"; manifest.write_text(json.dumps(dataset))
+    assert cli.main(["validate-dataset", "--manifest", str(manifest), "--root", str(tmp_path)]) == 0
+    assert cli.main(["run-sface", "--manifest", str(manifest), "--root", str(tmp_path)]) == 2
+    assert "blocked" in capsys.readouterr().err
 
 
 def test_exclusion_is_validated_without_image_processing(tmp_path):

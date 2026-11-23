@@ -22,27 +22,40 @@ class Artifact:
 
 
 def load_manifest(path: Path) -> dict[str, Artifact]:
-    raw = json.loads(path.read_text(encoding="utf-8"))
+    try:
+        raw = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ArtifactError("invalid model manifest JSON") from exc
     models = raw.get("models")
     if not isinstance(models, list):
         raise ArtifactError("model manifest requires a models array")
     result = {}
     for item in models:
+        if not isinstance(item, dict):
+            raise ArtifactError("invalid model manifest entry")
         try:
+            artifact_path = item.get("path")
+            if artifact_path is None:
+                artifact_path = item["artifact"]
             artifact = Artifact(
-                id=item["id"], path=Path(item.get("path", item["artifact"])),
+                id=item["id"], path=Path(artifact_path),
                 version=item["version"], source=item["source"],
                 license=item["license"], sha256=item["sha256"].lower(),
                 approval=item["approval"],
             )
         except (KeyError, TypeError) as exc:
             raise ArtifactError("invalid model manifest entry") from exc
-        if artifact.id in result or not artifact.sha256 or len(artifact.sha256) != 64:
-            raise ArtifactError(f"invalid or missing checksum for {artifact.id}")
-        if any(c not in "0123456789abcdef" for c in artifact.sha256):
-            raise ArtifactError(f"invalid checksum for {artifact.id}")
-        if "IMMUTABLE_COMMIT_REQUIRED" in artifact.source:
-            raise ArtifactError(f"immutable source required for {artifact.id}")
+        if artifact.id in result:
+            raise ArtifactError(f"duplicate model id: {artifact.id}")
+        if not artifact.id or not artifact.version or not artifact.source or not artifact.license:
+            raise ArtifactError(f"incomplete model metadata for {artifact.id}")
+        if artifact.approval == "APPROVED":
+            if len(artifact.sha256) != 64 or any(c not in "0123456789abcdef" for c in artifact.sha256):
+                raise ArtifactError(f"approved artifact has invalid checksum: {artifact.id}")
+            if "IMMUTABLE_COMMIT_REQUIRED" in artifact.source:
+                raise ArtifactError(f"approved artifact requires immutable source: {artifact.id}")
+        elif artifact.approval not in {"BLOCKED_UNVERIFIED_ARTIFACT", "BLOCKED_LICENSING_PROVENANCE"}:
+            raise ArtifactError(f"unknown approval state for {artifact.id}")
         result[artifact.id] = artifact
     return result
 
@@ -71,4 +84,11 @@ def verify_artifact(artifact: Artifact, model_dir: Path) -> Path:
 def require_approved(artifact: Artifact) -> None:
     if artifact.approval != "APPROVED":
         raise ArtifactError(f"{artifact.id} is not approved: {artifact.approval}")
+
+
+def verify_status(artifact: Artifact, model_dir: Path) -> dict:
+    if artifact.approval != "APPROVED":
+        return {"id": artifact.id, "status": "blocked", "approval": artifact.approval}
+    path = verify_artifact(artifact, model_dir)
+    return {"id": artifact.id, "status": "verified", "approval": artifact.approval, "path": str(path)}
 

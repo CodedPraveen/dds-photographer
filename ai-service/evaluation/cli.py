@@ -7,7 +7,7 @@ import platform
 import sys
 from pathlib import Path
 
-from .artifacts import ArtifactError, load_manifest, require_approved, verify_artifact
+from .artifacts import ArtifactError, load_manifest, verify_status
 from .cleanup import cleanup_run, cleanup_stale, create_run_dir
 from .dataset import DatasetError, load_dataset, validate_image
 from .isolation import IsolationError, check_environment
@@ -33,19 +33,32 @@ def main(argv=None) -> int:
     try:
         if args.command == "check-env":
             check_environment(); print(json.dumps({"status": "ok", "python": platform.python_version()})); return 0
-        check_environment()
-        models = load_manifest(args.models)
-        if args.command == "verify-models":
-            for artifact in models.values():
-                require_approved(artifact); verify_artifact(artifact, args.model_dir)
-            print(json.dumps({"status": "ok", "models": list(models)})); return 0
+        if args.command == "validate-dataset":
+            check_environment(dataset_root=args.root)
+            cases = load_dataset(args.manifest, args.root)
+            for case in cases:
+                if case["eligible"]:
+                    validate_image(case["_path"])
+            print(json.dumps({"status": "ok", "cases": len(cases)}))
+            return 0
         if args.command == "run-sface":
             raise SFaceBlocked("SFace evaluation is blocked until written licensing/provenance approval")
+        check_environment(
+            model_dir=getattr(args, "model_dir", None),
+            dataset_root=getattr(args, "root", None),
+            temp_root=getattr(args, "temp_root", None),
+        )
+        models = load_manifest(args.models) if args.command in {"verify-models", "run-yunet", "run-sface"} else {}
+        if args.command == "verify-models":
+            statuses = []
+            for artifact in models.values():
+                try:
+                    statuses.append(verify_status(artifact, args.model_dir))
+                except ArtifactError as exc:
+                    statuses.append({"id": artifact.id, "status": "failed", "error": str(exc)})
+            print(json.dumps({"status": "ok", "models": statuses}))
+            return 0 if all(item["status"] != "failed" for item in statuses) else 2
         cases = load_dataset(args.manifest, args.root)
-        if args.command == "validate-dataset":
-            for case in cases:
-                if case["eligible"]: validate_image(case["_path"])
-            print(json.dumps({"status": "ok", "cases": len(cases)})); return 0
         artifact = models["yunet"]; adapter = YuNetAdapter(artifact, args.model_dir)
         run_dir = create_run_dir(args.temp_root); cleanup_stale(args.temp_root)
         try:
