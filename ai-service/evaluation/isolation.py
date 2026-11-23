@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import platform
+import ipaddress
 from pathlib import Path
 
 
@@ -30,10 +31,18 @@ def verify_ipv4_routes(text: str) -> None:
         if fields[0] != "lo":
             raise IsolationError("external IPv4 route present")
         try:
-            int(fields[1], 16)
-            int(fields[7], 16)
+            destination = ipaddress.IPv4Address(int.from_bytes(bytes.fromhex(fields[1]), "little"))
+            gateway = int(fields[2], 16)
+            mask_int = int.from_bytes(bytes.fromhex(fields[7]), "little")
+            mask_bits = f"{mask_int:032b}"
+            if "01" in mask_bits:
+                raise ValueError("non-contiguous IPv4 mask")
+            prefix = mask_bits.count("1")
+            network = ipaddress.IPv4Network((destination, prefix), strict=False)
         except ValueError as exc:
             raise IsolationError("invalid IPv4 route value") from exc
+        if gateway != 0 or not network.subnet_of(ipaddress.IPv4Network("127.0.0.0/8")):
+            raise IsolationError("non-loopback IPv4 destination present")
 
 
 def verify_ipv6_routes(text: str) -> None:
@@ -44,10 +53,12 @@ def verify_ipv6_routes(text: str) -> None:
         if fields[-1] != "lo":
             raise IsolationError("external IPv6 route present")
         try:
-            int(fields[0], 16)
-            int(fields[1], 16)
+            destination = ipaddress.IPv6Address(int(fields[0], 16))
+            prefix = int(fields[1], 16)
         except ValueError as exc:
             raise IsolationError("invalid IPv6 route value") from exc
+        if destination != ipaddress.IPv6Address("::1") or prefix != 128:
+            raise IsolationError("non-loopback IPv6 destination present")
 
 
 def _mount_options(mountinfo: str, mountpoint: str) -> tuple[set[str], set[str]]:
@@ -80,19 +91,19 @@ def check_environment(model_dir: Path | None = None, dataset_root: Path | None =
     verify_ipv4_routes(_read(proc_root, "net/route"))
     verify_ipv6_routes(_read(proc_root, "net/ipv6_route"))
     status = _read(proc_root, "self/status")
-    if os.geteuid() == 0 or "CapEff:\t0000000000000000" not in status or "NoNewPrivs:\t1" not in status:
+    if getattr(os, "geteuid", lambda: -1)() == 0 or "CapEff:\t0000000000000000" not in status or "NoNewPrivs:\t1" not in status:
         raise IsolationError("process is not non-root with dropped capabilities and no-new-privileges")
     mountinfo = _read(proc_root, "self/mountinfo")
     root_options, _ = _mount_options(mountinfo, "/")
     if "ro" not in root_options:
         raise IsolationError("root filesystem is not read-only")
     if temp_root is not None:
-        temp_options, temp_super = _mount_options(mountinfo, str(temp_root))
+        temp_options, temp_super = _mount_options(mountinfo, str(Path(temp_root).resolve()))
         if not {"noexec", "nosuid"}.issubset(temp_options | temp_super) or not any(x.startswith("size=") for x in temp_super):
             raise IsolationError("temporary storage is not restricted")
     for path in (model_dir, dataset_root):
         if path is not None:
-            options, _ = _mount_options(mountinfo, str(path))
+            options, _ = _mount_options(mountinfo, str(Path(path).resolve()))
             if "ro" not in options:
                 raise IsolationError(f"mount is not read-only: {path}")
 

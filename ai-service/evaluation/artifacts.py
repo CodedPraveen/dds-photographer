@@ -2,12 +2,16 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from dataclasses import dataclass
 from pathlib import Path
 
 
 class ArtifactError(ValueError):
     pass
+
+
+_FULL_COMMIT = re.compile(r"@[0-9a-fA-F]{40}(?:$|[/#])")
 
 
 @dataclass(frozen=True)
@@ -52,8 +56,8 @@ def load_manifest(path: Path) -> dict[str, Artifact]:
         if artifact.approval == "APPROVED":
             if len(artifact.sha256) != 64 or any(c not in "0123456789abcdef" for c in artifact.sha256):
                 raise ArtifactError(f"approved artifact has invalid checksum: {artifact.id}")
-            if "IMMUTABLE_COMMIT_REQUIRED" in artifact.source:
-                raise ArtifactError(f"approved artifact requires immutable source: {artifact.id}")
+            if not _FULL_COMMIT.search(artifact.source):
+                raise ArtifactError(f"approved artifact requires a pinned full Git commit SHA: {artifact.id}")
         elif artifact.approval not in {"BLOCKED_UNVERIFIED_ARTIFACT", "BLOCKED_LICENSING_PROVENANCE"}:
             raise ArtifactError(f"unknown approval state for {artifact.id}")
         result[artifact.id] = artifact

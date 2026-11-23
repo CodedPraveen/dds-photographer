@@ -27,7 +27,7 @@ def test_blocked_manifest_entry_does_not_block_approved_entry(tmp_path):
     model = tmp_path / "yunet.onnx"; model.write_bytes(b"model")
     manifest = {
         "models": [
-            {"id": "yunet", "artifact": "yunet.onnx", "version": "v", "source": "repo@commit", "license": "MIT", "sha256": digest(model), "approval": "APPROVED"},
+            {"id": "yunet", "artifact": "yunet.onnx", "version": "v", "source": "repo@0123456789abcdef0123456789abcdef01234567", "license": "MIT", "sha256": digest(model), "approval": "APPROVED"},
             {"id": "sface", "artifact": "sface.onnx", "version": "v", "source": "repo", "license": "Apache-2.0", "sha256": "", "approval": "BLOCKED_LICENSING_PROVENANCE"},
         ]
     }
@@ -41,6 +41,13 @@ def test_manifest_fallback_does_not_eagerly_require_artifact_key(tmp_path):
     path = tmp_path / "models.json"
     path.write_text(json.dumps({"models": [{"id": "x", "path": "x.onnx", "version": "v", "source": "repo@commit", "license": "MIT", "sha256": "", "approval": "BLOCKED_UNVERIFIED_ARTIFACT"}]}))
     assert load_manifest(path)["x"].path == Path("x.onnx")
+
+
+@pytest.mark.parametrize("source", ["main", "latest", "commit", "repo@IMMUTABLE_COMMIT_REQUIRED", "repo@0123456789abcdef"])
+def test_approved_artifact_requires_full_pinned_commit(tmp_path, source):
+    path = tmp_path / "models.json"
+    path.write_text(json.dumps({"models": [{"id": "x", "artifact": "x.onnx", "version": "v", "source": source, "license": "MIT", "sha256": "1" * 64, "approval": "APPROVED"}]}))
+    with pytest.raises(ArtifactError): load_manifest(path)
 
 
 def test_sface_gate_blocks_before_loading(tmp_path):
@@ -74,10 +81,23 @@ def test_excluded_cases_never_open_or_stat_files(tmp_path):
 def test_ipv4_and_ipv6_route_fixtures():
     from evaluation.isolation import IsolationError, verify_ipv4_routes, verify_ipv6_routes
     ipv4 = "Iface Destination Gateway Flags RefCnt Use Metric Mask MTU Window IRTT\nlo 0000007F 00000000 0001 0 0 0 000000FF 0 0 0 0"
-    ipv6 = "0" * 32 + " 80 " + "0" * 32 + " 00 " + "0" * 32 + " 00000000 00000000 00000000 00000000 lo"
+    ipv6 = "0" * 31 + "1" + " 80 " + "0" * 32 + " 00 " + "0" * 32 + " 00000000 00000000 00000000 00000000 lo"
     verify_ipv4_routes(ipv4); verify_ipv6_routes(ipv6)
     with pytest.raises(IsolationError): verify_ipv4_routes(ipv4.replace("lo ", "eth0 "))
     with pytest.raises(IsolationError): verify_ipv6_routes(ipv6.replace(" lo", " eth0"))
+    with pytest.raises(IsolationError): verify_ipv4_routes(ipv4.replace("0000007F", "00000000"))
+    with pytest.raises(IsolationError): verify_ipv6_routes(ipv6.replace("0" * 31 + "1", "0" * 32))
+
+
+def test_default_relative_model_path_is_resolved_before_mount_check(monkeypatch, tmp_path):
+    from evaluation import isolation
+    seen = []
+    monkeypatch.setattr(isolation, "_mount_options", lambda _text, mountpoint: (seen.append(mountpoint) or ({"ro"}, {"size=1M", "noexec", "nosuid"})))
+    monkeypatch.setattr(isolation, "_read", lambda _root, name: "Iface Destination Gateway Flags RefCnt Use Metric Mask MTU Window IRTT\nlo 0000007F 00000000 0001 0 0 0 000000FF 0 0 0 0" if name == "net/route" else ("" if name == "net/ipv6_route" else "CapEff:\t0000000000000000\nNoNewPrivs:\t1" if name == "self/status" else ""))
+    monkeypatch.setattr(isolation.platform, "system", lambda: "Linux")
+    monkeypatch.setenv("DDS_EVALUATION_ISOLATED", "1")
+    isolation.check_environment(Path("models"), Path("dataset"), Path("/tmp/evaluation"), tmp_path)
+    assert str(Path("models").resolve()) in seen
 
 
 def test_cli_subcommands_do_not_require_unrelated_arguments(monkeypatch, tmp_path, capsys):
