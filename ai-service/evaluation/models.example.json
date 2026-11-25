@@ -1,0 +1,23 @@
+{
+  "models": [
+    {
+      "id": "yunet",
+      "artifact": "face_detection_yunet_2023mar.onnx",
+      "version": "2023mar",
+      "source": "opencv_zoo@IMMUTABLE_COMMIT_REQUIRED/models/face_detection_yunet",
+      "license": "MIT",
+      "sha256": "",
+      "approval": "BLOCKED_UNVERIFIED_ARTIFACT"
+    },
+    {
+      "id": "sface",
+      "artifact": "face_recognition_sface_2021dec.onnx",
+      "version": "2021dec",
+      "source": "opencv_zoo@IMMUTABLE_COMMIT_REQUIRED/models/face_recognition_sface",
+      "license": "Apache-2.0",
+      "sha256": "",
+      "approval": "BLOCKED_LICENSING_PROVENANCE"
+    }
+  ]
+}
+

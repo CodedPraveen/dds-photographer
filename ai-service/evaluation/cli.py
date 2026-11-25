@@ -1,0 +1,125 @@
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import platform
+import sys
+import time
+from pathlib import Path
+
+from .artifacts import ArtifactError, load_manifest, require_approved, verify_artifact, verify_status
+from .cleanup import cleanup_run, cleanup_stale, create_run_dir
+from .dataset import DatasetError, load_dataset, validate_image
+from .isolation import IsolationError, check_environment
+from .metrics import latency_summary
+from .sface import SFaceAdapter, SFaceBlocked, SFaceError, evaluate_pairs, load_pairs
+from .yunet import YuNetAdapter, YuNetError
+
+
+def _common(parser):
+    parser.add_argument("--models", type=Path, default=Path("models.json"))
+    parser.add_argument("--model-dir", type=Path, default=Path("models"))
+
+
+def main(argv=None) -> int:
+    parser = argparse.ArgumentParser(description="DDS isolated CPU-only model evaluation; no downloads, DB, storage, or HTTP server. Windows: $env:DDS_EVALUATION_ISOLATED='1'; python -m evaluation.cli check-env")
+    sub = parser.add_subparsers(dest="command", required=True)
+    p = sub.add_parser("check-env")
+    p.add_argument("--model-dir", type=Path)
+    p.add_argument("--dataset-root", type=Path)
+    p.add_argument("--temp-root", type=Path)
+    p = sub.add_parser("verify-models"); _common(p)
+    p = sub.add_parser("validate-dataset"); p.add_argument("--manifest", type=Path, required=True); p.add_argument("--root", type=Path, required=True)
+    p = sub.add_parser("run-yunet"); _common(p); p.add_argument("--manifest", type=Path, required=True); p.add_argument("--root", type=Path, required=True); p.add_argument("--temp-root", type=Path, default=Path("/tmp/evaluation"))
+    p = sub.add_parser("run-sface"); _common(p); p.add_argument("--manifest", type=Path, required=True); p.add_argument("--root", type=Path, required=True); p.add_argument("--threshold", type=float, default=0.363)
+    args = parser.parse_args(argv)
+    try:
+        if args.command == "check-env":
+            check_environment(args.model_dir, args.dataset_root, args.temp_root)
+            print(json.dumps({"status": "ok", "python": platform.python_version()})); return 0
+        if args.command == "validate-dataset":
+            check_environment(dataset_root=args.root)
+            cases = load_dataset(args.manifest, args.root)
+            for case in cases:
+                if case["eligible"]:
+                    validate_image(case["_path"])
+            print(json.dumps({"status": "ok", "cases": len(cases)}))
+            return 0
+        if args.command == "run-sface":
+            check_environment()
+            models = load_manifest(args.models)
+            sface_artifact = models.get("sface")
+            if sface_artifact is None:
+                raise SFaceBlocked("SFace artifact is missing from the model manifest")
+            from .sface import require_sface_approval
+            require_sface_approval(sface_artifact)
+        check_environment(
+            model_dir=getattr(args, "model_dir", None),
+            dataset_root=getattr(args, "root", None),
+            temp_root=getattr(args, "temp_root", None),
+        )
+        models = load_manifest(args.models) if args.command in {"verify-models", "run-yunet", "run-sface"} else {}
+        if args.command == "verify-models":
+            statuses = []
+            for artifact in models.values():
+                try:
+                    statuses.append(verify_status(artifact, args.model_dir))
+                except ArtifactError as exc:
+                    statuses.append({"id": artifact.id, "status": "failed", "error": str(exc)})
+            print(json.dumps({"status": "ok", "models": statuses}))
+            return 0 if all(item["status"] != "failed" for item in statuses) else 2
+        if args.command == "run-sface":
+            yunet_artifact = models.get("yunet")
+            if yunet_artifact is None:
+                raise YuNetError("YuNet artifact is missing from the model manifest")
+            require_approved(yunet_artifact)
+            verify_artifact(yunet_artifact, args.model_dir)
+            verify_artifact(models["sface"], args.model_dir)
+            cases, pairs = load_pairs(args.manifest, args.root)
+            adapter = SFaceAdapter(models["sface"], args.model_dir)
+            detector = YuNetAdapter(models["yunet"], args.model_dir)
+            started = time.perf_counter()
+            report = evaluate_pairs(cases, pairs, adapter, lambda image: detector.detect_faces(image)[0], args.threshold)
+            report["model_load_ms"] = adapter.model_load_ms + detector.model_load_ms
+            report["evaluation_latency_ms"] = (time.perf_counter() - started) * 1000
+            print(json.dumps({"status": "ok", **report}))
+            return 0
+        cases = load_dataset(args.manifest, args.root)
+        artifact = models["yunet"]; adapter = YuNetAdapter(artifact, args.model_dir)
+        cleanup_stale(args.temp_root)
+        run_dir = create_run_dir(args.temp_root)
+        report = None
+        try:
+            eligible = [case for case in cases if case["eligible"]]
+            results = [adapter.detect(case["_path"]) for case in eligible]
+            expected = [int(case.get("expected_face_count", -1)) for case in eligible]
+            actual = [result[0] for result in results]
+            report = {
+                "run_id": run_dir.name,
+                "model": {"id": artifact.id, "version": artifact.version, "sha256": artifact.sha256},
+                "dataset_id": json.loads(args.manifest.read_text(encoding="utf-8"))["dataset_id"],
+                "case_count": len(eligible),
+                "detected_count": sum(count == 1 for count in actual),
+                "expected_count_matches": sum(a == e for a, e in zip(actual, expected)),
+                "false_detection_cases": sum(e == 0 and a > 0 for a, e in zip(actual, expected)),
+                "missed_detection_cases": sum(e > 0 and a == 0 for a, e in zip(actual, expected)),
+                "confidence": {"max": max((result[1] for result in results), default=None)},
+                "latency": latency_summary([result[2] for result in results]),
+                "model_load_ms": adapter.model_load_ms,
+            }
+            cleanup_ok = cleanup_run(run_dir)
+            report["cleanup_status"] = "complete" if cleanup_ok else "failed"
+            print(json.dumps(report)); return 0 if cleanup_ok else 2
+        finally:
+            # cleanup_run is idempotent; retry only if processing failed before
+            # the normal cleanup point, never by rewriting a pending report.
+            if run_dir.exists():
+                cleanup_run(run_dir)
+    except (IsolationError, ArtifactError, DatasetError, SFaceBlocked, SFaceError, YuNetError, KeyError) as exc:
+        print(json.dumps({"status": "blocked", "error": str(exc)}), file=sys.stderr); return 2
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+
